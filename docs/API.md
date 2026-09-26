@@ -21,8 +21,9 @@
 - Даты и время: ISO 8601, UTC (`2026-09-28T10:00:00Z`). Даты без времени — `2026-09-28`.
 - Ошибки: тело `{"detail": "текст ошибки"}`. Текст — по-русски, его можно
   показывать пользователю как есть.
-- Значения атрибутов одежды (`category`, `color`, `warmth`, `style`, `season`,
-  `water_resistance`) — строки с машинными именами из `docs/attributes.md`.
+- Значения атрибутов одежды берутся из `docs/attributes.md`: `category`, `color`,
+  `style` — строки с машинными именами, `warmth` — число 1–5, `season` — список
+  строк (у вещи может быть несколько сезонов), `water_resistance` — `true`/`false`.
   Списки допустимых значений фронт **не хардкодит**, а берёт из `GET /attributes`.
 - Все объекты, у которых есть владелец, отдаются только владельцу. Запрос
   чужой вещи или комплекта — `403`.
@@ -91,7 +92,7 @@
   "lon": 30.3141,
   "preferences": {
     "style": "casual",
-    "liked_colors": ["black", "grey"],
+    "liked_colors": ["black", "gray"],
     "disliked_colors": ["yellow"]
   },
   "onboarding_completed": true,
@@ -125,12 +126,12 @@
 {
   "id": 42,
   "name": "Серый свитер",
-  "category": "sweater",
-  "color": "grey",
+  "category": "top",
+  "color": "gray",
   "warmth": 3,
   "style": "casual",
-  "season": "demi",
-  "water_resistance": "none",
+  "season": ["demi", "winter"],
+  "water_resistance": false,
   "photo": { "id": 17, "url": "/media/photos/17.jpg" },
   "created_at": "2026-10-15T12:00:00Z",
   "updated_at": "2026-10-15T12:00:00Z"
@@ -139,10 +140,11 @@
 
 - `name` — как вещь называется в интерфейсе и в тексте объяснения. Обязательно, до 100 символов.
 - `category`, `color`, `warmth` — обязательны, без них движок вещь не видит.
-- `style`, `season`, `water_resistance` — необязательны. Значения по умолчанию
-  и то, как движок трактует их отсутствие, задаёт справочник (Настя).
-- Тип `warmth` (число по шкале или строка-уровень) — как решит справочник.
-  Здесь показано число, поправим, если будет иначе.
+- `style`, `season`, `water_resistance` — необязательны. Отсутствие трактуется
+  по справочнику: без `style` вещь подходит под любой стиль, пустой `season` —
+  всесезонная, `water_resistance` по умолчанию `false`. В ответе поля есть всегда:
+  `style: null`, `season: []`, `water_resistance: false`.
+- `warmth` — число 1–5 по шкале из справочника.
 - `photo` — `null`, если фото нет.
 
 ### Weather
@@ -183,7 +185,9 @@
 }
 ```
 
-- `items` — вещи из гардероба пользователя, по одной на слой.
+- `items` — вещи из гардероба пользователя, по одной на категорию: верх (или
+  платье), низ, при необходимости верхняя одежда и обувь. Подслоёв нет — см.
+  `category` в справочнике.
 - `explanation` — текст от движка. Обязательное поле, не пустое.
 - `missing` — категории, которых не хватило в гардеробе для этой погоды
   (например, `["outerwear"]`). Пустой список — всё нашлось. На этапе 5 сюда
@@ -298,7 +302,7 @@
   "city": "Санкт-Петербург",
   "preferences": {
     "style": "casual",
-    "liked_colors": ["black", "grey"],
+    "liked_colors": ["black", "gray"],
     "disliked_colors": ["yellow"]
   }
 }
@@ -334,29 +338,31 @@
 ```json
 {
   "category": [
-    { "value": "sweater", "label": "Свитер" },
-    { "value": "jeans", "label": "Джинсы" }
+    { "value": "top", "label": "Верх" },
+    { "value": "bottom", "label": "Низ" }
   ],
   "color": [
-    { "value": "grey", "label": "Серый" }
+    { "value": "gray", "label": "Серый" }
   ],
   "warmth": [
-    { "value": 1, "label": "Лёгкая" }
+    { "value": 1, "label": "Очень лёгкая" }
   ],
   "style": [
-    { "value": "casual", "label": "Повседневный" }
+    { "value": "casual", "label": "Повседневное" }
   ],
   "season": [
     { "value": "demi", "label": "Демисезон" }
   ],
   "water_resistance": [
-    { "value": "none", "label": "Нет" }
+    { "value": true, "label": "Да" },
+    { "value": false, "label": "Нет" }
   ]
 }
 ```
 
-Значения в примере условные — настоящие появятся в `attributes.md`. Формат
-`{value, label}` фиксирован: `value` уходит в запросы, `label` показываем человеку.
+В примере по одному-два значения на атрибут, полный список — в `attributes.md`.
+Формат `{value, label}` фиксирован: `value` уходит в запросы, `label` показываем
+человеку. `value` у `warmth` — число, у `water_resistance` — булево, остальные — строки.
 
 ---
 
@@ -401,7 +407,7 @@ Query-параметры:
 |---|---|---|---|
 | category | string | нет | Значение из справочника `category` |
 | color | string | нет | Значение из справочника `color` |
-| season | string | нет | Значение из справочника `season` |
+| season | string | нет | Значение из справочника `season`; вещь подходит, если этот сезон есть в её списке |
 
 Ответ `200`:
 
@@ -423,17 +429,18 @@ Query-параметры:
 ```json
 {
   "name": "Серый свитер",
-  "category": "sweater",
-  "color": "grey",
+  "category": "top",
+  "color": "gray",
   "warmth": 3,
   "style": "casual",
-  "season": "demi",
-  "water_resistance": "none",
+  "season": ["demi", "winter"],
+  "water_resistance": false,
   "photo_id": 17
 }
 ```
 
-Обязательные: `name`, `category`, `color`, `warmth`. Остальные можно не передавать.
+Обязательные: `name`, `category`, `color`, `warmth`. Остальные можно не передавать
+(см. Item — что значит их отсутствие).
 `photo_id` — из ответа `POST /photos`; можно не передавать, вещь будет без фото.
 
 Ответ `201`: объект Item.
@@ -591,8 +598,8 @@ Query: `from`, `to` — даты `YYYY-MM-DD`, необязательные. П�
 
 ```json
 {
-  "category": { "value": "sweater", "confidence": 0.81 },
-  "color": { "value": "grey", "confidence": 0.93 }
+  "category": { "value": "top", "confidence": 0.81 },
+  "color": { "value": "gray", "confidence": 0.93 }
 }
 ```
 
