@@ -21,8 +21,10 @@
 | id | serial | PK | |
 | email | text | unique, not null | |
 | password_hash | text | not null | Пароль в открытом виде не хранится никогда |
+| password_changed_at | timestamptz | | когда пароль меняли через сброс; токены, выданные раньше, бэк не принимает. `null` — не меняли |
+| name | text | | как обращаться, до 50 символов; `null` — не указано |
 | city | text | | название города; `null`, пока пользователь не указал |
-| lat | numeric | | координаты из геокодера Open-Meteo, заполняет бэк |
+| lat | numeric | | координаты города, округлены до 2 знаков; заполняет бэк (геокодер Open-Meteo, Nominatim или подсказка `GET /geo/cities`) |
 | lon | numeric | | |
 | style | text | | значение из attributes.md: style; `null` — не выбран |
 | liked_colors | text[] | not null, default '{}' | значения из attributes.md: color |
@@ -30,7 +32,22 @@
 | created_at | timestamptz | not null, default now() | |
 | updated_at | timestamptz | not null, default now() | |
 
-`onboarding_completed` из объекта User не хранится — вычисляется: `city` и `style` не `null`. Объект `preferences` в API — это `style`, `liked_colors`, `disliked_colors`.
+`onboarding_completed` из объекта User не хранится — вычисляется: `city` не `null`. Стиль и цвета в онбординге можно пропустить.
+
+### password_reset_tokens
+
+Одноразовые токены для «Забыли пароль?». Хранится хеш токена, а не сам токен: если базу кто-то прочитает, по хешу сбросить чужой пароль нельзя — как с паролями.
+
+| Поле | Тип | Ограничения | Описание |
+|---|---|---|---|
+| id | serial | PK | |
+| user_id | int | FK → users.id, on delete cascade, not null | |
+| token_hash | text | unique, not null | SHA-256 от токена из письма |
+| expires_at | timestamptz | not null | `created_at` + 60 минут |
+| used_at | timestamptz | | когда использован; `null` — ещё нет |
+| created_at | timestamptz | not null, default now() | для лимита «не чаще раза в минуту» |
+
+Токен рабочий, если `used_at` пустой и `expires_at` в будущем. Новый запрос сброса помечает все прошлые рабочие токены пользователя использованными. Объект `preferences` в API — это `style`, `liked_colors`, `disliked_colors`.
 
 ### photos
 
@@ -91,6 +108,7 @@
 | feels_like | numeric | not null | минимальная «ощущается как» за светлое время |
 | wind_speed | numeric | not null | м/с |
 | precipitation | numeric | not null | мм за день |
+| precipitation_probability | int | 0–100 | вероятность осадков за день, %; `null` — Open-Meteo не отдал |
 | condition | text | not null | `clear`, `cloudy`, `rain`, `snow` — сводится из кодов Open-Meteo на бэке |
 | fetched_at | timestamptz | not null, default now() | момент запроса к Open-Meteo |
 
@@ -98,21 +116,24 @@
 
 ### outfits
 
-Комплекты. На день у пользователя может быть несколько: каждый «другой вариант» — новый комплект, старый помечается отклонённым. Текущий комплект дня — последний по `created_at`.
+Комплекты. На день у пользователя может быть несколько вариантов (не больше лимита из настроек бэка, по умолчанию 3): каждый «другой вариант» — новый комплект. Все варианты хранятся, один из них выбран — это комплект дня, он же попадает в историю.
 
 | Поле | Тип | Ограничения | Описание |
 |---|---|---|---|
 | id | serial | PK | |
 | user_id | int | FK → users.id, not null | |
 | date | date | not null | день, на который собран комплект |
+| variant | int | not null, ≥ 1 | номер варианта за день: 1, 2, 3 |
+| selected | boolean | not null, default false | выбран как комплект дня |
 | weather_record_id | int | FK → weather_records.id, not null | погода, на которой собран |
 | explanation | text | not null | текстовое объяснение выбора движка |
 | missing | text[] | not null, default '{}' | категории, которых не хватило в гардеробе |
-| rejected | boolean | not null, default false | `true` после «другой вариант» |
 | rating | text | | `like` / `dislike`; `null` — не оценён |
 | worn | boolean | not null, default false | надел ли комплект |
 | feedback_at | timestamptz | | когда оценили; `null` — не оценён, тогда в API `feedback: null` |
 | created_at | timestamptz | not null, default now() | |
+
+Уникальность: пара (`user_id`, `date`, `variant`) — два третьих варианта за день быть не может; и частичный уникальный индекс по (`user_id`, `date`) где `selected = true` — выбран ровно один вариант. Второе база проверит сама, даже если в коде бэка будет ошибка. Смена выбора — в одной транзакции: снять `selected` со старого, поставить новому.
 
 Оценка хранится прямо в комплекте, потому что она одна на комплект (повторный запрос перезаписывает) — отдельная таблица тут не нужна. `missing` хранится, а не пересчитывается: комплект на день считается один раз и потом отдаётся тот же самый.
 
@@ -129,7 +150,7 @@
 
 ### История носки
 
-Отдельной таблицы нет — она выводится: вещь носили в день `outfits.date`, если она есть в `outfit_items` комплекта с `worn = true`. Движку для правила «вчера надевали — сегодня не предлагаем» этого достаточно, а две таблицы с одной и той же правдой разъехались бы.
+Отдельной таблицы нет — она выводится: вещь носили в день `outfits.date`, если она есть в `outfit_items` комплекта с `worn = true`. `worn = true` бывает только у выбранного варианта (это проверяет бэк). Движку для правила «вчера надевали — сегодня не предлагаем» этого достаточно, а две таблицы с одной и той же правдой разъехались бы.
 
 ### partner_products
 
@@ -151,7 +172,7 @@
 
 ## Связи
 
-- `users` → `items`, `photos`, `outfits`, `weather_records`: один пользователь — много (один-ко-многим).
+- `users` → `items`, `photos`, `outfits`, `weather_records`, `password_reset_tokens`: один пользователь — много (один-ко-многим).
 - `items` → `photos`: у вещи не больше одного фото, фото может быть без вещи (пока не привязали или после отвязки).
 - `items` → `item_seasons`: одна вещь — несколько сезонов (один-ко-многим).
 - `outfits` → `weather_records`: много комплектов — одна погодная запись (все варианты одного дня собраны на одной погоде).
