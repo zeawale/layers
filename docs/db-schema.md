@@ -12,6 +12,72 @@
 - Названия атрибутов одежды берём из `docs/attributes.md`, не придумываем заново. Допустимые значения проверяет бэк (Pydantic), в базе они хранятся как `text`.
 - Форматы объектов в ответах API — в `docs/API.md`. Если поле есть в объекте API, оно либо хранится здесь, либо ниже написано, как оно вычисляется.
 
+
+## Диаграмма
+
+```mermaid
+erDiagram
+    users ||--o{ items : "владеет"
+    users ||--o{ photos : "загрузил"
+    users ||--o{ outfits : "получает"
+    users ||--o{ weather_records : "погода по городу"
+    items |o--o| photos : "фото"
+    items ||--o{ item_seasons : "сезоны"
+    weather_records ||--o{ outfits : "погода комплекта"
+    outfits ||--o{ outfit_items : "состоит из"
+    items ||--o{ outfit_items : "входит в"
+
+    users {
+        int id PK
+        text email
+        text city
+        text style
+    }
+    photos {
+        int id PK
+        int user_id FK
+        text path
+    }
+    items {
+        int id PK
+        int user_id FK
+        int photo_id FK
+        text name
+        text category
+        text color
+        int warmth
+    }
+    item_seasons {
+        int item_id PK, FK
+        text season PK
+    }
+    weather_records {
+        int id PK
+        int user_id FK
+        date date
+        text city
+        numeric temp_min
+        numeric temp_max
+    }
+    outfits {
+        int id PK
+        int user_id FK
+        int weather_record_id FK
+        date date
+        text explanation
+        text rating
+    }
+    outfit_items {
+        int outfit_id PK, FK
+        int item_id PK, FK
+    }
+    partner_products {
+        int id PK
+        text name
+        text category
+        text url
+    }
+```
 ## Таблицы
 
 ### users
