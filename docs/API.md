@@ -508,7 +508,7 @@ Query-параметры:
     { "value": 1, "label": "Очень лёгкая" }
   ],
   "style": [
-    { "value": "casual", "label": "Повседневное" }
+    { "value": "casual", "label": "Повседневный" }
   ],
   "season": [
     { "value": "demi", "label": "Демисезон" }
