@@ -12,8 +12,9 @@
 - Названия атрибутов одежды берём из `docs/attributes.md`, не придумываем заново. Допустимые значения проверяет бэк (Pydantic), в базе они хранятся как `text`.
 - Форматы объектов в ответах API — в `docs/API.md`. Если поле есть в объекте API, оно либо хранится здесь, либо ниже написано, как оно вычисляется.
 
-
 ## Диаграмма
+
+На диаграмме только ключи: какие таблицы есть и как связаны. Поля — в таблицах ниже, здесь их не дублируем, чтобы картинка не расходилась с текстом. Добавила таблицу — добавь её и сюда.
 
 ```mermaid
 erDiagram
@@ -21,7 +22,8 @@ erDiagram
     users ||--o{ photos : "загрузил"
     users ||--o{ outfits : "получает"
     users ||--o{ weather_records : "погода по городу"
-    items |o--o| photos : "фото"
+    users ||--o{ password_reset_tokens : "сброс пароля"
+    photos |o--o| items : "фото вещи"
     items ||--o{ item_seasons : "сезоны"
     weather_records ||--o{ outfits : "погода комплекта"
     outfits ||--o{ outfit_items : "состоит из"
@@ -29,23 +31,19 @@ erDiagram
 
     users {
         int id PK
-        text email
-        text city
-        text style
+    }
+    password_reset_tokens {
+        int id PK
+        int user_id FK
     }
     photos {
         int id PK
         int user_id FK
-        text path
     }
     items {
         int id PK
         int user_id FK
-        int photo_id FK
-        text name
-        text category
-        text color
-        int warmth
+        int photo_id FK "unique"
     }
     item_seasons {
         int item_id PK, FK
@@ -54,18 +52,11 @@ erDiagram
     weather_records {
         int id PK
         int user_id FK
-        date date
-        text city
-        numeric temp_min
-        numeric temp_max
     }
     outfits {
         int id PK
         int user_id FK
         int weather_record_id FK
-        date date
-        text explanation
-        text rating
     }
     outfit_items {
         int outfit_id PK, FK
@@ -73,11 +64,9 @@ erDiagram
     }
     partner_products {
         int id PK
-        text name
-        text category
-        text url
     }
 ```
+
 ## Таблицы
 
 ### users
@@ -142,7 +131,7 @@ erDiagram
 | warmth | int | not null, 1–5 | значение из attributes.md: warmth |
 | style | text | | значение из attributes.md: style; `null` — подходит под любой стиль |
 | water_resistance | boolean | not null, default false | значение из attributes.md: water_resistance |
-| photo_id | int | FK → photos.id, on delete set null | `null` — вещь без фото |
+| photo_id | int | FK → photos.id, unique, on delete set null | `null` — вещь без фото; одно фото — одна вещь |
 | created_at | timestamptz | not null, default now() | |
 | updated_at | timestamptz | not null, default now() | |
 
