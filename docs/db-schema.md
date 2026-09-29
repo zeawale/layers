@@ -12,6 +12,61 @@
 - Названия атрибутов одежды берём из `docs/attributes.md`, не придумываем заново. Допустимые значения проверяет бэк (Pydantic), в базе они хранятся как `text`.
 - Форматы объектов в ответах API — в `docs/API.md`. Если поле есть в объекте API, оно либо хранится здесь, либо ниже написано, как оно вычисляется.
 
+## Диаграмма
+
+На диаграмме только ключи: какие таблицы есть и как связаны. Поля — в таблицах ниже, здесь их не дублируем, чтобы картинка не расходилась с текстом. Добавила таблицу — добавь её и сюда.
+
+```mermaid
+erDiagram
+    users ||--o{ items : "владеет"
+    users ||--o{ photos : "загрузил"
+    users ||--o{ outfits : "получает"
+    users ||--o{ weather_records : "погода по городу"
+    users ||--o{ password_reset_tokens : "сброс пароля"
+    photos |o--o| items : "фото вещи"
+    items ||--o{ item_seasons : "сезоны"
+    weather_records ||--o{ outfits : "погода комплекта"
+    outfits ||--o{ outfit_items : "состоит из"
+    items ||--o{ outfit_items : "входит в"
+
+    users {
+        int id PK
+    }
+    password_reset_tokens {
+        int id PK
+        int user_id FK
+    }
+    photos {
+        int id PK
+        int user_id FK
+    }
+    items {
+        int id PK
+        int user_id FK
+        int photo_id FK "unique"
+    }
+    item_seasons {
+        int item_id PK, FK
+        text season PK
+    }
+    weather_records {
+        int id PK
+        int user_id FK
+    }
+    outfits {
+        int id PK
+        int user_id FK
+        int weather_record_id FK
+    }
+    outfit_items {
+        int outfit_id PK, FK
+        int item_id PK, FK
+    }
+    partner_products {
+        int id PK
+    }
+```
+
 ## Таблицы
 
 ### users
@@ -76,7 +131,7 @@
 | warmth | int | not null, 1–5 | значение из attributes.md: warmth |
 | style | text | | значение из attributes.md: style; `null` — подходит под любой стиль |
 | water_resistance | boolean | not null, default false | значение из attributes.md: water_resistance |
-| photo_id | int | FK → photos.id, on delete set null | `null` — вещь без фото |
+| photo_id | int | FK → photos.id, unique, on delete set null | `null` — вещь без фото; одно фото — одна вещь |
 | created_at | timestamptz | not null, default now() | |
 | updated_at | timestamptz | not null, default now() | |
 
