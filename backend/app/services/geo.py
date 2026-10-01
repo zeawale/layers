@@ -20,13 +20,15 @@ class City:
     name: str
     lat: float
     lon: float
+    region: str | None = None
+    country: str | None = None
 
 
-def find_city(name: str) -> City | None:
+def search_cities(query: str, count: int = 5) -> list[City]:
     try:
         response = httpx.get(
             OPEN_METEO_GEOCODING_URL,
-            params={"name": name, "count": 1, "language": "ru", "format": "json"},
+            params={"name": query, "count": count, "language": "ru", "format": "json"},
             timeout=TIMEOUT,
         )
         response.raise_for_status()
@@ -34,10 +36,21 @@ def find_city(name: str) -> City | None:
     except (httpx.HTTPError, ValueError) as error:
         raise GeoServiceError from error
 
-    if not results:
-        return None
-    first = results[0]
-    return City(name=first["name"], lat=first["latitude"], lon=first["longitude"])
+    return [
+        City(
+            name=result["name"],
+            lat=result["latitude"],
+            lon=result["longitude"],
+            region=result.get("admin1"),
+            country=result.get("country"),
+        )
+        for result in results
+    ]
+
+
+def find_city(name: str) -> City | None:
+    cities = search_cities(name, count=1)
+    return cities[0] if cities else None
 
 
 def city_by_coordinates(lat: float, lon: float) -> str | None:
