@@ -24,6 +24,7 @@ erDiagram
     users ||--o{ weather_records : "погода по городу"
     users ||--o{ password_reset_tokens : "сброс пароля"
     photos |o--o| items : "фото вещи"
+    photos |o--o| users : "фото профиля"
     items ||--o{ item_seasons : "сезоны"
     weather_records ||--o{ outfits : "погода комплекта"
     outfits ||--o{ outfit_items : "состоит из"
@@ -31,6 +32,7 @@ erDiagram
 
     users {
         int id PK
+        int avatar_photo_id FK "unique"
     }
     password_reset_tokens {
         int id PK
@@ -76,7 +78,7 @@ erDiagram
 | id | serial | PK | |
 | email | text | unique, not null | |
 | password_hash | text | not null | Пароль в открытом виде не хранится никогда |
-| password_changed_at | timestamptz | | когда пароль меняли через сброс; токены, выданные раньше, бэк не принимает. `null` — не меняли |
+| password_changed_at | timestamptz | | когда пароль меняли (сброс или смена из профиля); токены, выданные раньше, бэк не принимает. `null` — не меняли |
 | name | text | | как обращаться, до 50 символов; `null` — не указано |
 | city | text | | название города; `null`, пока пользователь не указал |
 | lat | numeric | | координаты города, округлены до 2 знаков; заполняет бэк (геокодер Open-Meteo, Nominatim или подсказка `GET /geo/cities`) |
@@ -84,6 +86,7 @@ erDiagram
 | style | text | | значение из attributes.md: style; `null` — не выбран |
 | liked_colors | text[] | not null, default '{}' | значения из attributes.md: color |
 | disliked_colors | text[] | not null, default '{}' | значения из attributes.md: color |
+| avatar_photo_id | int | FK → photos.id, unique, on delete set null | фото профиля; `null` — нет фото. Фото, привязанное к вещи, сюда привязать нельзя (проверяет бэк) |
 | created_at | timestamptz | not null, default now() | |
 | updated_at | timestamptz | not null, default now() | |
 
@@ -115,7 +118,7 @@ erDiagram
 | path | text | not null | путь к файлу на диске, не сам файл |
 | created_at | timestamptz | not null, default now() | |
 
-Фото без вещи старше суток бэк удаляет вместе с файлом (`created_at` для этого и нужен).
+Фото без вещи старше суток бэк удаляет вместе с файлом (`created_at` для этого и нужен). Фото профиля (`users.avatar_photo_id`) не трогает: оно тоже без вещи, но не брошенное.
 
 ### items
 
@@ -228,6 +231,7 @@ erDiagram
 ## Связи
 
 - `users` → `items`, `photos`, `outfits`, `weather_records`, `password_reset_tokens`: один пользователь — много (один-ко-многим).
+- `users` → `photos` через `avatar_photo_id`: у пользователя не больше одного фото профиля.
 - `items` → `photos`: у вещи не больше одного фото, фото может быть без вещи (пока не привязали или после отвязки).
 - `items` → `item_seasons`: одна вещь — несколько сезонов (один-ко-многим).
 - `outfits` → `weather_records`: много комплектов — одна погодная запись (все варианты одного дня собраны на одной погоде).
