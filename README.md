@@ -50,6 +50,21 @@ docker compose down -v        # остановить и снести базу в
 docker compose build backend  # пересобрать после правки requirements.txt
 ```
 
+### Миграции базы
+
+Таблицы создаёт Alembic. В Docker Compose бэкенд при старте сам выполняет
+`alembic upgrade head`, руками ничего запускать не надо.
+
+Поменяла модель в `backend/app/models/` — добавь миграцию в том же PR:
+
+```bash
+docker compose exec backend alembic revision --autogenerate -m "что поменялось"
+```
+
+Файл появится в `backend/alembic/versions/`. Открой его и проверь глазами:
+autogenerate не всё видит сам (например, переименование поля он поймёт как
+удаление и добавление).
+
 ### Без докера
 
 Если докер капризничает, бэкенд и фронт можно поднять руками — но база всё
@@ -60,6 +75,7 @@ docker compose build backend  # пересобрать после правки r
 cd backend
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+alembic upgrade head
 uvicorn app.main:app --reload
 
 # фронтенд
