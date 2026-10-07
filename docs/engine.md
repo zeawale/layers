@@ -81,6 +81,14 @@ class OutfitRequest:
     preferences: Preferences
     worn_yesterday: frozenset[int] = frozenset()      # id вещей из комплекта, отмеченного «надет» вчера
     shown_today: list[frozenset[int]] = field(default_factory=list)  # вещи уже показанных вариантов дня
+    ratings: list["RatedOutfit"] = field(default_factory=list)       # оценки за 30 дней
+
+
+@dataclass(frozen=True)
+class RatedOutfit:
+    date: date
+    item_ids: frozenset[int]   # только вещи, которые ещё есть в гардеробе
+    rating: str                # like | dislike
 ```
 
 - **`date`** движок может использовать, чтобы понять сезон. Брать ли сезон по
@@ -92,8 +100,9 @@ class OutfitRequest:
 - **`shown_today`** пустой при первом комплекте дня. При «Другом варианте» в нём
   наборы вещей всех уже показанных вариантов: новый вариант не должен
   совпасть ни с одним из них.
-- **Оценки** (`like` / `dislike`) на вход пока не идут. Их добавим отдельным
-  полем, когда согласуем раздел «Оценки и история» в `API.md` на этапе 4.
+- **`ratings`** — оценки за последние 30 дней: какие вещи были в комплекте
+  и понравился он или нет. Комплекты без оценки сюда не попадают. Как
+  учитывать оценки и невыбранные варианты, решает Настя (HANDBOOK, раздел 9).
 
 ## Выход: `OutfitResult`
 
