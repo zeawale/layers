@@ -97,7 +97,7 @@
     "liked_colors": ["black", "gray"],
     "disliked_colors": ["yellow"]
   },
-  "avatar": { "id": 20, "url": "/media/photos/20.jpg" },
+  "avatar": { "id": 20, "url": "/media/photos/Hn4pZ0aWm-Q7uE1xKcJr5w.jpg" },
   "onboarding_completed": true,
   "created_at": "2026-09-28T10:00:00Z"
 }
@@ -123,12 +123,14 @@
 ```json
 {
   "id": 17,
-  "url": "/media/photos/17.jpg"
+  "url": "/media/photos/2c7Vq_Lx9TbN3kRwYe8sAg.jpg"
 }
 ```
 
 `url` относительный, фронт подставляет базовый адрес бэкенда. Файл отдаётся
-как статика, без токена.
+как статика, без токена. Поэтому имя файла случайное, а не `id`: по номерам
+нельзя перебрать чужие фото. Фронт `url` не разбирает и не собирает сам —
+берёт из ответа как есть.
 
 ### Item
 
@@ -144,7 +146,7 @@
   "style": "casual",
   "season": ["demi", "winter"],
   "water_resistance": false,
-  "photo": { "id": 17, "url": "/media/photos/17.jpg" },
+  "photo": { "id": 17, "url": "/media/photos/2c7Vq_Lx9TbN3kRwYe8sAg.jpg" },
   "created_at": "2026-10-15T12:00:00Z",
   "updated_at": "2026-10-15T12:00:00Z"
 }
