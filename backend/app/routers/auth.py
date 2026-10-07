@@ -1,18 +1,36 @@
-from datetime import datetime, timezone
+import secrets
+from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from sqlalchemy import exists, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.dependencies import get_current_user
-from app.models import User
-from app.schemas.auth import AuthOut, LoginIn, PasswordChangeIn, RegisterIn
+from app.config import settings
+from app.models import PasswordResetToken, User
+from app.schemas.auth import (
+    AuthOut,
+    LoginIn,
+    PasswordChangeIn,
+    PasswordResetConfirmIn,
+    PasswordResetRequestIn,
+    RegisterIn,
+)
 from app.schemas.user import UserOut
-from app.services.security import create_access_token, hash_password, verify_password
+from app.services import mail
+from app.services.security import (
+    create_access_token,
+    hash_password,
+    hash_reset_token,
+    verify_password,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+RESET_TOKEN_TTL = timedelta(minutes=60)
+RESET_EMAIL_INTERVAL = timedelta(minutes=1)
 
 
 def auth_response(user: User) -> AuthOut:
@@ -67,3 +85,88 @@ def change_password(
     db.commit()
     db.refresh(user)
     return auth_response(user)
+
+
+@router.post("/password-reset/request", status_code=status.HTTP_204_NO_CONTENT)
+def request_password_reset(
+    body: PasswordResetRequestIn,
+    background: BackgroundTasks,
+    db: Session = Depends(get_db),
+) -> None:
+    # Ответ всегда 204, есть такой email или нет: по ответу не узнать, кто зарегистрирован.
+    # Письмо уходит в фоне, поэтому и по времени ответа этого не понять.
+    user = db.scalar(select(User).where(User.email == body.email.lower()))
+    if user is None:
+        return
+
+    now = datetime.now(timezone.utc)
+    sent_recently = db.scalar(
+        select(
+            exists().where(
+                PasswordResetToken.user_id == user.id,
+                PasswordResetToken.created_at > now - RESET_EMAIL_INTERVAL,
+            )
+        )
+    )
+    if sent_recently:
+        return
+
+    # Новый запрос отменяет все прошлые рабочие токены
+    db.execute(
+        update(PasswordResetToken)
+        .where(PasswordResetToken.user_id == user.id, PasswordResetToken.used_at.is_(None))
+        .values(used_at=now)
+    )
+    token = secrets.token_urlsafe(32)
+    db.add(
+        PasswordResetToken(
+            user_id=user.id,
+            token_hash=hash_reset_token(token),
+            expires_at=now + RESET_TOKEN_TTL,
+        )
+    )
+    db.commit()
+
+    link = f"{settings.frontend_url.rstrip('/')}/reset-password?token={token}"
+    background.add_task(mail.send, user.email, "Layers: сброс пароля", reset_email_text(user, link))
+
+
+@router.post("/password-reset/confirm")
+def confirm_password_reset(body: PasswordResetConfirmIn, db: Session = Depends(get_db)) -> AuthOut:
+    now = datetime.now(timezone.utc)
+    reset = db.scalar(
+        select(PasswordResetToken)
+        .where(
+            PasswordResetToken.token_hash == hash_reset_token(body.token),
+            PasswordResetToken.used_at.is_(None),
+            PasswordResetToken.expires_at > now,
+        )
+        # Два одновременных запроса с одной ссылкой: второй дождётся первого и не найдёт токен
+        .with_for_update()
+    )
+    if reset is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ссылка больше не работает, запроси новую",
+        )
+
+    user = db.get(User, reset.user_id)
+    reset.used_at = now
+    user.password_hash = hash_password(body.password)
+    # Старые токены входа перестают работать, как после смены пароля из профиля
+    user.password_changed_at = now.replace(microsecond=0)
+    db.commit()
+    db.refresh(user)
+    return auth_response(user)
+
+
+def reset_email_text(user: User, link: str) -> str:
+    greeting = f"Привет, {user.name}!" if user.name else "Привет!"
+    return (
+        f"{greeting}\n\n"
+        "Кто-то попросил сбросить пароль в Layers для этого адреса. Если это ты, "
+        "открой ссылку и задай новый пароль:\n\n"
+        f"{link}\n\n"
+        "Ссылка работает 60 минут и только один раз.\n\n"
+        "Если это был не ты, просто ничего не делай: пароль останется прежним.\n"
+    )
