@@ -99,11 +99,14 @@ def delete_orphans(db: Session) -> int:
         .execution_options(synchronize_session=False)
     ).all()
     db.commit()
+    delete_files(paths)
+    return len(paths)
 
-    # Файлы удаляем после коммита: если база откатится, фото останется целым
+
+def delete_files(paths: list[str]) -> None:
+    """Зовём после коммита: если база откатится, фото останется целым."""
     for path in paths:
         (MEDIA_DIR / path).unlink(missing_ok=True)
-    return len(paths)
 
 
 async def delete_orphans_forever() -> None:
