@@ -1,9 +1,11 @@
 from datetime import datetime
 
 from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, SmallInteger, Text, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.models.item_season import ItemSeason
+from app.models.photo import Photo
 
 
 class Item(Base):
@@ -31,6 +33,12 @@ class Item(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+    # selectin: сезоны и фото для всего списка вещей — двумя запросами, а не по запросу на вещь
+    seasons: Mapped[list[ItemSeason]] = relationship(
+        cascade="all, delete-orphan", passive_deletes=True, lazy="selectin"
+    )
+    photo: Mapped[Photo | None] = relationship(lazy="selectin")
 
     __table_args__ = (
         CheckConstraint(

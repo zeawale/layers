@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import exists, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.dependencies import get_current_user
-from app.models import Photo, User
+from app.models import Item, Photo, User
 from app.schemas.user import UserOut, UserUpdate
 from app.services import geo
 
@@ -87,9 +88,9 @@ def set_avatar(user: User, photo_id: int | None, db: Session) -> None:
         user.avatar_photo_id = None
         return
 
-    # Чужое фото — тоже 404, а не 403: так договорились в API.md.
-    # Проверка «фото уже привязано к вещи» появится вместе с таблицей items.
+    # Чужое фото и фото вещи — тоже 404, а не 403: так договорились в API.md
     photo = db.get(Photo, photo_id)
-    if photo is None or photo.user_id != user.id:
+    attached_to_item = db.scalar(select(exists().where(Item.photo_id == photo_id)))
+    if photo is None or photo.user_id != user.id or attached_to_item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Фото не найдено")
     user.avatar_photo_id = photo.id
