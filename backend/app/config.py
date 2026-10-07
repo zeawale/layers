@@ -23,6 +23,9 @@ class Settings(BaseSettings):
 
     cors_origins: str = "http://localhost:5173"
 
+    # Сколько вариантов комплекта можно получить за день (API.md, OutfitDay)
+    outfit_variants_max: int = 3
+
     # Из него собирается ссылка в письме сброса пароля
     frontend_url: str = "http://localhost:5173"
 
