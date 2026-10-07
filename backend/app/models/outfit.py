@@ -12,6 +12,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -33,7 +34,7 @@ class Outfit(Base):
     )
     explanation: Mapped[str] = mapped_column(Text)
     missing: Mapped[list[str]] = mapped_column(
-        ARRAY(Text), server_default="{}"
+        ARRAY(Text), default=list, server_default=text("'{}'")
     )
     rating: Mapped[str | None] = mapped_column(Text)
     worn: Mapped[bool] = mapped_column(

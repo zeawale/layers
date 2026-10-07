@@ -9,7 +9,7 @@
 - Внешний ключ — `<таблица_в_единственном_числе>_id`: `user_id`, `item_id`.
 - У каждой пользовательской сущности есть `user_id` — без него нельзя отличить свои вещи от чужих. У таблиц-связок его нет: владелец определяется через родителя.
 - Даты создания и изменения: `created_at`, `updated_at`.
-- Названия атрибутов одежды берём из `docs/attributes.md`, не придумываем заново. Допустимые значения проверяет бэк (Pydantic), в базе они хранятся как `text`.
+- Названия атрибутов одежды берём из `docs/attributes.md`, не придумываем заново. Допустимые значения проверяет бэк (Pydantic), в базе они хранятся как `text`. Короткие списки не из справочника (`weather_records.condition`, `outfits.rating`) база проверяет сама.
 - Форматы объектов в ответах API — в `docs/API.md`. Если поле есть в объекте API, оно либо хранится здесь, либо ниже написано, как оно вычисляется.
 
 ## Диаграмма
@@ -131,7 +131,7 @@ erDiagram
 | name | text | not null | название для интерфейса и текста объяснения, до 100 символов |
 | category | text | not null | значение из attributes.md: category |
 | color | text | not null | значение из attributes.md: color |
-| warmth | int | not null, 1–5 | значение из attributes.md: warmth |
+| warmth | smallint | not null, 1–5 | значение из attributes.md: warmth |
 | style | text | | значение из attributes.md: style; `null` — подходит под любой стиль |
 | water_resistance | boolean | not null, default false | значение из attributes.md: water_resistance |
 | photo_id | int | FK → photos.id, unique, on delete set null | `null` — вещь без фото; одно фото — одна вещь |
@@ -139,6 +139,8 @@ erDiagram
 | updated_at | timestamptz | not null, default now() | |
 
 Сезоны — в `item_seasons`, потому что их может быть несколько.
+
+Индекс по `user_id`: гардероб всегда выбирается по пользователю.
 
 ### item_seasons
 
@@ -166,8 +168,8 @@ erDiagram
 | feels_like | numeric | not null | минимальная «ощущается как» за светлое время |
 | wind_speed | numeric | not null | м/с |
 | precipitation | numeric | not null | мм за день |
-| precipitation_probability | int | 0–100 | вероятность осадков за день, %; `null` — Open-Meteo не отдал |
-| condition | text | not null | `clear`, `cloudy`, `rain`, `snow` — сводится из кодов Open-Meteo на бэке |
+| precipitation_probability | smallint | 0–100 | вероятность осадков за день, %; `null` — Open-Meteo не отдал |
+| condition | text | not null, только `clear`, `cloudy`, `rain`, `snow` | сводится из кодов Open-Meteo на бэке |
 | fetched_at | timestamptz | not null, default now() | момент запроса к Open-Meteo |
 
 Уникальность — пара (`user_id`, `date`): на день одна запись, при обновлении кеша (раз в час) она перезаписывается, а не добавляется новая.
@@ -181,12 +183,12 @@ erDiagram
 | id | serial | PK | |
 | user_id | int | FK → users.id, not null | |
 | date | date | not null | день, на который собран комплект |
-| variant | int | not null, ≥ 1 | номер варианта за день: 1, 2, 3 |
+| variant | smallint | not null, ≥ 1 | номер варианта за день: 1, 2, 3 |
 | selected | boolean | not null, default false | выбран как комплект дня |
 | weather_record_id | int | FK → weather_records.id, not null | погода, на которой собран |
 | explanation | text | not null | текстовое объяснение выбора движка |
 | missing | text[] | not null, default '{}' | категории, которых не хватило в гардеробе |
-| rating | text | | `like` / `dislike`; `null` — не оценён |
+| rating | text | только `like`, `dislike` | `null` — не оценён |
 | worn | boolean | not null, default false | надел ли комплект |
 | feedback_at | timestamptz | | когда оценили; `null` — не оценён, тогда в API `feedback: null` |
 | created_at | timestamptz | not null, default now() | |
@@ -204,7 +206,7 @@ erDiagram
 | outfit_id | int | FK → outfits.id, on delete cascade, not null | |
 | item_id | int | FK → items.id, not null | |
 
-Первичный ключ — пара (`outfit_id`, `item_id`). Что делать с комплектами при удалении вещи — решаем на этапе 4 (см. API.md, `DELETE /items/{id}`).
+Первичный ключ — пара (`outfit_id`, `item_id`). Отдельный индекс по `item_id`: первичный ключ начинается с `outfit_id` и поиску по вещи не помогает, а по вещи ищут история носки и удаление вещи. Что делать с комплектами при удалении вещи — решаем на этапе 4 (см. API.md, `DELETE /items/{id}`).
 
 ### История носки
 
@@ -225,7 +227,7 @@ erDiagram
 | category | text | not null | значение из attributes.md: category |
 | color | text | | значение из attributes.md: color; `null` — любой |
 | style | text | | значение из attributes.md: style; `null` — любой |
-| min_warmth | int | | |
+| min_warmth | smallint | | |
 | water_resistance | boolean | not null, default false | главный сценарий партнёрки — «нет дождевика, вот дождевик» |
 
 ## Связи

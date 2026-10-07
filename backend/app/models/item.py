@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, SmallInteger, Text, func
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, SmallInteger, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -37,4 +37,6 @@ class Item(Base):
             "warmth BETWEEN 1 AND 5",
             name="items_warmth_check",
         ),
+        # Гардероб всегда выбирается по пользователю
+        Index("items_user_id_idx", "user_id"),
     )
