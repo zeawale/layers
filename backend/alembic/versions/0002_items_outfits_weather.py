@@ -109,7 +109,7 @@ def upgrade() -> None:
     op.create_table('outfit_items',
     sa.Column('outfit_id', sa.Integer(), nullable=False),
     sa.Column('item_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['item_id'], ['items.id'], ),
+    sa.ForeignKeyConstraint(['item_id'], ['items.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['outfit_id'], ['outfits.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('outfit_id', 'item_id')
     )

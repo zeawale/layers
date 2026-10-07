@@ -12,12 +12,12 @@ class OutfitItem(Base):
         primary_key=True,
     )
     item_id: Mapped[int] = mapped_column(
-        ForeignKey("items.id"),
+        ForeignKey("items.id", ondelete="CASCADE"),
         primary_key=True,
     )
 
     __table_args__ = (
         # Первичный ключ начинается с outfit_id, по item_id он не помогает:
-        # нужен для истории носки и для удаления вещи
+        # нужен для истории носки и для каскада при удалении вещи
         Index("outfit_items_item_id_idx", "item_id"),
     )
