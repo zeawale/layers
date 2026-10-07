@@ -1,6 +1,7 @@
 import datetime as dt
+from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 from app.models import Outfit, WeatherRecord
 from app.schemas.item import ItemOut
@@ -80,3 +81,21 @@ class OutfitDayOut(BaseModel):
     variants: list[OutfitOut]
     selected_id: int
     variants_max: int
+
+
+class FeedbackIn(BaseModel):
+    """Тело POST /outfit/{id}/feedback: меняем только присланные поля."""
+
+    rating: Literal["like", "dislike"] | None = None
+    worn: bool = False
+
+    @model_validator(mode="after")
+    def check_not_empty(self) -> "FeedbackIn":
+        if not self.model_fields_set:
+            raise ValueError("Пришли rating, worn или оба")
+        return self
+
+
+class HistoryOut(BaseModel):
+    outfits: list[OutfitOut]
+    total: int

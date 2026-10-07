@@ -35,6 +35,13 @@ class Preferences:
 
 
 @dataclass(frozen=True)
+class RatedOutfit:
+    date: date
+    item_ids: frozenset[int]
+    rating: str
+
+
+@dataclass(frozen=True)
 class OutfitRequest:
     date: date
     weather: WeatherInput
@@ -42,6 +49,7 @@ class OutfitRequest:
     preferences: Preferences
     worn_yesterday: frozenset[int] = frozenset()
     shown_today: list[frozenset[int]] = field(default_factory=list)
+    ratings: list[RatedOutfit] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

@@ -1,8 +1,8 @@
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app import engine
@@ -10,12 +10,14 @@ from app.config import settings
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models import Item, Outfit, OutfitItem, User, WeatherRecord
-from app.schemas.outfit import OutfitDayOut, OutfitOut
+from app.schemas.outfit import FeedbackIn, HistoryOut, OutfitDayOut, OutfitOut
 from app.services import weather
 
 router = APIRouter(prefix="/outfit", tags=["outfit"])
 
 WORN = "Комплект на сегодня уже отмечен как надетый. Сними отметку, чтобы выбрать другой"
+HISTORY_DAYS = 30
+RATINGS_DAYS = 30
 
 
 @router.get("/today")
@@ -68,11 +70,7 @@ def select_variant(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> OutfitDayOut:
-    outfit = db.get(Outfit, outfit_id)
-    if outfit is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комплект не найден")
-    if outfit.user_id != user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Это чужой комплект")
+    outfit = get_own_outfit(db, user, outfit_id)
 
     # «Сегодня» — по часовому поясу города, в котором собран комплект
     today = datetime.now(timezone.utc).astimezone(ZoneInfo(outfit.weather.timezone)).date()
@@ -91,6 +89,67 @@ def select_variant(
         db.commit()
         variants = day_variants(db, user, outfit.date)
     return day_out(variants)
+
+
+@router.post("/{outfit_id}/feedback")
+def give_feedback(
+    outfit_id: int,
+    body: FeedbackIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> OutfitOut:
+    get_own_outfit(db, user, outfit_id)
+    # По очереди с выбором и «Другим вариантом»: пока ставим «надет», выбор не должен уехать
+    lock_user(db, user)
+    outfit = db.get(Outfit, outfit_id, populate_existing=True)
+    sent = body.model_fields_set
+
+    if "worn" in sent and body.worn and not outfit.selected:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Отметить можно только выбранный вариант"
+        )
+    if "rating" in sent:
+        outfit.rating = body.rating
+    if "worn" in sent:
+        outfit.worn = body.worn
+    # Ни оценки, ни отметки — в API снова feedback: null
+    outfit.feedback_at = func.now() if outfit.rating is not None or outfit.worn else None
+    db.commit()
+    db.refresh(outfit)
+    return OutfitOut.from_outfit(outfit)
+
+
+@router.get("/history")
+def history(
+    date_from: date | None = Query(None, alias="from"),
+    date_to: date | None = Query(None, alias="to"),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> HistoryOut:
+    date_to = date_to or weather.local_today(db, user)
+    date_from = date_from or date_to - timedelta(days=HISTORY_DAYS - 1)
+    if date_from > date_to:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Дата начала позже даты конца")
+
+    outfits = db.scalars(
+        select(Outfit)
+        .where(
+            Outfit.user_id == user.id,
+            Outfit.selected.is_(True),
+            Outfit.date.between(date_from, date_to),
+        )
+        .order_by(Outfit.date.desc())
+    ).all()
+    return HistoryOut(outfits=[OutfitOut.from_outfit(outfit) for outfit in outfits], total=len(outfits))
+
+
+def get_own_outfit(db: Session, user: User, outfit_id: int) -> Outfit:
+    outfit = db.get(Outfit, outfit_id)
+    if outfit is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Комплект не найден")
+    if outfit.user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Это чужой комплект")
+    return outfit
 
 
 def today_weather(db: Session, user: User) -> WeatherRecord:
@@ -140,6 +199,14 @@ def build(
             Outfit.worn.is_(True),
         )
     )
+    rated = db.scalars(
+        select(Outfit).where(
+            Outfit.user_id == user.id,
+            Outfit.rating.is_not(None),
+            Outfit.date > record.date - timedelta(days=RATINGS_DAYS),
+            Outfit.date <= record.date,
+        )
+    )
     request = engine.OutfitRequest(
         date=record.date,
         weather=engine.WeatherInput(
@@ -171,6 +238,14 @@ def build(
         ),
         worn_yesterday=frozenset(worn_yesterday),
         shown_today=shown,
+        ratings=[
+            engine.RatedOutfit(
+                date=outfit.date,
+                item_ids=frozenset(item.id for item in outfit.items),
+                rating=outfit.rating,
+            )
+            for outfit in rated
+        ],
     )
     result = engine.build_outfit(request)
 

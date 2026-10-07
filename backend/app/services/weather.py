@@ -75,6 +75,18 @@ def get_today(db: Session, user: User) -> WeatherRecord:
     return record
 
 
+def local_today(db: Session, user: User) -> date:
+    """«Сегодня» по часовому поясу последней погоды пользователя. Погоды ещё не было — по UTC."""
+    tz = db.scalar(
+        select(WeatherRecord.timezone)
+        .where(WeatherRecord.user_id == user.id)
+        .order_by(WeatherRecord.date.desc())
+        .limit(1)
+    )
+    now = datetime.now(timezone.utc)
+    return now.astimezone(ZoneInfo(tz)).date() if tz else now.date()
+
+
 def is_fresh(record: WeatherRecord, city: str) -> bool:
     now = datetime.now(timezone.utc)
     return (
