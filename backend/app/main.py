@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
-from app.routers import attributes, auth, geo, health, items, outfits, photos, users
+from app.routers import attributes, auth, geo, health, items, outfits, photos, recognition, users
 from app.services.photos import MEDIA_DIR, PHOTOS_DIR, delete_orphans_forever
 
 
@@ -39,6 +39,7 @@ app.include_router(attributes.router)
 app.include_router(geo.router)
 app.include_router(photos.router)
 app.include_router(items.router)
+app.include_router(recognition.router)
 app.include_router(outfits.router)
 
 # Фото отдаются как статика, без токена (API.md, объект Photo)
