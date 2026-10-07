@@ -24,6 +24,8 @@ class WeatherRecord(Base):
     fetched_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+    # Часовой пояс города из ответа Open-Meteo: по нему понятно, какое у человека «сегодня»
+    timezone: Mapped[str] = mapped_column(Text)
 
     __table_args__ = (
         UniqueConstraint(
