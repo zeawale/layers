@@ -1,0 +1,129 @@
+"""Вещи, комплекты, погода, сброс пароля, партнёрские товары
+
+Revision ID: 0002
+Revises: 0001
+Create Date: 2026-10-06 20:17:34.139833
+"""
+
+from alembic import op
+import sqlalchemy as sa
+
+
+revision = '0002'
+down_revision = '0001'
+branch_labels = None
+depends_on = None
+
+
+def upgrade() -> None:
+    op.create_table('partner_products',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.Text(), nullable=False),
+    sa.Column('shop', sa.Text(), nullable=False),
+    sa.Column('price', sa.Numeric(), nullable=True),
+    sa.Column('url', sa.Text(), nullable=False),
+    sa.Column('image_url', sa.Text(), nullable=True),
+    sa.Column('category', sa.Text(), nullable=False),
+    sa.Column('color', sa.Text(), nullable=True),
+    sa.Column('style', sa.Text(), nullable=True),
+    sa.Column('min_warmth', sa.SmallInteger(), nullable=True),
+    sa.Column('water_resistance', sa.Boolean(), server_default='false', nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('password_reset_tokens',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('token_hash', sa.Text(), nullable=False),
+    sa.Column('expires_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('used_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('token_hash')
+    )
+    op.create_table('weather_records',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('date', sa.Date(), nullable=False),
+    sa.Column('city', sa.Text(), nullable=False),
+    sa.Column('temp_min', sa.Numeric(), nullable=False),
+    sa.Column('temp_max', sa.Numeric(), nullable=False),
+    sa.Column('feels_like', sa.Numeric(), nullable=False),
+    sa.Column('wind_speed', sa.Numeric(), nullable=False),
+    sa.Column('precipitation', sa.Numeric(), nullable=False),
+    sa.Column('precipitation_probability', sa.SmallInteger(), nullable=True),
+    sa.Column('condition', sa.Text(), nullable=False),
+    sa.Column('fetched_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.CheckConstraint("condition IN ('clear', 'cloudy', 'rain', 'snow')", name='weather_records_condition_check'),
+    sa.CheckConstraint('precipitation_probability BETWEEN 0 AND 100', name='weather_records_precipitation_probability_check'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id', 'date', name='weather_records_user_id_date_key')
+    )
+    op.create_table('items',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.Text(), nullable=False),
+    sa.Column('category', sa.Text(), nullable=False),
+    sa.Column('color', sa.Text(), nullable=False),
+    sa.Column('warmth', sa.SmallInteger(), nullable=False),
+    sa.Column('style', sa.Text(), nullable=True),
+    sa.Column('water_resistance', sa.Boolean(), server_default='false', nullable=False),
+    sa.Column('photo_id', sa.Integer(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.CheckConstraint('warmth BETWEEN 1 AND 5', name='items_warmth_check'),
+    sa.ForeignKeyConstraint(['photo_id'], ['photos.id'], ondelete='SET NULL'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('photo_id')
+    )
+    op.create_index('items_user_id_idx', 'items', ['user_id'], unique=False)
+    op.create_table('outfits',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('date', sa.Date(), nullable=False),
+    sa.Column('variant', sa.SmallInteger(), nullable=False),
+    sa.Column('selected', sa.Boolean(), server_default='false', nullable=False),
+    sa.Column('weather_record_id', sa.Integer(), nullable=False),
+    sa.Column('explanation', sa.Text(), nullable=False),
+    sa.Column('missing', sa.ARRAY(sa.Text()), server_default='{}', nullable=False),
+    sa.Column('rating', sa.Text(), nullable=True),
+    sa.Column('worn', sa.Boolean(), server_default='false', nullable=False),
+    sa.Column('feedback_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.CheckConstraint("rating IN ('like', 'dislike')", name='outfits_rating_check'),
+    sa.CheckConstraint('variant >= 1', name='outfits_variant_check'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['weather_record_id'], ['weather_records.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id', 'date', 'variant', name='outfits_user_id_date_variant_key')
+    )
+    op.create_index('outfits_one_selected_per_day', 'outfits', ['user_id', 'date'], unique=True, postgresql_where=sa.text('selected IS true'))
+    op.create_table('item_seasons',
+    sa.Column('item_id', sa.Integer(), nullable=False),
+    sa.Column('season', sa.Text(), nullable=False),
+    sa.ForeignKeyConstraint(['item_id'], ['items.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('item_id', 'season')
+    )
+    op.create_table('outfit_items',
+    sa.Column('outfit_id', sa.Integer(), nullable=False),
+    sa.Column('item_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['item_id'], ['items.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['outfit_id'], ['outfits.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('outfit_id', 'item_id')
+    )
+    op.create_index('outfit_items_item_id_idx', 'outfit_items', ['item_id'], unique=False)
+
+
+def downgrade() -> None:
+    op.drop_index('outfit_items_item_id_idx', table_name='outfit_items')
+    op.drop_table('outfit_items')
+    op.drop_table('item_seasons')
+    op.drop_index('outfits_one_selected_per_day', table_name='outfits', postgresql_where=sa.text('selected IS true'))
+    op.drop_table('outfits')
+    op.drop_index('items_user_id_idx', table_name='items')
+    op.drop_table('items')
+    op.drop_table('weather_records')
+    op.drop_table('password_reset_tokens')
+    op.drop_table('partner_products')
