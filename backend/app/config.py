@@ -23,6 +23,16 @@ class Settings(BaseSettings):
 
     cors_origins: str = "http://localhost:5173"
 
+    # Из него собирается ссылка в письме сброса пароля
+    frontend_url: str = "http://localhost:5173"
+
+    # Почта для писем. Без SMTP_HOST письма не уходят, а печатаются в лог бэкенда
+    smtp_host: str = ""
+    smtp_port: int = 465
+    smtp_user: str = ""
+    smtp_password: str = ""
+    mail_from: str = ""
+
     @property
     def database_url(self) -> str:
         return (

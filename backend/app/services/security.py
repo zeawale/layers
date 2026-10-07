@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
@@ -46,3 +47,8 @@ def decode_access_token(token: str) -> dict | None:
     if not str(payload["sub"]).isdigit():
         return None
     return payload
+
+
+def hash_reset_token(token: str) -> str:
+    """В базе лежит только хеш: по нему одному чужой пароль не сбросить."""
+    return hashlib.sha256(token.encode()).hexdigest()
