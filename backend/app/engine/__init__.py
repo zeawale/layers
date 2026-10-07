@@ -6,6 +6,7 @@ from app.engine.models import (
     OutfitRequest,
     OutfitResult,
     Preferences,
+    RatedOutfit,
     WeatherInput,
 )
 from app.engine.stub import build_outfit
@@ -16,6 +17,7 @@ __all__ = [
     "OutfitRequest",
     "OutfitResult",
     "Preferences",
+    "RatedOutfit",
     "WeatherInput",
     "build_outfit",
 ]
