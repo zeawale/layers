@@ -14,9 +14,11 @@ from sqlalchemy import (
     func,
     text,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.models.item import Item
+from app.models.weather_record import WeatherRecord
 
 
 class Outfit(Base):
@@ -46,6 +48,10 @@ class Outfit(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+
+    weather: Mapped[WeatherRecord] = relationship(lazy="selectin")
+    # Удалённые вещи уходят из outfit_items каскадом в базе (db-schema.md)
+    items: Mapped[list[Item]] = relationship(secondary="outfit_items", lazy="selectin", passive_deletes=True)
 
     __table_args__ = (
         UniqueConstraint(
