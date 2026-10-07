@@ -11,6 +11,7 @@ from pydantic import (
 )
 
 from app.models import User
+from app.schemas.photo import PhotoOut
 from app.services.attributes import values
 
 
@@ -30,11 +31,6 @@ UtcDatetime = Annotated[
         return_type=str,
     ),
 ]
-
-
-class PhotoOut(BaseModel):
-    id: int
-    url: str
 
 
 class Preferences(BaseModel):
@@ -90,7 +86,7 @@ class UserOut(BaseModel):
                 liked_colors=user.liked_colors,
                 disliked_colors=user.disliked_colors,
             ),
-            avatar=PhotoOut(id=user.avatar.id, url=user.avatar.url) if user.avatar else None,
+            avatar=PhotoOut.from_photo(user.avatar) if user.avatar else None,
             onboarding_completed=user.onboarding_completed,
             created_at=user.created_at,
         )
