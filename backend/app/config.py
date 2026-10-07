@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     # Сколько вариантов комплекта можно получить за день (API.md, OutfitDay)
     outfit_variants_max: int = 3
 
+    # Ниже этой уверенности распознавание поле формы не предзаполняет
+    recognition_threshold: float = 0.5
+
     # Из него собирается ссылка в письме сброса пароля
     frontend_url: str = "http://localhost:5173"
 
