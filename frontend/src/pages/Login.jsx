@@ -47,6 +47,10 @@ export default function Login() {
       bgcolor: 'background.paper',
       '& fieldset': { borderColor: 'divider' },
     },
+    '& input:-webkit-autofill': {
+      WebkitBoxShadow: '0 0 0 100px #ffffff inset',
+      WebkitTextFillColor: '#1c1b18',
+    },
   }
 
   return (
