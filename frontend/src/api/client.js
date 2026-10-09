@@ -1,16 +1,29 @@
-// Единственное место, где знаем адрес бэкенда и формат ошибок.
-// Компоненты вызывают api('/wardrobe'), а не пишут fetch руками.
-
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+const TOKEN_KEY = 'layers_token'
+
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY)
+}
+
+export function setToken(token) {
+  if (token) localStorage.setItem(TOKEN_KEY, token)
+  else localStorage.removeItem(TOKEN_KEY)
+}
 
 export async function api(path, options = {}) {
-  const response = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-    ...options,
-  })
+  const token = getToken()
+  const headers = { 'Content-Type': 'application/json', ...options.headers }
+  if (token) headers.Authorization = `Bearer ${token}`
+
+  const response = await fetch(`${BASE_URL}${path}`, { headers, ...options })
+
+  if (response.status === 401 && token) {
+    setToken(null)
+    window.location.href = '/login'
+    throw new Error('Сессия истекла')
+  }
 
   if (!response.ok) {
-    // FastAPI кладёт текст ошибки в поле detail
     const body = await response.json().catch(() => ({}))
     throw new Error(body.detail ?? `HTTP ${response.status}`)
   }
