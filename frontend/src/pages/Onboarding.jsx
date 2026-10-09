@@ -24,11 +24,11 @@ const COLOR_HEX = {
   multicolor: 'conic-gradient(red, orange, yellow, green, blue, violet, red)',
 }
 
-const STYLE_META = {
-  sport: { label: 'Спортивный', desc: 'Удобно каждый день' },
-  casual: { label: 'Повседневный', desc: 'Просто и красиво' },
-  business: { label: 'Деловой', desc: 'Строго — для работы и учёбы' },
-}
+const STYLES = [
+  { value: 'casual', label: 'Повседневный', desc: 'Удобно каждый день' },
+  { value: 'sport', label: 'Спортивный', desc: 'Движение и комфорт' },
+  { value: 'business', label: 'Деловой', desc: 'Строго — для работы и учёбы' },
+]
 
 export default function Onboarding() {
   const navigate = useNavigate()
@@ -173,18 +173,18 @@ export default function Onboarding() {
       {/* Шаг 1: Стиль */}
       {step === 0 && (
         <>
-          <Typography variant="h2" sx={{ mb: 1 }}>Ваш стиль</Typography>
-          <Typography sx={{ color: 'text.secondary', mb: 3, fontSize: 15 }}>
-            Выберите один для подбора комплектов
+          <Typography variant="h2" sx={{ mb: 1 }}>Какой стиль вам ближе?</Typography>
+          <Typography sx={{ color: 'text.secondary', mb: 3, fontSize: 15, lineHeight: 1.5 }}>
+            Выберите стиль, который вам ближе. Дальше сервис будет учиться на ваших оценках.
           </Typography>
 
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5, mb: 4 }}>
-            {Object.entries(STYLE_META).map(([key, meta]) => {
-              const active = style === key
+            {STYLES.map((s) => {
+              const active = style === s.value
               return (
                 <Box
-                  key={key}
-                  onClick={() => setStyle(key)}
+                  key={s.value}
+                  onClick={() => setStyle(s.value)}
                   sx={{
                     position: 'relative',
                     borderRadius: 3,
@@ -195,11 +195,11 @@ export default function Onboarding() {
                     cursor: 'pointer',
                   }}
                 >
-                  <Box sx={{ height: 104, bgcolor: 'divider' }} />
-                  <Box sx={{ p: 1.5 }}>
-                    <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{meta.label}</Typography>
-                    <Typography sx={{ color: 'text.secondary', fontSize: 13, lineHeight: 1.3 }}>
-                      {meta.desc}
+                  <Box sx={{ height: 104, bgcolor: 'divider', borderRadius: '10px 10px 0 0' }} />
+                  <Box sx={{ px: 2, py: 1.5 }}>
+                    <Typography sx={{ fontWeight: 600, fontSize: 15, mb: 0.25 }}>{s.label}</Typography>
+                    <Typography sx={{ color: 'text.secondary', fontSize: 13, lineHeight: 1.4 }}>
+                      {s.desc}
                     </Typography>
                   </Box>
                   {active && (
