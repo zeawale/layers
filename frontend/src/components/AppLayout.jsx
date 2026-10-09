@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { BottomNavigation, BottomNavigationAction, Box, Paper } from '@mui/material'
+import { Box, Paper } from '@mui/material'
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined'
 import CheckroomOutlined from '@mui/icons-material/CheckroomOutlined'
 import PersonOutline from '@mui/icons-material/PersonOutline'
@@ -46,34 +46,41 @@ export default function AppLayout() {
           zIndex: 10,
         }}
       >
-        <BottomNavigation
-          value={current}
-          onChange={(_, path) => navigate(path)}
-          sx={{ bgcolor: 'transparent', height: 52 }}
-        >
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', height: 52 }}>
           {TABS.map((tab) => {
             const active = tab.path === current
             return (
-              <BottomNavigationAction
+              <Box
                 key={tab.path}
-                value={tab.path}
-                icon={tab.icon}
-                // Подпись видна только у активной вкладки, у остальных — только иконка
-                label={active ? tab.label : undefined}
+                onClick={() => navigate(tab.path)}
+                role="tab"
+                aria-selected={active}
                 aria-label={tab.label}
                 sx={{
-                  flexDirection: 'row',
-                  minWidth: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.75,
+                  px: active ? 2 : 1.5,
+                  py: 1,
                   borderRadius: 999,
+                  cursor: 'pointer',
                   color: 'common.white',
-                  opacity: 0.62,
-                  '& .MuiBottomNavigationAction-label': { ml: active ? 1 : 0, fontSize: 14, fontWeight: 600 },
-                  '&.Mui-selected': { color: 'text.primary', bgcolor: 'background.paper', opacity: 1 },
+                  opacity: active ? 1 : 0.62,
+                  bgcolor: active ? 'background.paper' : 'transparent',
+                  ...(active && { color: 'text.primary' }),
+                  '& svg': { fontSize: 22 },
                 }}
-              />
+              >
+                {tab.icon}
+                {active && (
+                  <Box component="span" sx={{ fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    {tab.label}
+                  </Box>
+                )}
+              </Box>
             )
           })}
-        </BottomNavigation>
+        </Box>
       </Paper>
     </Box>
   )
