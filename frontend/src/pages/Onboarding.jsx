@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   IconButton,
   InputAdornment,
   TextField,
@@ -14,7 +15,7 @@ import CheckIcon from '@mui/icons-material/Check'
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
 import SearchIcon from '@mui/icons-material/Search'
 
-import { api } from '../api/client.js'
+import { api, getToken } from '../api/client.js'
 
 const COLOR_HEX = {
   black: '#1c1b18', white: '#ffffff', gray: '#9e9e9e', beige: '#d4c5a9',
@@ -51,14 +52,22 @@ export default function Onboarding() {
   const [loading, setLoading] = useState(false)
   const [colors, setColors] = useState([])
   const [styles, setStyles] = useState([])
+  const [attrsLoading, setAttrsLoading] = useState(true)
+  const [attrsError, setAttrsError] = useState('')
+  const [attrsAttempt, setAttrsAttempt] = useState(0)
   const debounceRef = useRef(null)
 
   useEffect(() => {
-    api('/attributes').then((data) => {
-      if (data.color) setColors(data.color)
-      if (data.style) setStyles([...data.style].sort((a, b) => styleRank(a.value) - styleRank(b.value)))
-    }).catch(() => {})
-  }, [])
+    setAttrsLoading(true)
+    setAttrsError('')
+    api('/attributes')
+      .then((data) => {
+        if (data.color) setColors(data.color)
+        if (data.style) setStyles([...data.style].sort((a, b) => styleRank(a.value) - styleRank(b.value)))
+      })
+      .catch((err) => setAttrsError(err.message))
+      .finally(() => setAttrsLoading(false))
+  }, [attrsAttempt])
 
   const searchCities = useCallback((q) => {
     if (q.length < 3) { setCities([]); return }
@@ -130,6 +139,9 @@ export default function Onboarding() {
   function back() {
     setStep(step - 1)
   }
+
+  // Онбординг без входа не открываем
+  if (!getToken()) return <Navigate to="/login" replace />
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
@@ -399,6 +411,19 @@ export default function Onboarding() {
             </Typography>
           </Box>
         </>
+      )}
+
+      {/* Стили и цвета приходят из справочника: пока он грузится — спиннер, не пришёл — ошибка и «Повторить» */}
+      {step < 2 && attrsLoading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+          <CircularProgress size={28} />
+        </Box>
+      )}
+      {step < 2 && attrsError && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mb: 4 }}>
+          <Alert severity="error" sx={{ width: '100%' }}>{attrsError}</Alert>
+          <Button variant="outlined" onClick={() => setAttrsAttempt((n) => n + 1)}>Повторить</Button>
+        </Box>
       )}
 
       {/* Кнопка действия */}
