@@ -33,7 +33,7 @@ export default function Login() {
         body: JSON.stringify({ email, password }),
       })
       setToken(data.access_token)
-      navigate('/today')
+      navigate(data.user.onboarding_completed ? '/today' : '/onboarding')
     } catch (err) {
       setError(err.message)
     } finally {

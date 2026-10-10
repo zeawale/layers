@@ -1,9 +1,11 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Box, Paper } from '@mui/material'
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined'
 import CheckroomOutlined from '@mui/icons-material/CheckroomOutlined'
 import PersonOutline from '@mui/icons-material/PersonOutline'
 import WbSunnyOutlined from '@mui/icons-material/WbSunnyOutlined'
+
+import { getToken } from '../api/client.js'
 
 // Вкладки нижней панели: порядок и названия — как в макетах.
 const TABS = [
@@ -22,6 +24,9 @@ export default function AppLayout() {
   // Активная вкладка — та, с чего начинается адрес: /wardrobe/5 тоже подсветит «Гардероб».
   // Если адрес не подошёл ни к одной вкладке, ни одна не подсвечивается (false).
   const current = TABS.find((tab) => pathname.startsWith(tab.path))?.path ?? false
+
+  // Экраны приложения без входа не открываем
+  if (!getToken()) return <Navigate to="/login" replace />
 
   return (
     // Интерфейс только под мобильный экран шириной 390 px, поэтому на большом экране он по центру.
