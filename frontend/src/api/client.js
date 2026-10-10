@@ -25,7 +25,9 @@ export async function api(path, options = {}) {
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}))
-    throw new Error(body.detail ?? `HTTP ${response.status}`)
+    // У 422 detail — список ошибок по полям, у остальных — строка
+    const detail = Array.isArray(body.detail) ? body.detail.map((e) => e.msg).join('. ') : body.detail
+    throw new Error(detail ?? `HTTP ${response.status}`)
   }
 
   return response.status === 204 ? null : response.json()

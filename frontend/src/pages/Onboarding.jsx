@@ -24,11 +24,19 @@ const COLOR_HEX = {
   multicolor: 'conic-gradient(red, orange, yellow, green, blue, violet, red)',
 }
 
-const STYLES = [
-  { value: 'casual', label: 'Повседневный', desc: 'Удобно каждый день' },
-  { value: 'sport', label: 'Спортивный', desc: 'Движение и комфорт' },
-  { value: 'business', label: 'Деловой', desc: 'Строго — для работы и учёбы' },
-]
+// Описания карточек стилей. Названия и сам список берём из GET /attributes,
+// порядок — как в макете: стиль, которого нет в словаре, идёт в конец.
+const STYLE_DESC = {
+  casual: 'Удобно каждый день',
+  sport: 'Движение и комфорт',
+  business: 'Строго — для работы и учёбы',
+}
+const STYLE_ORDER = Object.keys(STYLE_DESC)
+
+function styleRank(value) {
+  const i = STYLE_ORDER.indexOf(value)
+  return i === -1 ? STYLE_ORDER.length : i
+}
 
 export default function Onboarding() {
   const navigate = useNavigate()
@@ -42,11 +50,13 @@ export default function Onboarding() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [colors, setColors] = useState([])
+  const [styles, setStyles] = useState([])
   const debounceRef = useRef(null)
 
   useEffect(() => {
     api('/attributes').then((data) => {
       if (data.color) setColors(data.color)
+      if (data.style) setStyles([...data.style].sort((a, b) => styleRank(a.value) - styleRank(b.value)))
     }).catch(() => {})
   }, [])
 
@@ -179,7 +189,7 @@ export default function Onboarding() {
           </Typography>
 
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5, mb: 4 }}>
-            {STYLES.map((s) => {
+            {styles.map((s) => {
               const active = style === s.value
               return (
                 <Box
@@ -199,7 +209,7 @@ export default function Onboarding() {
                   <Box sx={{ px: 2, py: 1.5 }}>
                     <Typography sx={{ fontWeight: 600, fontSize: 15, mb: 0.25 }}>{s.label}</Typography>
                     <Typography sx={{ color: 'text.secondary', fontSize: 13, lineHeight: 1.4 }}>
-                      {s.desc}
+                      {STYLE_DESC[s.value]}
                     </Typography>
                   </Box>
                   {active && (
@@ -401,7 +411,14 @@ export default function Onboarding() {
       )}
 
       {/* Кнопка действия */}
-      <Button variant="contained" size="large" fullWidth onClick={next} disabled={loading}>
+      <Button
+        variant="contained"
+        size="large"
+        fullWidth
+        onClick={next}
+        // Без города нет погоды, шаг города пропустить нельзя
+        disabled={loading || (step === 2 && !selectedCity && !cityQuery.trim())}
+      >
         {loading ? 'Сохраняем…' : step === 2 ? 'Готово' : 'Далее'}
       </Button>
     </Box>

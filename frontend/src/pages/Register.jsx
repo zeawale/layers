@@ -95,6 +95,7 @@ export default function Register() {
                   </InputAdornment>
                 ),
               },
+              htmlInput: { maxLength: 50 },
             }}
           />
         </Box>
