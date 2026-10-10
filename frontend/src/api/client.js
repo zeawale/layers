@@ -12,12 +12,15 @@ export function setToken(token) {
 
 export async function api(path, options = {}) {
   const token = getToken()
-  const headers = { 'Content-Type': 'application/json', ...options.headers }
+  const headers = { ...options.headers }
+  // Фото уходят как FormData: Content-Type с границей частей браузер ставит сам
+  if (!(options.body instanceof FormData)) headers['Content-Type'] ??= 'application/json'
   if (token) headers.Authorization = `Bearer ${token}`
 
-  const response = await fetch(`${BASE_URL}${path}`, { headers, ...options })
+  const response = await fetch(`${BASE_URL}${path}`, { ...options, headers })
 
-  if (response.status === 401 && token) {
+  // 401 на входе — неверный пароль, а не истёкшая сессия: его показываем на форме
+  if (response.status === 401 && token && path !== '/auth/login') {
     setToken(null)
     window.location.href = '/login'
     throw new Error('Сессия истекла')
