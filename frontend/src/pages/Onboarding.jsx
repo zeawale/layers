@@ -128,15 +128,15 @@ export default function Onboarding() {
   }
 
   function back() {
-    if (step > 0) setStep(step - 1)
-    else navigate(-1)
+    setStep(step - 1)
   }
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      {/* Навбар */}
+      {/* Навбар. На первом шаге «назад» нет: аккаунт уже создан, возвращаться некуда.
+          Кнопку прячем, а не убираем, чтобы «Шаг 1 из 3» не съезжал. */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-        <IconButton onClick={back} sx={{ border: '1px solid', borderColor: 'divider', width: 40, height: 40 }}>
+        <IconButton onClick={back} sx={{ border: '1px solid', borderColor: 'divider', width: 40, height: 40, visibility: step === 0 ? 'hidden' : 'visible' }}>
           <ArrowBackIcon sx={{ fontSize: 20 }} />
         </IconButton>
         <Typography variant="body2" sx={{ flex: 1, textAlign: 'center', color: 'text.secondary' }}>

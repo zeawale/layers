@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link as RouterLink, useNavigate } from 'react-router-dom'
+import { Link as RouterLink, useNavigate, useNavigationType } from 'react-router-dom'
 import {
   Alert,
   Box,
@@ -18,6 +18,9 @@ import { api, setToken } from '../api/client.js'
 
 export default function Login() {
   const navigate = useNavigate()
+  // Вход часто открывается первым экраном, и тогда «назад» увёл бы из приложения.
+  // Кнопку показываем, только если сюда перешли с другого экрана, например с регистрации.
+  const canGoBack = useNavigationType() === 'PUSH'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -43,9 +46,11 @@ export default function Login() {
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <IconButton onClick={() => navigate(-1)} sx={{ ml: -1, mb: 2, border: '1px solid', borderColor: 'divider', width: 40, height: 40 }}>
-        <ArrowBackIcon sx={{ fontSize: 20 }} />
-      </IconButton>
+      {canGoBack && (
+        <IconButton onClick={() => navigate(-1)} sx={{ ml: -1, mb: 2, border: '1px solid', borderColor: 'divider', width: 40, height: 40 }}>
+          <ArrowBackIcon sx={{ fontSize: 20 }} />
+        </IconButton>
+      )}
 
       <Typography variant="h1" sx={{ mb: 1.5 }}>
         С возвращением

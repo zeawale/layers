@@ -50,7 +50,7 @@ export default function Register() {
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <IconButton onClick={() => navigate(-1)} sx={{ ml: -1, mb: 2, border: '1px solid', borderColor: 'divider', width: 40, height: 40 }}>
+      <IconButton onClick={() => navigate('/login')} sx={{ ml: -1, mb: 2, border: '1px solid', borderColor: 'divider', width: 40, height: 40 }}>
         <ArrowBackIcon sx={{ fontSize: 20 }} />
       </IconButton>
 
