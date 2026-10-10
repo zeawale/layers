@@ -200,34 +200,54 @@ export default function Onboarding() {
                   key={s.value}
                   onClick={() => setStyle(s.value)}
                   sx={{
-                    position: 'relative',
-                    borderRadius: 3,
+                    borderRadius: '20px',
                     border: '2px solid',
-                    borderColor: active ? 'primary.main' : 'divider',
+                    borderColor: active ? 'text.primary' : 'divider',
                     bgcolor: 'background.paper',
-                    overflow: 'hidden',
+                    p: 1,
                     cursor: 'pointer',
+                    height: 'fit-content',
                   }}
                 >
-                  <Box sx={{ height: 104, bgcolor: 'divider', borderRadius: '10px 10px 0 0' }} />
-                  <Box sx={{ px: 2, py: 1.5 }}>
+                  {/* Фото */}
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      aspectRatio: '1 / 1',
+                      borderRadius: '12px',
+                      bgcolor: 'divider',
+                      overflow: 'hidden',
+                      mb: 1,
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={`/onboarding/style-${s.value}.jpg`}
+                      alt=""
+                      onError={(e) => { e.currentTarget.style.display = 'none' }}
+                      // Кадр чуть выше центра: на вертикальных фото видна и голова, и образ
+                      sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 25%', display: 'block' }}
+                    />
+                    {active && (
+                      <Box
+                        sx={{
+                          position: 'absolute', top: 8, right: 8,
+                          width: 26, height: 26, borderRadius: '50%',
+                          bgcolor: 'text.primary',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}
+                      >
+                        <CheckIcon sx={{ fontSize: 15, color: 'common.white' }} />
+                      </Box>
+                    )}
+                  </Box>
+                  {/* Текст */}
+                  <Box sx={{ px: 0.5, pb: 0.5 }}>
                     <Typography sx={{ fontWeight: 600, fontSize: 15, mb: 0.25 }}>{s.label}</Typography>
                     <Typography sx={{ color: 'text.secondary', fontSize: 13, lineHeight: 1.4 }}>
                       {STYLE_DESC[s.value]}
                     </Typography>
                   </Box>
-                  {active && (
-                    <Box
-                      sx={{
-                        position: 'absolute', top: 10, right: 10,
-                        width: 26, height: 26, borderRadius: '50%',
-                        bgcolor: 'primary.main',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}
-                    >
-                      <CheckIcon sx={{ fontSize: 14, color: 'common.white' }} />
-                    </Box>
-                  )}
                 </Box>
               )
             })}
@@ -238,9 +258,9 @@ export default function Onboarding() {
       {/* Шаг 2: Цвета */}
       {step === 1 && (
         <>
-          <Typography variant="h2" sx={{ mb: 1 }}>Любимые цвета</Typography>
-          <Typography sx={{ color: 'text.secondary', mb: 3, fontSize: 15 }}>
-            Отметьте цвета, которые носите и которые точно нет
+          <Typography variant="h2" sx={{ mb: 1 }}>Цвета, которые вы любите</Typography>
+          <Typography sx={{ color: 'text.secondary', mb: 3, fontSize: 15, lineHeight: 1.5 }}>
+            Любимые цвета чаще попадут в комплекты, а нелюбимые — не попадут совсем.
           </Typography>
 
           {/* Люблю носить */}
@@ -264,10 +284,9 @@ export default function Onboarding() {
                       width: 44, height: 44, borderRadius: '50%',
                       cursor: dimmed ? 'default' : 'pointer',
                       position: 'relative',
-                      background: COLOR_HEX[c.value] || '#ccc',
-                      border: active ? '3px solid' : '1px solid',
+                      background: dimmed ? '#ffffff' : (COLOR_HEX[c.value] || '#ccc'),
+                      border: active ? '3px solid' : dimmed ? '1px dashed' : '1px solid',
                       borderColor: active ? 'primary.main' : 'divider',
-                      opacity: dimmed ? 0.3 : 1,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}
                   >
@@ -284,13 +303,18 @@ export default function Onboarding() {
                 )
               })}
             </Box>
+            {liked.length > 0 && (
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.5, fontSize: 13 }}>
+                {colors.filter((c) => liked.includes(c.value)).map((c) => c.label).join(' · ')}
+              </Typography>
+            )}
           </Box>
 
           {/* Не ношу */}
-          <Box sx={{ bgcolor: 'background.paper', borderRadius: 3, p: 2, mb: 4 }}>
+          <Box sx={{ bgcolor: 'background.paper', borderRadius: 3, p: 2, mb: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
               <Typography sx={{ fontWeight: 600, fontSize: 15 }}>Не ношу</Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              <Typography variant="body2" sx={{ color: disliked.length > 0 ? 'error.main' : 'text.secondary' }}>
                 {disliked.length} выбрано
               </Typography>
             </Box>
@@ -307,10 +331,9 @@ export default function Onboarding() {
                       width: 44, height: 44, borderRadius: '50%',
                       cursor: dimmed ? 'default' : 'pointer',
                       position: 'relative',
-                      background: COLOR_HEX[c.value] || '#ccc',
-                      border: active ? '3px solid' : '1px solid',
+                      background: dimmed ? '#ffffff' : (COLOR_HEX[c.value] || '#ccc'),
+                      border: active ? '3px solid' : dimmed ? '1px dashed' : '1px solid',
                       borderColor: active ? 'error.main' : 'divider',
-                      opacity: dimmed ? 0.3 : 1,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}
                   >
@@ -327,16 +350,38 @@ export default function Onboarding() {
                 )
               })}
             </Box>
+            {disliked.length > 0 && (
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.5, fontSize: 13 }}>
+                {colors.filter((c) => disliked.includes(c.value)).map((c) => c.label).join(' · ')}
+              </Typography>
+            )}
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.5, fontSize: 12, lineHeight: 1.4 }}>
+              Цвета из «Люблю носить» здесь недоступны — и наоборот
+            </Typography>
           </Box>
+
+          {/* Ваша палитра */}
+          {liked.length > 0 && (
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', mb: 1, display: 'block' }}>
+                Ваша палитра
+              </Typography>
+              <Box sx={{ display: 'flex', borderRadius: 3, overflow: 'hidden', height: 48 }}>
+                {colors.filter((c) => liked.includes(c.value)).map((c) => (
+                  <Box key={c.value} sx={{ flex: 1, background: COLOR_HEX[c.value] || '#ccc' }} />
+                ))}
+              </Box>
+            </Box>
+          )}
         </>
       )}
 
       {/* Шаг 3: Город */}
       {step === 2 && (
         <>
-          <Typography variant="h2" sx={{ mb: 1 }}>Ваш город</Typography>
-          <Typography sx={{ color: 'text.secondary', mb: 3, fontSize: 15 }}>
-            Чтобы учесть погоду при подборе комплекта
+          <Typography variant="h2" sx={{ mb: 1 }}>Где вы живёте?</Typography>
+          <Typography sx={{ color: 'text.secondary', mb: 3, fontSize: 15, lineHeight: 1.5 }}>
+            Город нужен для прогноза погоды: комплект подбирается под температуру, ветер и осадки.
           </Typography>
 
           <Box sx={{ mb: 2 }}>
@@ -363,14 +408,17 @@ export default function Onboarding() {
           {/* Подсказки городов */}
           {cities.length > 0 && (
             <Box sx={{ bgcolor: 'background.paper', borderRadius: 3, overflow: 'hidden', mb: 2 }}>
-              {cities.map((city, i) => (
+              {cities.map((city, i) => {
+                const chosen = selectedCity?.name === city.name
+                return (
                 <Box
                   key={`${city.name}-${city.lat}-${city.lon}`}
                   onClick={() => selectCity(city)}
                   sx={{
                     display: 'flex', alignItems: 'center', gap: 1.5,
                     px: 2, py: 1.5, cursor: 'pointer',
-                    '&:hover': { bgcolor: 'action.hover' },
+                    bgcolor: chosen ? 'rgba(46, 70, 54, 0.1)' : 'transparent',
+                    '&:hover': { bgcolor: chosen ? 'rgba(46, 70, 54, 0.1)' : 'action.hover' },
                     borderBottom: i < cities.length - 1 ? '1px solid' : 'none',
                     borderColor: 'divider',
                   }}
@@ -384,11 +432,12 @@ export default function Onboarding() {
                       </Typography>
                     )}
                   </Box>
-                  {selectedCity?.name === city.name && (
+                  {chosen && (
                     <CheckIcon sx={{ color: 'primary.main', fontSize: 20 }} />
                   )}
                 </Box>
-              ))}
+                )
+              })}
             </Box>
           )}
 
@@ -435,7 +484,7 @@ export default function Onboarding() {
         // Без города нет погоды, шаг города пропустить нельзя
         disabled={loading || (step === 2 && !selectedCity && !cityQuery.trim())}
       >
-        {loading ? 'Сохраняем…' : step === 2 ? 'Готово' : 'Далее'}
+        {loading ? 'Сохраняем…' : step === 2 ? 'Готово — подобрать комплект' : 'Далее'}
       </Button>
     </Box>
   )
