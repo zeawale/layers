@@ -48,18 +48,6 @@ export default function Register() {
     }
   }
 
-  const fieldSx = {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: 3,
-      bgcolor: 'background.paper',
-      '& fieldset': { borderColor: 'divider' },
-    },
-    '& input:-webkit-autofill': {
-      WebkitBoxShadow: '0 0 0 100px #ffffff inset',
-      WebkitTextFillColor: '#1c1b18',
-    },
-  }
-
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
       <IconButton onClick={() => navigate(-1)} sx={{ ml: -1, mb: 2, border: '1px solid', borderColor: 'divider', width: 40, height: 40 }}>
@@ -86,7 +74,6 @@ export default function Register() {
             onChange={(e) => setName(e.target.value)}
             autoComplete="name"
             fullWidth
-            sx={fieldSx}
             slotProps={{
               input: {
                 startAdornment: (
@@ -112,7 +99,6 @@ export default function Register() {
             required
             autoComplete="email"
             fullWidth
-            sx={fieldSx}
             slotProps={{
               input: {
                 startAdornment: (
@@ -138,7 +124,6 @@ export default function Register() {
             inputProps={{ minLength: 8 }}
             autoComplete="new-password"
             fullWidth
-            sx={fieldSx}
             slotProps={{
               input: {
                 startAdornment: (

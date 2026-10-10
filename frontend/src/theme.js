@@ -30,6 +30,23 @@ const theme = createTheme({
       // Кнопки в макетах — «таблетки» высотой 52 px
       styleOverrides: { root: { borderRadius: 999, minHeight: 52, paddingInline: 24 } },
     },
+    MuiOutlinedInput: {
+      // Поля ввода в макетах: белые, сильно скруглённые, с тонкой рамкой
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderRadius: theme.shape.borderRadius * 3,
+          backgroundColor: theme.palette.background.paper,
+        }),
+        notchedOutline: ({ theme }) => ({ borderColor: theme.palette.divider }),
+        // Автозаполнение Chrome и Edge красит поле в голубой, оставляем белым
+        input: ({ theme }) => ({
+          '&:-webkit-autofill': {
+            WebkitBoxShadow: `0 0 0 100px ${theme.palette.background.paper} inset`,
+            WebkitTextFillColor: theme.palette.text.primary,
+          },
+        }),
+      },
+    },
   },
 })
 

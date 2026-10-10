@@ -132,14 +132,6 @@ export default function Onboarding() {
     else navigate(-1)
   }
 
-  const fieldSx = {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: 3,
-      bgcolor: 'background.paper',
-      '& fieldset': { borderColor: 'divider' },
-    },
-  }
-
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
       {/* Навбар */}
@@ -344,7 +336,6 @@ export default function Onboarding() {
               value={cityQuery}
               onChange={(e) => handleCityInput(e.target.value)}
               fullWidth
-              sx={fieldSx}
               slotProps={{
                 input: {
                   startAdornment: (

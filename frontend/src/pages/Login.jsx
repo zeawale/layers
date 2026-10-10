@@ -41,18 +41,6 @@ export default function Login() {
     }
   }
 
-  const fieldSx = {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: 3,
-      bgcolor: 'background.paper',
-      '& fieldset': { borderColor: 'divider' },
-    },
-    '& input:-webkit-autofill': {
-      WebkitBoxShadow: '0 0 0 100px #ffffff inset',
-      WebkitTextFillColor: '#1c1b18',
-    },
-  }
-
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
       <IconButton onClick={() => navigate(-1)} sx={{ ml: -1, mb: 2, border: '1px solid', borderColor: 'divider', width: 40, height: 40 }}>
@@ -81,7 +69,6 @@ export default function Login() {
             required
             autoComplete="email"
             fullWidth
-            sx={fieldSx}
             slotProps={{
               input: {
                 startAdornment: (
@@ -106,7 +93,6 @@ export default function Login() {
             required
             autoComplete="current-password"
             fullWidth
-            sx={fieldSx}
             slotProps={{
               input: {
                 startAdornment: (
