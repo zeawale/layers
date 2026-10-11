@@ -4,18 +4,14 @@ import CloudOutlined from '@mui/icons-material/CloudOutlined'
 import UmbrellaOutlined from '@mui/icons-material/UmbrellaOutlined'
 import WbSunnyOutlined from '@mui/icons-material/WbSunnyOutlined'
 
+import { formatTemp } from '../../format.js'
+
 // Состояний погоды ровно четыре (HANDBOOK, раздел 8; API.md, Weather)
 const CONDITION_ICON = {
   clear: <WbSunnyOutlined />,
   cloudy: <CloudOutlined />,
   rain: <UmbrellaOutlined />,
   snow: <AcUnitOutlined />,
-}
-
-// «+12°», «−3°», «0°»
-export function formatTemp(t) {
-  const n = Math.round(t)
-  return `${n > 0 ? '+' : n < 0 ? '−' : ''}${Math.abs(n)}°`
 }
 
 function Stat({ value, label }) {

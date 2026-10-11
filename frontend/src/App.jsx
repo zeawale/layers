@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 
 import AppLayout from './components/AppLayout.jsx'
 import History from './pages/History.jsx'
+import HistoryDay from './pages/HistoryDay.jsx'
 import Login from './pages/Login.jsx'
 import Onboarding from './pages/Onboarding.jsx'
 import Profile from './pages/Profile.jsx'
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/today" element={<Today />} />
         <Route path="/wardrobe" element={<Wardrobe />} />
         <Route path="/history" element={<History />} />
+        <Route path="/history/:id" element={<HistoryDay />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
     </Routes>

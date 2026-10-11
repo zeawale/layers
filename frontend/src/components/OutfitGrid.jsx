@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import CheckroomOutlined from '@mui/icons-material/CheckroomOutlined'
 
-import { mediaUrl } from '../../api/client.js'
+import { mediaUrl } from '../api/client.js'
 
 // Порядок слотов — как в макете: сверху вниз от верхней одежды к обуви
 const ORDER = ['outerwear', 'top', 'dress', 'accessory', 'bottom', 'footwear']

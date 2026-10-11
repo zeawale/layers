@@ -19,3 +19,8 @@ export function selectVariant(id) {
 export function sendFeedback(id, changes) {
   return api(`/outfit/${id}/feedback`, { method: 'POST', body: JSON.stringify(changes) })
 }
+
+// История — выбранный вариант каждого дня, новые сверху, по умолчанию 30 дней
+export function getHistory() {
+  return api('/outfit/history')
+}

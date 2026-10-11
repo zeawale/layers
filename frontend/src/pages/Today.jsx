@@ -8,9 +8,10 @@ import CheckroomOutlined from '@mui/icons-material/CheckroomOutlined'
 
 import { getToday, regenerate, selectVariant, sendFeedback } from '../api/outfit.js'
 import { getMe } from '../api/users.js'
+import FeedbackBar from '../components/FeedbackBar.jsx'
+import OutfitGrid from '../components/OutfitGrid.jsx'
+import { formatDayLong } from '../format.js'
 import useAttributes from '../hooks/useAttributes.js'
-import FeedbackBar from './today/FeedbackBar.jsx'
-import OutfitGrid from './today/OutfitGrid.jsx'
 import WeatherCard from './today/WeatherCard.jsx'
 
 function greeting(name) {
@@ -18,11 +19,6 @@ function greeting(name) {
   const part = h < 5 ? 'Доброй ночи' : h < 12 ? 'Доброе утро' : h < 17 ? 'Добрый день' : h < 23 ? 'Добрый вечер' : 'Доброй ночи'
   // Без имени — просто «Доброе утро» (API.md, User.name)
   return name ? `${part}, ${name}` : part
-}
-
-function today() {
-  const s = new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })
-  return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
 // Главный экран — макеты 2.0–2.4, 2.8–2.10. Все действия отвечают OutfitDay, экран перерисовывается из ответа.
@@ -75,7 +71,7 @@ export default function Today() {
 
   const header = (
     <>
-      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>{today()}</Typography>
+      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>{formatDayLong(new Date().toLocaleDateString('sv-SE'))}</Typography>
       <Typography variant="h1" sx={{ mb: 3 }}>{greeting(name)}</Typography>
     </>
   )
