@@ -1,11 +1,13 @@
 import { Route, Routes } from 'react-router-dom'
 
 import AppLayout from './components/AppLayout.jsx'
+import ChangePassword from './pages/ChangePassword.jsx'
 import History from './pages/History.jsx'
 import HistoryDay from './pages/HistoryDay.jsx'
 import Login from './pages/Login.jsx'
 import Onboarding from './pages/Onboarding.jsx'
 import Profile from './pages/Profile.jsx'
+import ProfileName from './pages/ProfileName.jsx'
 import Register from './pages/Register.jsx'
 import Start from './pages/Start.jsx'
 import Today from './pages/Today.jsx'
@@ -20,6 +22,8 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/profile/name" element={<ProfileName />} />
+      <Route path="/profile/password" element={<ChangePassword />} />
 
       {/* Экраны внутри приложения: у всех общая обёртка с нижней панелью */}
       <Route element={<AppLayout />}>
