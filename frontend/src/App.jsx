@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 import AppLayout from './components/AppLayout.jsx'
 import AddItem from './pages/AddItem.jsx'
 import History from './pages/History.jsx'
+import ItemDetails from './pages/ItemDetails.jsx'
 import Login from './pages/Login.jsx'
 import Onboarding from './pages/Onboarding.jsx'
 import Profile from './pages/Profile.jsx'
@@ -21,6 +22,7 @@ export default function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/wardrobe/new" element={<AddItem />} />
+      <Route path="/wardrobe/:id" element={<ItemDetails />} />
 
       {/* Экраны внутри приложения: у всех общая обёртка с нижней панелью */}
       <Route element={<AppLayout />}>
