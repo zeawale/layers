@@ -5,6 +5,11 @@ export function getToken() {
   return localStorage.getItem(TOKEN_KEY)
 }
 
+// Фото бэк отдаёт относительным адресом (/media/...), базовый адрес знает только api/
+export function mediaUrl(path) {
+  return path ? `${BASE_URL}${path}` : null
+}
+
 export function setToken(token) {
   if (token) localStorage.setItem(TOKEN_KEY, token)
   else localStorage.removeItem(TOKEN_KEY)
