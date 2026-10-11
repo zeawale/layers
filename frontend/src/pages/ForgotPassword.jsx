@@ -41,17 +41,6 @@ export default function ForgotPassword() {
     }
   }
 
-  const fieldSx = {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: 3,
-      bgcolor: 'background.paper',
-      '& fieldset': { borderColor: 'divider' },
-    },
-    '& input:-webkit-autofill': {
-      WebkitBoxShadow: '0 0 0 100px #ffffff inset',
-      WebkitTextFillColor: '#1c1b18',
-    },
-  }
 
   if (sent) {
     return (
@@ -117,7 +106,6 @@ export default function ForgotPassword() {
             required
             autoComplete="email"
             fullWidth
-            sx={fieldSx}
             slotProps={{
               input: {
                 startAdornment: (

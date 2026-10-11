@@ -19,14 +19,6 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import { api } from '../api/client.js'
 import AuthStatus from '../components/AuthStatus.jsx'
 
-const fieldSx = {
-  '& .MuiOutlinedInput-root': {
-    borderRadius: 3,
-    bgcolor: 'background.paper',
-    '& fieldset': { borderColor: 'divider' },
-  },
-}
-
 function PasswordField({ label, value, onChange, autoFocus }) {
   const [visible, setVisible] = useState(false)
   return (
@@ -43,7 +35,6 @@ function PasswordField({ label, value, onChange, autoFocus }) {
         autoFocus={autoFocus}
         autoComplete="new-password"
         fullWidth
-        sx={fieldSx}
         slotProps={{
           input: {
             startAdornment: (
