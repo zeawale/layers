@@ -23,3 +23,8 @@ export function getItem(id) {
 export function deleteItem(id) {
   return api(`/items/${id}`, { method: 'DELETE' })
 }
+
+// Передаём только то, что меняем; photo_id: null отвязывает фото
+export function updateItem(id, changes) {
+  return api(`/items/${id}`, { method: 'PATCH', body: JSON.stringify(changes) })
+}

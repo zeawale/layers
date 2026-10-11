@@ -142,8 +142,7 @@ export default function ItemDetails() {
           </Box>
 
           <Box sx={{ display: 'flex', gap: 1.5 }}>
-            {/* Правка вещи — следующий шаг гардероба (макет 3.9) */}
-            <Button variant="contained" size="large" fullWidth disabled>
+            <Button variant="contained" size="large" fullWidth onClick={() => navigate(`/wardrobe/${id}/edit`)}>
               Редактировать
             </Button>
             <Button
