@@ -28,3 +28,8 @@ export function deleteItem(id) {
 export function updateItem(id, changes) {
   return api(`/items/${id}`, { method: 'PATCH', body: JSON.stringify(changes) })
 }
+
+// Всё или ничего: одна чужая или несуществующая — не удаляется ни одна
+export function bulkDeleteItems(ids) {
+  return api('/items/bulk-delete', { method: 'POST', body: JSON.stringify({ ids }) })
+}

@@ -5,10 +5,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   IconButton,
   Typography,
 } from '@mui/material'
@@ -17,6 +13,7 @@ import CheckroomOutlined from '@mui/icons-material/CheckroomOutlined'
 
 import { getToken, mediaUrl } from '../api/client.js'
 import { deleteItem, getItem } from '../api/items.js'
+import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import useAttributes from '../hooks/useAttributes.js'
 
 // «2 сентября» и «2 сентября 2026»
@@ -157,23 +154,15 @@ export default function ItemDetails() {
             </Button>
           </Box>
 
-          <Dialog open={confirmOpen} onClose={() => !deleting && setConfirmOpen(false)} PaperProps={{ sx: { borderRadius: '20px', p: 1 } }}>
-            <DialogTitle sx={{ fontWeight: 700, fontSize: 18 }}>Удалить «{item.name}»?</DialogTitle>
-            <DialogContent>
-              <Typography sx={{ color: 'text.secondary', fontSize: 15, lineHeight: 1.5 }}>
-                Вещь пропадёт из гардероба и больше не попадёт в комплекты.
-              </Typography>
-              {deleteError && <Alert severity="error" sx={{ mt: 2 }}>{deleteError}</Alert>}
-            </DialogContent>
-            <DialogActions sx={{ flexDirection: 'column', gap: 1, px: 3, pb: 2 }}>
-              <Button variant="contained" color="error" fullWidth onClick={handleDelete} disabled={deleting}>
-                {deleting ? 'Удаляем…' : 'Удалить'}
-              </Button>
-              <Button fullWidth onClick={() => setConfirmOpen(false)} disabled={deleting} sx={{ color: 'text.primary', ml: '0 !important' }}>
-                Отмена
-              </Button>
-            </DialogActions>
-          </Dialog>
+          <ConfirmDialog
+            open={confirmOpen}
+            title={`Удалить «${item.name}»?`}
+            text="Вещь пропадёт из гардероба и больше не попадёт в комплекты."
+            loading={deleting}
+            error={deleteError}
+            onConfirm={handleDelete}
+            onClose={() => setConfirmOpen(false)}
+          />
         </>
       )}
     </Box>
