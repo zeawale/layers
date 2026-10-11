@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Alert, Box, Button, CircularProgress, InputAdornment, TextField, Typography } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
+import { Alert, Box, Button, CircularProgress, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
 import SearchIcon from '@mui/icons-material/Search'
 
 import { listItems } from '../api/items.js'
@@ -18,6 +20,8 @@ function itemsWord(n) {
 
 // Макеты 3.0 «Гардероб», 3.1 «Гардероб · пусто», 3.8 «Ничего не нашлось»
 export default function Wardrobe() {
+  const navigate = useNavigate()
+  const addItem = () => navigate('/wardrobe/new')
   const { label, loading: attrsLoading, error: attrsError, retry: retryAttrs } = useAttributes()
   const [items, setItems] = useState(null)
   const [error, setError] = useState('')
@@ -44,9 +48,18 @@ export default function Wardrobe() {
 
   return (
     <Box sx={{ px: 3, pt: 4 }}>
-      <Typography variant="h1" sx={{ mb: 0.5 }}>
-        Гардероб
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+        <Typography variant="h1">Гардероб</Typography>
+        {items?.length > 0 && (
+          <IconButton
+            onClick={addItem}
+            aria-label="Добавить вещь"
+            sx={{ bgcolor: 'primary.main', color: 'common.white', width: 44, height: 44, '&:hover': { bgcolor: 'primary.dark' } }}
+          >
+            <AddIcon />
+          </IconButton>
+        )}
+      </Box>
       <Typography sx={{ color: 'text.secondary', mb: 3, fontSize: 15 }}>
         {items?.length ? `${items.length} ${itemsWord(items.length)} в гардеробе` : 'Пока ни одной вещи'}
       </Typography>
@@ -64,7 +77,7 @@ export default function Wardrobe() {
         </Box>
       )}
 
-      {!loading && !failed && items.length === 0 && <EmptyWardrobe />}
+      {!loading && !failed && items.length === 0 && <EmptyWardrobe onAdd={addItem} />}
 
       {!loading && !failed && items.length > 0 && (
         <>
