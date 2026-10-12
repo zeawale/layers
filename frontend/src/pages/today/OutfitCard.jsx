@@ -25,7 +25,16 @@ export default function OutfitCard({ day, outfit, label, variants, feedback }) {
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, minHeight: 38, mb: 2.5 }}>
         <Typography variant="h3" component="h2">Комплект на сегодня</Typography>
-        <VariantButton variant={outfit.variant} max={day.variants_max} canMore={canMore} busy={variants.busy} locked={locked} onClick={variants.another} />
+        <VariantButton
+          variant={outfit.variant}
+          max={day.variants_max}
+          canMore={canMore}
+          canCycle={day.variants.length > 1}
+          busy={variants.busy}
+          locked={locked}
+          onNew={variants.another}
+          onCycle={variants.cycle}
+        />
       </Box>
       {(items.length > 0 || missing.length > 0) && (
         <Panel shadow sx={{ p: 1.5, pb: 2.5, mb: 2.5 }}>

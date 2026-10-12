@@ -26,7 +26,7 @@ export default function VariantDots({ variants, selectedId, canMore, disabled, o
       )}
       {!canMore && (
         <Typography variant="caption" component="p" align="center" sx={{ color: 'text.secondary', mt: variants.length > 1 ? 0 : 1.5 }}>
-          На сегодня вариантов больше нет
+          Новых вариантов на сегодня больше нет
         </Typography>
       )}
     </>

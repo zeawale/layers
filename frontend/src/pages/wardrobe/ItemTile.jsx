@@ -3,7 +3,7 @@ import CheckIcon from '@mui/icons-material/Check'
 
 import ItemPhoto from '../../components/ItemPhoto.jsx'
 
-// Вещь в сетке гардероба (макеты 3.0, 3.10): фото 165×196 со скруглением 20 прямо на фоне, под ним название
+// Вещь в сетке гардероба (макеты 3.0, 3.10): белая плитка 165×196 со скруглением 20, фото в ней целиком, под ней название
 // и «Категория · цвет». selecting — режим выбора: кружок в углу фото; selected — тёмная рамка и галочка
 export default function ItemTile({ image, title, subtitle, selecting, selected, onClick }) {
   return (
@@ -17,8 +17,10 @@ export default function ItemTile({ image, title, subtitle, selecting, selected, 
     >
       <ItemPhoto
         src={image}
+        contain
         sx={{
           aspectRatio: '165 / 196',
+          p: 1,
           borderRadius: '20px',
           bgcolor: 'background.paper',
           mb: 0.5,

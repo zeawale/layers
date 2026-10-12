@@ -47,5 +47,11 @@ export default function useVariants(day, setDay, notify) {
     if (target) select(target.id)
   }
 
-  return { busy, locked, another, select, step }
+  // Кнопка «↻ N из M», когда новых вариантов больше не будет: по кругу между готовыми, после последнего — первый
+  function cycle() {
+    const i = day.variants.findIndex((v) => v.id === day.selected_id)
+    select(day.variants[(i + 1) % day.variants.length].id)
+  }
+
+  return { busy, locked, another, cycle, select, step }
 }

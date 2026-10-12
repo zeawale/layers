@@ -20,9 +20,14 @@ const LAYOUTS = {
 }
 const MANY = { columns: 'repeat(2, minmax(0, 1fr))', rows: '130px' }
 
+// Фото целиком в белой рамке: вещи снимают в разных пропорциях, обрезка съедала низ брюк и обуви.
 function Tile({ item, label, sx }) {
   return (
-    <ItemPhoto src={mediaUrl(item.photo?.url)} sx={{ aspectRatio: 'auto', height: '100%', borderRadius: '16px', bgcolor: 'background.default', ...sx }}>
+    <ItemPhoto
+      src={mediaUrl(item.photo?.url)}
+      contain
+      sx={{ aspectRatio: 'auto', height: '100%', p: 0.75, borderRadius: '16px', border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', ...sx }}
+    >
       <CategoryPill>{label}</CategoryPill>
     </ItemPhoto>
   )

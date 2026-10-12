@@ -72,8 +72,9 @@ export default function ItemDetails() {
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', pb: 4 }}>
       <Box sx={{ position: 'relative' }}>
-        <ItemPhoto src={mediaUrl(item.photo?.url)} sx={{ aspectRatio: '390 / 414', bgcolor: 'background.paper' }} />
-        <BackButton onClick={() => toWardrobe()} sx={{ position: 'absolute', top: 20, left: 20, width: 44, height: 44, border: 0, bgcolor: 'background.paper', '&:hover': { bgcolor: 'background.paper' } }} />
+        {/* Фото целиком: снизу поле под заходящий на фото «лист», сверху — под кнопку «назад» */}
+        <ItemPhoto src={mediaUrl(item.photo?.url)} contain sx={{ aspectRatio: '390 / 414', pt: 2, pb: 3.5, bgcolor: 'background.paper' }} />
+        <BackButton onClick={() => toWardrobe()} sx={{ position: 'absolute', top: 20, left: 20 }} />
       </Box>
 
       {/* «Лист» со скруглёнными верхними углами заходит на фото, как в макете */}
