@@ -19,7 +19,7 @@ export const sortStyles = (styles) => [...styles].sort((a, b) => styleRank(a.val
 export default function StyleStep({ styles, value, onChange }) {
   return (
     <>
-      <Typography variant="h2" sx={{ mb: 1 }}>Какой стиль тебе ближе?</Typography>
+      <Typography variant="h2" sx={{ mb: 1.25 }}>Какой стиль тебе ближе?</Typography>
       <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
         Выбери стиль, который тебе ближе. Дальше сервис будет учиться на твоих оценках.
       </Typography>

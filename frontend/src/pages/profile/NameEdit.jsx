@@ -18,8 +18,8 @@ export default function NameEdit() {
 
   return (
     <Box component="form" onSubmit={submit}>
-      <Typography variant="h2" sx={{ mb: 1 }}>Как к тебе обращаться</Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 3 }}>
+      <Typography variant="h2" sx={{ mb: 1.25 }}>Как к тебе обращаться</Typography>
+      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2.75 }}>
         Имя показываем в приветствии. Необязательно, до 50 символов. Без имени пишем просто «Доброе утро».
       </Typography>
       <Box sx={{ mb: 3 }}>
