@@ -12,6 +12,12 @@ const theme = createTheme({
     background: { default: '#f4f1ea', paper: '#ffffff' },
     text: { primary: '#1c1b18', secondary: '#6f6a60', disabled: '#a39d91' },
     divider: '#e2dcd0',
+    // Сплошные светлые заливки кружков с иконкой (80 px) и скелетонов загрузки
+    tint: { success: '#dce5dc', secondary: '#f3ded3', neutral: '#ebe6dc' },
+    // Золотая «искра» — подбор комплекта и «Почему этот комплект»
+    gold: { main: '#d9a441' },
+    // Карточка погоды на главном: небо, тёплое пятно солнца и иконки
+    weather: { sky: '#dde8f1', sun: '#dbd0b3', icon: '#6f9cc4' },
     // Кружки справочника цветов (GET /attributes, color). Ключи — машинные значения цветов
     swatch: {
       black: '#1c1b18', white: '#ffffff', gray: '#9e9e9e', beige: '#d4c5a9',
@@ -24,7 +30,11 @@ const theme = createTheme({
   },
   shape: { borderRadius: 16 },
   // Тень плавающей нижней панели из макетов
-  custom: { tabBarShadow: '0 16px 40px -6px rgba(28, 27, 24, 0.18)' },
+  custom: {
+    tabBarShadow: '0 16px 40px -6px rgba(28, 27, 24, 0.18)',
+    // Мягкая тень белой карточки комплекта
+    cardShadow: '0 12px 32px -12px rgba(28, 27, 24, 0.16)',
+  },
   typography: {
     // Manrope — весь интерфейс, Cormorant Garamond — крупные заголовки.
     // Шрифты подключаются в index.html.
@@ -46,6 +56,8 @@ const theme = createTheme({
     button: { textTransform: 'none', fontWeight: 600 }, // без капслока, как в макетах
     // Подпись активной вкладки нижней панели
     tab: { fontSize: 13, fontWeight: 600, lineHeight: 1.2 },
+    // Крупная температура на карточке погоды
+    temperature: { fontSize: 56, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.03em' },
   },
   components: {
     MuiButton: {
@@ -74,6 +86,10 @@ const theme = createTheme({
           }),
         },
       ],
+    },
+    MuiSkeleton: {
+      // Скелетоны загрузки в макете (2.4) — бежевые плашки, одинаковые на фоне и на белой карточке
+      styleOverrides: { root: ({ theme }) => ({ backgroundColor: theme.palette.tint.neutral }) },
     },
     MuiSnackbarContent: {
       // Уведомления в макетах — тёмная плашка со скруглением: «Сессия истекла», «Вещь добавлена»

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Alert, Box, Button } from '@mui/material'
 
 import { getToken } from '../api/client.js'
@@ -12,10 +12,13 @@ import ColorsStep from './onboarding/ColorsStep.jsx'
 import StepHeader from './onboarding/StepHeader.jsx'
 import StyleStep, { sortStyles } from './onboarding/StyleStep.jsx'
 
-// Онбординг: стиль → цвета → город. Стиль и цвета можно пропустить, город — нет (HANDBOOK, раздел 8)
+// Онбординг: стиль → цвета → город. Стиль и цвета можно пропустить, город — нет (HANDBOOK, раздел 8).
+// С главного экрана по 400 «нет города» приходят с state.step = 'city': только шаг города,
+// без «назад», и стиль с цветами не отправляем — preferences заменяется целиком и стёр бы их
 export default function Onboarding() {
   const navigate = useNavigate()
-  const [step, setStep] = useState(0)
+  const cityOnly = useLocation().state?.step === 'city'
+  const [step, setStep] = useState(cityOnly ? 2 : 0)
   const [style, setStyle] = useState(null)
   const [palette, setPalette] = useState({ liked: [], disliked: [] })
   const city = useCitySearch()
@@ -29,13 +32,16 @@ export default function Onboarding() {
     setError('')
     setLoading(true)
     try {
-      const body = { preferences: {} }
-      if (style) body.preferences.style = style
-      if (palette.liked.length) body.preferences.liked_colors = palette.liked
-      if (palette.disliked.length) body.preferences.disliked_colors = palette.disliked
-      Object.assign(body, city.fields)
+      const body = { ...city.fields }
+      if (!cityOnly) {
+        body.preferences = {}
+        if (style) body.preferences.style = style
+        if (palette.liked.length) body.preferences.liked_colors = palette.liked
+        if (palette.disliked.length) body.preferences.disliked_colors = palette.disliked
+      }
       await updateMe(body)
-      navigate('/today')
+      // Первый подбор показываем экраном 1.7 «Подбираем первый комплект», а не скелетоном
+      navigate('/today', { replace: true, state: { first: !cityOnly } })
     } catch (err) {
       setError(err.message)
     } finally {
@@ -55,7 +61,7 @@ export default function Onboarding() {
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <StepHeader step={step} total={3} onBack={() => setStep(step - 1)} onSkip={step < 2 ? next : null} />
+      <StepHeader step={step} total={3} onBack={cityOnly ? null : () => setStep(step - 1)} onSkip={step < 2 ? next : null} />
 
       {(error || city.error) && <Alert severity="error" sx={{ mb: 2 }}>{error || city.error}</Alert>}
 

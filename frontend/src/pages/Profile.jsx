@@ -16,6 +16,7 @@ import Avatar from '../components/Avatar.jsx'
 import ColorDot from '../components/ColorDot.jsx'
 import IconCircle from '../components/IconCircle.jsx'
 import { LoadError, Loading } from '../components/LoadState.jsx'
+import SourcesNote from '../components/SourcesNote.jsx'
 import { plural } from '../format.js'
 import useAttributes from '../hooks/useAttributes.js'
 import PhotoSheet from './profile/PhotoSheet.jsx'
@@ -205,10 +206,7 @@ export default function Profile() {
         Выйти из аккаунта
       </Button>
 
-      {/* Лицензии Open-Meteo и OpenStreetMap требуют подписи (API.md, «Подписи источников данных») */}
-      <Typography variant="caption" align="center" sx={{ color: 'text.disabled' }}>
-        Погода и поиск городов: Open-Meteo.com. Город по координатам: © OpenStreetMap
-      </Typography>
+      <SourcesNote />
 
       <PhotoSheet open={photoOpen} user={user} onClose={() => setPhotoOpen(false)} onChange={setUser} />
     </Box>

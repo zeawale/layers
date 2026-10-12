@@ -3,13 +3,13 @@ import { Box, Typography } from '@mui/material'
 import BackButton from '../../components/BackButton.jsx'
 
 // Шапка онбординга: «назад», «Шаг N из 3», «Пропустить» и полоски прогресса.
-// На первом шаге «назад» нет: аккаунт уже создан, возвращаться некуда.
+// На первом шаге «назад» нет: аккаунт уже создан, возвращаться некуда. Нет onBack — тоже нет.
 // Кнопку прячем, а не убираем, чтобы «Шаг 1 из 3» не съезжал.
 export default function StepHeader({ step, total, onBack, onSkip }) {
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-        <BackButton onClick={onBack} sx={{ visibility: step === 0 ? 'hidden' : 'visible' }} />
+        <BackButton onClick={onBack} sx={{ visibility: step === 0 || !onBack ? 'hidden' : 'visible' }} />
         <Typography variant="body2" sx={{ flex: 1, textAlign: 'center', color: 'text.secondary' }}>
           Шаг {step + 1} из {total}
         </Typography>
