@@ -25,3 +25,8 @@ export function regenerate() {
 export function selectVariant(id) {
   return api(`/outfit/${id}/select`, { method: 'POST' })
 }
+
+// Оценка и «надет»: { rating: 'like' | 'dislike' | null } и/или { worn: true | false }. Ответ — один Outfit
+export function sendFeedback(id, changes) {
+  return api(`/outfit/${id}/feedback`, { method: 'POST', body: JSON.stringify(changes) })
+}
