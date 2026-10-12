@@ -26,3 +26,26 @@ export function greeting(name, date = new Date()) {
   const part = h < 5 ? 'Доброй ночи' : h < 12 ? 'Доброе утро' : h < 17 ? 'Добрый день' : h < 23 ? 'Добрый вечер' : 'Доброй ночи'
   return name ? `${part}, ${name}` : part
 }
+
+// Дата комплекта приходит строкой YYYY-MM-DD — разбираем как местный день, без сдвига по часовому поясу
+const parseDay = (iso) => {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d)
+}
+const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1)
+
+// «Пт, 25 сентября» — строка истории (макет 4.0)
+export function formatDayShort(iso) {
+  const date = parseDay(iso)
+  const weekday = date.toLocaleDateString('ru-RU', { weekday: 'short' })
+  return `${capital(weekday)}, ${date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}`
+}
+
+// «Пятница, 25 сентября» — заголовок дня в истории (макет 4.1)
+export function formatDayLong(iso) {
+  return capital(formatDay(parseDay(iso)))
+}
+
+// Погода словами: четыре значения condition из API.md (Weather), справочника для них нет
+const CONDITION_TEXT = { clear: 'ясно', cloudy: 'облачно', rain: 'дождь', snow: 'снег' }
+export const conditionText = (c) => CONDITION_TEXT[c] ?? ''

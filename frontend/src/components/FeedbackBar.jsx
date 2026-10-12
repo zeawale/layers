@@ -23,8 +23,9 @@ const WORN = {
 const keep = (style) => ({ ...style, '&:hover': style, '&.Mui-disabled': style })
 
 // «Нравится», «Не нравится» и «Отметить: надет сегодня» (макеты 2.0, 2.3).
-// feedback — из Outfit (null, пока ничего не отмечено). Повторное нажатие снимает оценку или отметку
-export default function FeedbackBar({ feedback, busy, onRate, onWorn }) {
+// feedback — из Outfit (null, пока ничего не отмечено). Повторное нажатие снимает оценку или отметку.
+// past — прошлый день из истории (4.1a): «надет в этот день» и без подсказки про варианты
+export default function FeedbackBar({ feedback, busy, onRate, onWorn, past = false }) {
   const rating = feedback?.rating
   const worn = Boolean(feedback?.worn)
   return (
@@ -59,11 +60,13 @@ export default function FeedbackBar({ feedback, busy, onRate, onWorn }) {
         startIcon={<CheckIcon />}
         sx={{ minHeight: 47, ...keep(WORN[worn ? 'on' : 'off']) }}
       >
-        {worn ? 'Надет сегодня' : 'Отметить: надет сегодня'}
+        {`${worn ? 'Надет' : 'Отметить: надет'} ${past ? 'в этот день' : 'сегодня'}`}
       </Button>
-      <Typography variant="caption" component="p" align="center" sx={{ color: 'text.disabled', mt: 1.5, px: 3 }}>
-        {worn ? 'Снимите отметку, чтобы сменить вариант' : 'После отметки «надет» варианты на сегодня не меняются'}
-      </Typography>
+      {!past && (
+        <Typography variant="caption" component="p" align="center" sx={{ color: 'text.disabled', mt: 1.5, px: 3 }}>
+          {worn ? 'Сними отметку, чтобы сменить вариант' : 'После отметки «надет» варианты на сегодня не меняются'}
+        </Typography>
+      )}
     </Box>
   )
 }

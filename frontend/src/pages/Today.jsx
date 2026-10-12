@@ -11,13 +11,13 @@ import SourcesNote from '../components/SourcesNote.jsx'
 import Toast from '../components/Toast.jsx'
 import { formatTemp } from '../format.js'
 import useAttributes from '../hooks/useAttributes.js'
+import useFeedback from '../hooks/useFeedback.jsx'
 import EmptyWardrobeCard from './today/EmptyWardrobeCard.jsx'
 import FirstOutfit from './today/FirstOutfit.jsx'
 import ForecastError from './today/ForecastError.jsx'
 import OutfitCard from './today/OutfitCard.jsx'
 import TodayHeader from './today/TodayHeader.jsx'
 import TodaySkeleton from './today/TodaySkeleton.jsx'
-import useFeedback from './today/useFeedback.jsx'
 import useVariants from './today/useVariants.js'
 import WeatherCard from './today/WeatherCard.jsx'
 
@@ -41,7 +41,8 @@ export default function Today() {
   const [toast, setToast] = useState(null)
   const notify = (t) => setToast(typeof t === 'string' ? { text: t } : t)
   const variants = useVariants(day, setDay, notify)
-  const feedback = useFeedback(setDay, notify)
+  // Ответ на оценку — один Outfit: подменяем его внутри OutfitDay
+  const feedback = useFeedback((u) => setDay((d) => ({ ...d, variants: d.variants.map((v) => (v.id === u.id ? u : v)) })), notify)
 
   useEffect(() => {
     if (location.state?.first) navigate('.', { replace: true, state: null })
