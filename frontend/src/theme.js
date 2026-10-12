@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material/styles'
+import { alpha, createTheme } from '@mui/material/styles'
 
 // Одно место для цветов и шрифтов. Правим здесь, а не по компонентам.
 // Значения взяты из макетов Figma (страница «Дизайн-система»).
@@ -48,6 +48,28 @@ const theme = createTheme({
       defaultProps: { disableElevation: true },
       // Кнопки в макетах — «таблетки» высотой 52 px
       styleOverrides: { root: { borderRadius: 999, minHeight: 52, paddingInline: 24 } },
+      // Второстепенные кнопки в макетах — белые с тонкой рамкой и тёмным текстом
+      variants: [
+        // Неактивная главная кнопка («Сохраняем…», «Готово» без города) — бледная, но текст читается.
+        // Иначе MUI красит её в серый с серым текстом
+        {
+          props: { variant: 'contained', color: 'primary' },
+          style: ({ theme }) => ({
+            '&.Mui-disabled': {
+              backgroundColor: alpha(theme.palette.primary.main, 0.6),
+              color: theme.palette.common.white,
+            },
+          }),
+        },
+        {
+          props: { variant: 'outlined', color: 'primary' },
+          style: ({ theme }) => ({
+            borderColor: theme.palette.divider,
+            color: theme.palette.text.primary,
+            backgroundColor: theme.palette.background.paper,
+          }),
+        },
+      ],
     },
     MuiOutlinedInput: {
       // Поля ввода в макетах: белые, сильно скруглённые, с тонкой рамкой

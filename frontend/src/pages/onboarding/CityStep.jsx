@@ -1,8 +1,10 @@
-import { Box, InputAdornment, TextField, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import CheckIcon from '@mui/icons-material/Check'
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
 import SearchIcon from '@mui/icons-material/Search'
+
+import FormField from '../../components/FormField.jsx'
 
 // Одноимённых городов бывает несколько (два Кировска) — различаем по координатам
 const sameCity = (a, b) => a?.lat === b.lat && a?.lon === b.lon
@@ -17,21 +19,12 @@ export default function CityStep({ query, onQuery, cities, selected, onSelect, o
       </Typography>
 
       <Box sx={{ mb: 2 }}>
-        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.75 }}>Город</Typography>
-        <TextField
+        <FormField
+          label="Город"
+          icon={<SearchIcon />}
           placeholder="Москва"
           value={query}
           onChange={(e) => onQuery(e.target.value)}
-          fullWidth
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: 'text.secondary' }} />
-                </InputAdornment>
-              ),
-            },
-          }}
         />
       </Box>
 

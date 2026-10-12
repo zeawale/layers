@@ -1,23 +1,21 @@
 import { useState } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
-import {
-  Alert,
-  Box,
-  Button,
-  Checkbox,
-  FormControlLabel,
-  IconButton,
-  InputAdornment,
-  Link,
-  TextField,
-  Typography,
-} from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
+import { Alert, Box, Button, Checkbox, FormControlLabel, Link, Typography } from '@mui/material'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline'
 
-import { api, setToken } from '../api/client.js'
+import { register } from '../api/auth.js'
+import { setToken } from '../api/client.js'
+import BackButton from '../components/BackButton.jsx'
+import FormField from '../components/FormField.jsx'
+import PasswordField from '../components/PasswordField.jsx'
+
+// Ошибки 422 по полям — свой текст по-русски вместо английского текста валидатора
+const FIELD_ERRORS = {
+  email: 'Проверьте адрес почты',
+  password: 'Пароль — минимум 8 символов',
+  name: 'Имя — не длиннее 50 символов',
+}
 
 export default function Register() {
   const navigate = useNavigate()
@@ -26,23 +24,21 @@ export default function Register() {
   const [password, setPassword] = useState('')
   const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState({})
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    setFieldErrors({})
     setLoading(true)
     try {
-      const body = { email, password }
-      if (name.trim()) body.name = name.trim()
-      const data = await api('/auth/register', {
-        method: 'POST',
-        body: JSON.stringify(body),
-      })
+      const data = await register({ email, password, name: name.trim() })
       setToken(data.access_token)
       navigate('/onboarding')
     } catch (err) {
-      setError(err.message)
+      if (err.fields) setFieldErrors(Object.fromEntries(Object.keys(err.fields).map((f) => [f, FIELD_ERRORS[f] ?? err.fields[f]])))
+      else setError(err.message)
     } finally {
       setLoading(false)
     }
@@ -50,96 +46,51 @@ export default function Register() {
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <IconButton onClick={() => navigate('/login')} sx={{ ml: -1, mb: 2, border: '1px solid', borderColor: 'divider', width: 40, height: 40 }}>
-        <ArrowBackIcon sx={{ fontSize: 20 }} />
-      </IconButton>
+      <BackButton onClick={() => navigate('/login', { replace: true })} sx={{ ml: -1, mb: 2 }} />
 
-      <Typography variant="h1" sx={{ mb: 1.5 }}>
-        Создадим ваш{'\n'}гардероб
-      </Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 4, fontSize: 15, lineHeight: 1.5 }}>
-        Минута на регистрацию — и сервис начнёт подбирать комплекты.
-      </Typography>
+      <Typography variant="h1" sx={{ mb: 1.5 }}>Создадим ваш{'\n'}гардероб</Typography>
+      <Typography sx={{ color: 'text.secondary', mb: 4 }}>Минута на регистрацию — и сервис начнёт подбирать комплекты.</Typography>
 
       <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
         {error && <Alert severity="error">{error}</Alert>}
 
-        <Box>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.75 }}>
-            Как к вам обращаться · необязательно, до 50 символов
-          </Typography>
-          <TextField
-            placeholder="Саша"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            autoComplete="name"
-            fullWidth
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PersonOutlineIcon sx={{ color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-              },
-              htmlInput: { maxLength: 50 },
-            }}
-          />
-        </Box>
+        <FormField
+          label="Как к вам обращаться · необязательно, до 50 символов"
+          icon={<PersonOutlineIcon />}
+          placeholder="Саша"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          autoComplete="name"
+          error={fieldErrors.name}
+          slotProps={{ htmlInput: { maxLength: 50 } }}
+        />
 
-        <Box>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.75 }}>
-            Электронная почта
-          </Typography>
-          <TextField
-            placeholder="sasha@mail.ru"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-            fullWidth
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MailOutlineIcon sx={{ color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </Box>
+        <FormField
+          label="Электронная почта"
+          icon={<MailOutlineIcon />}
+          placeholder="sasha@mail.ru"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+          error={fieldErrors.email}
+        />
 
-        <Box>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.75 }}>
-            Пароль · минимум 8 символов
-          </Typography>
-          <TextField
-            placeholder="••••••••"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            inputProps={{ minLength: 8 }}
-            autoComplete="new-password"
-            fullWidth
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockOutlinedIcon sx={{ color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </Box>
+        <PasswordField
+          label="Пароль · минимум 8 символов"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={8}
+          autoComplete="new-password"
+          error={fieldErrors.password}
+        />
 
         <FormControlLabel
-          control={<Checkbox checked={agreed} onChange={(e) => setAgreed(e.target.checked)} sx={{ color: 'primary.main', '&.Mui-checked': { color: 'primary.main' } }} />}
+          control={<Checkbox checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />}
           label={
-            <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.4 }}>
+            <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
               Соглашаюсь с условиями сервиса и обработкой персональных данных
             </Typography>
           }
@@ -152,7 +103,7 @@ export default function Register() {
 
         <Typography variant="body2" align="center" sx={{ color: 'text.secondary' }}>
           Уже есть аккаунт?{' '}
-          <Link component={RouterLink} to="/login" sx={{ fontWeight: 700, color: 'text.primary' }}>
+          <Link component={RouterLink} to="/login" variant="subtitle1" sx={{ color: 'text.primary' }}>
             Войти
           </Link>
         </Typography>
