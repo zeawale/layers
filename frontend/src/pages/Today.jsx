@@ -17,6 +17,7 @@ import ForecastError from './today/ForecastError.jsx'
 import OutfitCard from './today/OutfitCard.jsx'
 import TodayHeader from './today/TodayHeader.jsx'
 import TodaySkeleton from './today/TodaySkeleton.jsx'
+import useFeedback from './today/useFeedback.jsx'
 import useVariants from './today/useVariants.js'
 import WeatherCard from './today/WeatherCard.jsx'
 
@@ -36,7 +37,11 @@ export default function Today() {
   // Убираем из истории, чтобы при обновлении страницы экран подбора не появлялся снова
   const [first] = useState(Boolean(location.state?.first))
   const [tick, setTick] = useState(0)
-  const variants = useVariants(day, setDay)
+  // Уведомление экрана: { text, hint, icon } — ошибки вариантов и оценки, «Спасибо за оценку!»
+  const [toast, setToast] = useState(null)
+  const notify = (t) => setToast(typeof t === 'string' ? { text: t } : t)
+  const variants = useVariants(day, setDay, notify)
+  const feedback = useFeedback(setDay, notify)
 
   useEffect(() => {
     if (location.state?.first) navigate('.', { replace: true, state: null })
@@ -110,13 +115,13 @@ export default function Today() {
           <WeatherCard weather={outfit.weather} />
           {wardrobeEmpty
             ? <EmptyWardrobeCard onAdd={() => navigate('/wardrobe/new')} />
-            : <OutfitCard day={day} outfit={outfit} label={label} variants={variants} />}
+            : <OutfitCard day={day} outfit={outfit} label={label} variants={variants} feedback={feedback} />}
           <SourcesNote sx={{ mt: 1 }} />
         </>
       )}
 
-      {/* 409 и 429 у «Другого варианта», ошибки переключения — текстом бэка как есть */}
-      <Toast text={variants.message} onClose={variants.clearMessage} />
+      {/* 409 и 429 у «Другого варианта», ошибки переключения и оценки — текстом бэка как есть */}
+      <Toast {...toast} onClose={() => setToast(null)} />
     </Box>
   )
 }
