@@ -10,7 +10,7 @@ export default function ForecastError({ onRetry }) {
   return (
     <Panel sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
       <IconCircle tone="secondary" sx={{ mb: 2 }}><FilterDramaOutlined /></IconCircle>
-      <Typography variant="h4" component="h2" sx={{ mb: 2 }}>Не удалось получить прогноз, попробуйте позже</Typography>
+      <Typography variant="h4" component="h2" sx={{ mb: 2 }}>Не удалось получить прогноз, попробуй позже</Typography>
       <Button variant="contained" size="large" fullWidth startIcon={<RefreshIcon />} onClick={onRetry}>
         Попробовать снова
       </Button>

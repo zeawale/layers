@@ -69,7 +69,7 @@ export default function Wardrobe() {
       // Всё или ничего: не удалилась ни одна. 404 — часть вещей уже удалили в другой вкладке: обновляем список
       if (err.status === 404) {
         setConfirmOpen(false)
-        setDeleteError('Часть вещей уже удалена. Список обновили — выберите вещи ещё раз')
+        setDeleteError('Часть вещей уже удалена. Список обновили — выбери вещи ещё раз')
         setSelected([])
         setAttempt((n) => n + 1)
       } else setDeleteError(err.message)

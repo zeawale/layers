@@ -6,7 +6,7 @@ import FormField from '../../components/FormField.jsx'
 import SaveButton from './SaveButton.jsx'
 import useSave from './useSave.js'
 
-// Макет 4.6 «Как к вам обращаться». Пустое имя стирает его — приветствия будут без имени
+// Макет 4.6 «Как к тебе обращаться». Пустое имя стирает его — приветствия будут без имени
 export default function NameEdit() {
   const { user, saving, error, fields, run } = useSave()
   const [name, setName] = useState(user.name ?? '')
@@ -18,7 +18,7 @@ export default function NameEdit() {
 
   return (
     <Box component="form" onSubmit={submit}>
-      <Typography variant="h2" sx={{ mb: 1 }}>Как к вам обращаться</Typography>
+      <Typography variant="h2" sx={{ mb: 1 }}>Как к тебе обращаться</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 3 }}>
         Имя показываем в приветствии. Необязательно, до 50 символов. Без имени пишем просто «Доброе утро».
       </Typography>

@@ -28,7 +28,7 @@ export async function api(path, options = {}) {
   } catch {
     // fetch падает до ответа, когда нет сети или бэк не запущен — текст браузера «Failed to fetch» не показываем.
     // offline — экран может показать своё состояние «Нет соединения» (макет 2.11)
-    const error = new Error('Нет связи с сервером. Проверьте интернет и попробуйте ещё раз')
+    const error = new Error('Нет связи с сервером. Проверь интернет и попробуй ещё раз')
     error.offline = true
     throw error
   }
@@ -36,7 +36,7 @@ export async function api(path, options = {}) {
   // 401 на входе — неверный пароль, а не истёкшая сессия: его показываем на форме
   if (response.status === 401 && token && path !== '/auth/login') {
     setToken(null)
-    // Экран входа по ?expired показывает «Сессия истекла — войдите заново» (макет 2.12)
+    // Экран входа по ?expired показывает «Сессия истекла — войди заново» (макет 2.12)
     window.location.href = '/login?expired=1'
     throw new Error('Сессия истекла')
   }

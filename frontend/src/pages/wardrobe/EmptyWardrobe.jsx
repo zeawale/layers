@@ -17,7 +17,7 @@ export default function EmptyWardrobe({ onAdd }) {
         <IconCircle sx={{ mb: 3 }}><CheckroomOutlined /></IconCircle>
         <Typography variant="h2" sx={{ mb: 1.5 }}>Здесь пока пусто</Typography>
         <Typography sx={{ color: 'text.secondary', mb: 3 }}>
-          Добавьте первую вещь — достаточно фото. Категорию и цвет мы определим сами.
+          Добавь первую вещь — достаточно фото. Категорию и цвет мы определим сами.
         </Typography>
         <Button variant="contained" size="large" fullWidth onClick={onAdd} disabled={!onAdd}>
           Добавить первую вещь

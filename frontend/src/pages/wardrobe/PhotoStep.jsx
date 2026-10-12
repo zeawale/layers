@@ -34,9 +34,9 @@ export default function PhotoStep({ onFile, onManual, error }) {
         }}
       >
         <IconCircle sx={{ mx: 'auto', mb: 2 }}><PhotoCameraOutlined /></IconCircle>
-        <Typography variant="h2" sx={{ mb: 1 }}>Сфотографируйте вещь</Typography>
+        <Typography variant="h2" sx={{ mb: 1 }}>Сфотографируй вещь</Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-          или загрузите из галереи. JPG, PNG или WEBP до 10 МБ
+          или загрузи из галереи. JPG, PNG или WEBP до 10 МБ
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5 }}>
           <Button variant="contained" size="large" fullWidth startIcon={<PhotoCameraOutlined />} onClick={() => cameraRef.current.click()}>

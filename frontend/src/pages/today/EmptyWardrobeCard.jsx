@@ -10,7 +10,7 @@ export default function EmptyWardrobeCard({ onAdd }) {
     <Panel sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
       <IconCircle sx={{ mb: 2.5 }}><CheckroomOutlined /></IconCircle>
       <Typography variant="h3" component="h2" sx={{ mb: 1.5 }}>В гардеробе пока пусто</Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 3 }}>Добавьте вещи — и мы соберём комплект под погоду.</Typography>
+      <Typography sx={{ color: 'text.secondary', mb: 3 }}>Добавь вещи — и мы соберём комплект под погоду.</Typography>
       <Button variant="contained" size="large" fullWidth onClick={onAdd}>Добавить вещи</Button>
     </Panel>
   )

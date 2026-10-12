@@ -51,7 +51,7 @@ export default function ResetPassword() {
     return (
       <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
         {done ? (
-          <AuthStatus icon={<CheckIcon />} title="Пароль изменён" text="Теперь войдите с новым паролем.">
+          <AuthStatus icon={<CheckIcon />} title="Пароль изменён" text="Теперь войди с новым паролем.">
             <Button variant="contained" size="large" fullWidth onClick={toLogin}>Ко входу</Button>
           </AuthStatus>
         ) : (
@@ -59,7 +59,7 @@ export default function ResetPassword() {
             icon={<AccessTimeIcon />}
             tone="secondary"
             title="Ссылка больше не работает"
-            text="Ссылка действует 60 минут и только один раз. Запросите новую."
+            text="Ссылка действует 60 минут и только один раз. Запроси новую."
           >
             <Button variant="contained" size="large" fullWidth onClick={() => navigate('/forgot-password', { replace: true })}>
               Запросить новую ссылку
@@ -76,7 +76,7 @@ export default function ResetPassword() {
 
       <Typography variant="h1" sx={{ mb: 1.5 }}>Новый пароль</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 4 }}>
-        Придумайте новый пароль. После сохранения старый перестанет работать.
+        Придумай новый пароль. После сохранения старый перестанет работать.
       </Typography>
 
       <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
@@ -95,7 +95,7 @@ export default function ResetPassword() {
         />
         <Box>
           <PasswordField
-            label="Повторите пароль"
+            label="Повтори пароль"
             toggle
             value={repeat}
             onChange={(e) => setRepeat(e.target.value)}

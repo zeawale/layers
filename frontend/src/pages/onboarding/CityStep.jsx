@@ -9,11 +9,11 @@ import FormField from '../../components/FormField.jsx'
 // Одноимённых городов бывает несколько (два Кировска) — различаем по координатам
 const sameCity = (a, b) => a?.lat === b.lat && a?.lon === b.lon
 
-// «Где вы живёте?» — шаг 3 онбординга и экран 4.3 в профиле. Подсказки ищет useCitySearch, сюда приходит список
+// «Где ты живёшь?» — шаг 3 онбординга и экран 4.3 в профиле. Подсказки ищет useCitySearch, сюда приходит список
 export default function CityStep({ query, onQuery, cities, selected, onSelect, onGeolocate }) {
   return (
     <>
-      <Typography variant="h2" sx={{ mb: 1 }}>Где вы живёте?</Typography>
+      <Typography variant="h2" sx={{ mb: 1 }}>Где ты живёшь?</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 3 }}>
         Город нужен для прогноза погоды: комплект подбирается под температуру, ветер и осадки.
       </Typography>

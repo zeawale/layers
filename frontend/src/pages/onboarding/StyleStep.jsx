@@ -15,13 +15,13 @@ const styleRank = (value) => (STYLE_ORDER.includes(value) ? STYLE_ORDER.indexOf(
 
 export const sortStyles = (styles) => [...styles].sort((a, b) => styleRank(a.value) - styleRank(b.value))
 
-// «Какой стиль вам ближе?» — шаг 1 онбординга и экран 4.4 в профиле
+// «Какой стиль тебе ближе?» — шаг 1 онбординга и экран 4.4 в профиле
 export default function StyleStep({ styles, value, onChange }) {
   return (
     <>
-      <Typography variant="h2" sx={{ mb: 1 }}>Какой стиль вам ближе?</Typography>
+      <Typography variant="h2" sx={{ mb: 1 }}>Какой стиль тебе ближе?</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 3 }}>
-        Выберите стиль, который вам ближе. Дальше сервис будет учиться на ваших оценках.
+        Выбери стиль, который тебе ближе. Дальше сервис будет учиться на твоих оценках.
       </Typography>
 
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 1.5, mb: 4 }}>
