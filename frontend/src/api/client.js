@@ -33,7 +33,8 @@ export async function api(path, options = {}) {
   // 401 на входе — неверный пароль, а не истёкшая сессия: его показываем на форме
   if (response.status === 401 && token && path !== '/auth/login') {
     setToken(null)
-    window.location.href = '/login'
+    // Экран входа по ?expired показывает «Сессия истекла — войдите заново» (макет 2.12)
+    window.location.href = '/login?expired=1'
     throw new Error('Сессия истекла')
   }
 

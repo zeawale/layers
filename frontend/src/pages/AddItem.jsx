@@ -45,7 +45,7 @@ export default function AddItem() {
       uploaded = await uploadPhoto(file)
       setPhoto(uploaded)
     } catch (err) {
-      // 413 и 415 бэк присылает по-русски: «Фото больше 10 МБ…», «Подходят только фото в JPEG, PNG или WebP»
+      // 413 и 415 — текст из api/photos.js: «Фото больше 10 МБ — выберите поменьше», «Подойдёт фото в JPEG, PNG или WebP»
       setPhotoError(err.message)
       setPreview(null)
       setStage('photo')
