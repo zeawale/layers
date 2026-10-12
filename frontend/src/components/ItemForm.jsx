@@ -1,23 +1,28 @@
 import { useId } from 'react'
 import { Box, Button, Chip, MenuItem, Typography } from '@mui/material'
+import AutoAwesomeOutlined from '@mui/icons-material/AutoAwesomeOutlined'
+import CheckIcon from '@mui/icons-material/Check'
+import EditOutlined from '@mui/icons-material/EditOutlined'
 
+import ColorDot from './ColorDot.jsx'
 import FormField from './FormField.jsx'
 
 // Форма вещи — макеты 3.6 «Проверка полей» и 3.9 «Редактировать вещь».
 // Значения и подписи — только из справочника (attrs = ответ GET /attributes).
-// auto — какие поля предзаполнило распознавание: у них метка «авто».
+// auto — какие поля предзаполнило распознавание: у них метка «авто» внутри поля, перед стрелкой (3.6).
 // errors — ошибки 422 по полям, уже по-русски: { name: '…' }.
 
-function AutoLabel({ text, auto }) {
+function AutoChip() {
   return (
-    <>
-      {text}
-      {auto && <Chip label="авто" size="small" color="success" variant="outlined" sx={{ ml: 1, height: 20 }} />}
-    </>
+    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, height: 24, px: 1, borderRadius: 999, bgcolor: 'tint.gold', color: 'gold.dark' }}>
+      <AutoAwesomeOutlined sx={{ width: 14, height: 14 }} />
+      <Typography variant="subtitle2">авто</Typography>
+    </Box>
   )
 }
 
 // Ряд «таблеток»: один выбор (стиль, защита от осадков) или несколько (сезон).
+// Выбранная — тёмная с галочкой, остальные — белые с тонкой рамкой (3.6).
 // Подпись группы связана с ней через aria-labelledby — читалка назовёт группу
 function ToggleRow({ label, options, isActive, onToggle }) {
   const labelId = useId()
@@ -31,11 +36,18 @@ function ToggleRow({ label, options, isActive, onToggle }) {
             <Chip
               key={String(o.value)}
               label={o.label}
+              icon={active ? <CheckIcon /> : undefined}
               onClick={() => onToggle(o.value)}
               aria-pressed={active}
-              color={active ? 'primary' : 'default'}
-              variant={active ? 'filled' : 'outlined'}
-              sx={{ height: 40, borderRadius: 999, px: 1, bgcolor: active ? undefined : 'background.paper' }}
+              variant="outlined"
+              sx={{
+                height: 40,
+                borderRadius: 999,
+                px: 1,
+                ...(active
+                  ? { bgcolor: 'text.primary', borderColor: 'text.primary', color: 'common.white', '& .MuiChip-icon': { color: 'common.white', width: 16, height: 16 }, '&&:hover': { bgcolor: 'text.primary' } }
+                  : { bgcolor: 'background.paper', borderColor: 'divider' }),
+              }}
             />
           )
         })}
@@ -63,6 +75,7 @@ export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {
       <FormField
         label="Название"
         placeholder="Например, серый свитер"
+        icon={<EditOutlined />}
         value={value.name}
         onChange={(e) => set('name')(e.target.value)}
         required
@@ -72,7 +85,8 @@ export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {
 
       <FormField
         select
-        label={<AutoLabel text="Категория" auto={auto.category} />}
+        label="Категория"
+        end={auto.category && <AutoChip />}
         value={value.category ?? ''}
         onChange={(e) => set('category')(e.target.value)}
         required
@@ -83,7 +97,9 @@ export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {
 
       <FormField
         select
-        label={<AutoLabel text="Цвет" auto={auto.color} />}
+        label="Цвет"
+        icon={value.color && <ColorDot value={value.color} size={20} />}
+        end={auto.color && <AutoChip />}
         value={value.color ?? ''}
         onChange={(e) => set('color')(e.target.value)}
         required

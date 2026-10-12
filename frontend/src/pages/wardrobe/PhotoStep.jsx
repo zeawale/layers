@@ -25,16 +25,18 @@ export default function PhotoStep({ onFile, onManual, error }) {
       <Box
         sx={{
           bgcolor: 'background.paper',
-          border: '1px dashed',
-          borderColor: 'divider',
-          borderRadius: '20px',
-          p: 3,
+          border: '1.5px dashed',
+          borderColor: 'outline.main',
+          borderRadius: '28px',
+          px: 3.25,
+          pt: 5,
+          pb: 5,
           textAlign: 'center',
-          mb: 2,
+          mb: 2.5,
         }}
       >
-        <IconCircle sx={{ mx: 'auto', mb: 2 }}><PhotoCameraOutlined /></IconCircle>
-        <Typography variant="h2" sx={{ mb: 1 }}>Сфотографируй вещь</Typography>
+        <IconCircle sx={{ mx: 'auto', mb: 2.5 }}><PhotoCameraOutlined /></IconCircle>
+        <Typography variant="h3" component="h2" sx={{ mb: 1.5 }}>Сфотографируй вещь</Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
           или загрузи из галереи. JPG, PNG или WEBP до 10 МБ
         </Typography>
@@ -52,12 +54,12 @@ export default function PhotoStep({ onFile, onManual, error }) {
         <input ref={galleryRef} type="file" accept={ACCEPT} hidden onChange={pick} />
       </Box>
 
-      <Box sx={{ bgcolor: 'background.paper', borderRadius: 3, p: 2, mb: 3 }}>
+      <Box sx={{ bgcolor: 'background.paper', borderRadius: '20px', p: 2.5, mb: 3 }}>
         <Typography variant="subtitle1" sx={{ mb: 1.5 }}>Как получить хорошее фото</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}>
           {TIPS.map((tip) => (
-            <Box key={tip} sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-              <CheckIcon fontSize="small" sx={{ color: 'success.main' }} />
+            <Box key={tip} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <IconCircle size={24} sx={{ '& svg': { width: 14, height: 14 } }}><CheckIcon /></IconCircle>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>{tip}</Typography>
             </Box>
           ))}
@@ -65,7 +67,7 @@ export default function PhotoStep({ onFile, onManual, error }) {
       </Box>
 
       <Typography align="center">
-        <Link component="button" type="button" variant="subtitle1" onClick={onManual} sx={{ color: 'text.primary' }}>
+        <Link component="button" type="button" variant="subtitle1" onClick={onManual} sx={{ color: 'primary.main' }}>
           Заполнить вручную, без фото
         </Link>
       </Typography>

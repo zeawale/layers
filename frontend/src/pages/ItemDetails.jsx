@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Box, Button, Typography } from '@mui/material'
+import { alpha } from '@mui/material/styles'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 
 import { getToken, mediaUrl } from '../api/client.js'
 import { deleteItem, getItem } from '../api/items.js'
@@ -53,48 +55,63 @@ export default function ItemDetails() {
   const missing = error?.status === 404 || error?.status === 403
   const failed = (!missing && error?.message) || attrsError
 
+  const ready = !error && !failed && item && attrs
+
+  // Пока грузится или ошибка — обычная шапка; карточка (3.2) — фото во всю ширину, «назад» поверх него
+  if (!ready) {
+    return (
+      <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
+        <BackButton onClick={() => toWardrobe()} sx={{ mb: 2 }} />
+        {missing && <ItemMissing onBack={() => toWardrobe()} />}
+        {failed && <LoadError message={failed} onRetry={() => { setAttempt((n) => n + 1); retryAttrs() }} />}
+        {!error && !failed && <Loading />}
+      </Box>
+    )
+  }
+
   return (
-    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <BackButton onClick={() => toWardrobe()} sx={{ mb: 2 }} />
+    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', pb: 4 }}>
+      <Box sx={{ position: 'relative' }}>
+        <ItemPhoto src={mediaUrl(item.photo?.url)} sx={{ aspectRatio: '390 / 414', bgcolor: 'background.paper' }} />
+        <BackButton onClick={() => toWardrobe()} sx={{ position: 'absolute', top: 20, left: 20, width: 44, height: 44, border: 0, bgcolor: 'background.paper', '&:hover': { bgcolor: 'background.paper' } }} />
+      </Box>
 
-      {missing && <ItemMissing onBack={() => toWardrobe()} />}
+      {/* «Лист» со скруглёнными верхними углами заходит на фото, как в макете */}
+      <Box sx={{ position: 'relative', mt: -1.75, px: 3, pt: 3.5, borderRadius: '24px 24px 0 0', bgcolor: 'background.default' }}>
+        <Typography variant="overline" component="p" sx={{ color: 'text.disabled' }}>
+          {label('category', item.category)} · добавлена {formatDate(item.created_at, false)}
+        </Typography>
+        {/* Название до 100 символов без пробелов не должно вылезать за экран */}
+        <Typography variant="h2" component="h1" sx={{ mt: 1, mb: 2.25, overflowWrap: 'anywhere' }}>{item.name}</Typography>
 
-      {failed && <LoadError message={failed} onRetry={() => { setAttempt((n) => n + 1); retryAttrs() }} />}
+        <ItemFacts item={item} label={label} warmthMax={attrs.warmth.length} />
 
-      {!error && !failed && (!item || !attrs) && <Loading />}
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 1.25 }}>
+          <Button variant="outlined" size="large" onClick={() => navigate(`/wardrobe/${id}/edit`)}>
+            Редактировать
+          </Button>
+          <Button
+            variant="outlined"
+            size="large"
+            startIcon={<DeleteOutlineIcon />}
+            onClick={() => setConfirmOpen(true)}
+            sx={(t) => ({ color: 'error.main', borderColor: alpha(t.palette.error.main, 0.5), '&:hover': { borderColor: 'error.main' } })}
+          >
+            Удалить
+          </Button>
+        </Box>
 
-      {!error && !failed && item && attrs && (
-        <>
-          <ItemPhoto src={mediaUrl(item.photo?.url)} sx={{ borderRadius: '20px', bgcolor: 'background.paper', mb: 2.5 }} />
-
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
-            {label('category', item.category)} · добавлена {formatDate(item.created_at, false)}
-          </Typography>
-          {/* Название до 100 символов без пробелов не должно вылезать за экран */}
-          <Typography variant="h1" sx={{ mb: 2.5, overflowWrap: 'anywhere' }}>{item.name}</Typography>
-
-          <ItemFacts item={item} label={label} warmthMax={attrs.warmth.length} />
-
-          <Box sx={{ display: 'flex', gap: 1.5 }}>
-            <Button variant="contained" size="large" fullWidth onClick={() => navigate(`/wardrobe/${id}/edit`)}>
-              Редактировать
-            </Button>
-            <Button variant="outlined" size="large" fullWidth onClick={() => setConfirmOpen(true)} sx={{ color: 'error.main' }}>
-              Удалить
-            </Button>
-          </Box>
-
-          <ConfirmDialog
-            open={confirmOpen}
-            title={`Удалить «${item.name}»?`}
-            text="Вещь пропадёт из гардероба и больше не попадёт в комплекты."
-            loading={deleting}
-            error={deleteError}
-            onConfirm={handleDelete}
-            onClose={() => { setConfirmOpen(false); setDeleteError('') }}
-          />
-        </>
-      )}
+        <ConfirmDialog
+          open={confirmOpen}
+          image={mediaUrl(item.photo?.url)}
+          title={`Удалить «${item.name}»?`}
+          text="Вещь пропадёт из гардероба и больше не попадёт в комплекты."
+          loading={deleting}
+          error={deleteError}
+          onConfirm={handleDelete}
+          onClose={() => { setConfirmOpen(false); setDeleteError('') }}
+        />
+      </Box>
 
       <Notice />
     </Box>

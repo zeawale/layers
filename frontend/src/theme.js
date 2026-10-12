@@ -1,4 +1,5 @@
 import { alpha, createTheme } from '@mui/material/styles'
+import KeyboardArrowDownRounded from '@mui/icons-material/KeyboardArrowDownRounded'
 
 // Одно место для цветов и шрифтов. Правим здесь, а не по компонентам.
 // Значения взяты из макетов Figma (страница «Дизайн-система»).
@@ -15,9 +16,10 @@ const theme = createTheme({
     // Рамка контурных кнопок-«таблеток» — темнее разделителя (макеты 1.2.2, 2.0, 3.2)
     outline: { main: '#cfc7b8' },
     // Сплошные светлые заливки кружков с иконкой (80 px) и скелетонов загрузки
-    tint: { success: '#dce5dc', secondary: '#f3ded3', neutral: '#ebe6dc' },
+    tint: { success: '#dce5dc', secondary: '#f3ded3', neutral: '#ebe6dc', gold: '#f6e9cc' },
     // Золотая «искра» — подбор комплекта и «Почему этот комплект»
-    gold: { main: '#d9a441' },
+    // dark — значок и текст на золотистой заливке: «Заполнили автоматически», «авто» (3.6)
+    gold: { main: '#d9a441', dark: '#9a6f16' },
     // Карточка погоды на главном: небо, тёплое пятно солнца, холодное пятно дождя (2.2) и иконки
     weather: { sky: '#dde8f1', sun: '#dbd0b3', rain: '#c0ccd4', icon: '#6f9cc4' },
     // Кружки справочника цветов (GET /attributes, color). Ключи — машинные значения цветов
@@ -34,6 +36,8 @@ const theme = createTheme({
   // Тень плавающей нижней панели из макетов
   custom: {
     tabBarShadow: '0 16px 40px -6px rgba(28, 27, 24, 0.18)',
+    // Тень круглой кнопки «+» в шапке гардероба (3.0)
+    fabShadow: '0 8px 20px -6px rgba(46, 70, 54, 0.45)',
     // Мягкая тень белой карточки комплекта
     cardShadow: '0 12px 32px -12px rgba(28, 27, 24, 0.16)',
   },
@@ -104,16 +108,23 @@ const theme = createTheme({
         }),
       },
     },
+    MuiSelect: {
+      // Стрелка выпадающего списка — «шеврон», как в макетах 3.6 и 3.9
+      defaultProps: { IconComponent: KeyboardArrowDownRounded },
+      styleOverrides: { icon: ({ theme }) => ({ color: theme.palette.text.secondary, right: 14 }) },
+    },
     MuiOutlinedInput: {
-      // Поля ввода в макетах: белые, сильно скруглённые, с тонкой рамкой
+      // Поля ввода в макетах: белые, высота 52, скругление 14, тонкая рамка (1.2, 3.6)
       styleOverrides: {
         root: ({ theme }) => ({
-          borderRadius: theme.shape.borderRadius * 3,
+          borderRadius: 14,
           backgroundColor: theme.palette.background.paper,
         }),
         notchedOutline: ({ theme }) => ({ borderColor: theme.palette.divider }),
         // Автозаполнение Chrome и Edge красит поле в голубой, оставляем белым
         input: ({ theme }) => ({
+          paddingTop: 15,
+          paddingBottom: 15,
           '&:-webkit-autofill': {
             WebkitBoxShadow: `0 0 0 100px ${theme.palette.background.paper} inset`,
             WebkitTextFillColor: theme.palette.text.primary,

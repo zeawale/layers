@@ -1,15 +1,19 @@
-import { Box, Button, InputAdornment, TextField } from '@mui/material'
+import { Box, InputAdornment, TextField } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 
-// Поиск по названию и «Выбрать» рядом (макет 3.0). onSelect нет — режим выбора уже включён, кнопку прячем
+import PillButton from './PillButton.jsx'
+
+// Поиск по названию и «Выбрать» рядом (макет 3.0), обе высотой 48. onSelect нет — режим выбора уже включён,
+// кнопку прячем, поиск на всю ширину (3.10)
 export default function SearchRow({ query, onChange, onSelect }) {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2.25 }}>
       <TextField
         placeholder="Поиск по названию"
         value={query}
         onChange={(e) => onChange(e.target.value)}
         fullWidth
+        sx={{ '& .MuiOutlinedInput-root': { height: 48, borderRadius: 999 } }}
         slotProps={{
           input: {
             startAdornment: (
@@ -20,7 +24,7 @@ export default function SearchRow({ query, onChange, onSelect }) {
           },
         }}
       />
-      {onSelect && <Button onClick={onSelect} sx={{ color: 'text.primary', flexShrink: 0 }}>Выбрать</Button>}
+      {onSelect && <PillButton onClick={onSelect}>Выбрать</PillButton>}
     </Box>
   )
 }

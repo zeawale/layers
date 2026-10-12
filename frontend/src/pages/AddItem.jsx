@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { Alert, Box, Button, Typography } from '@mui/material'
+import { Alert, Box } from '@mui/material'
 
 import { getToken } from '../api/client.js'
 import { createItem, recognizeItem } from '../api/items.js'
@@ -9,7 +9,7 @@ import ItemForm, { EMPTY_ITEM, itemFieldErrors } from '../components/ItemForm.js
 import { LoadError, Loading } from '../components/LoadState.jsx'
 import ScreenHeader from '../components/ScreenHeader.jsx'
 import useAttributes from '../hooks/useAttributes.js'
-import PhotoRow from './wardrobe/PhotoRow.jsx'
+import AutoCard from './wardrobe/AutoCard.jsx'
 import PhotoStep from './wardrobe/PhotoStep.jsx'
 import RecognizingStep from './wardrobe/RecognizingStep.jsx'
 
@@ -96,11 +96,12 @@ export default function AddItem() {
   }
 
   return (
-    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
+    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2.5, pb: 4 }}>
       <ScreenHeader
         title="Новая вещь"
-        onBack={() => (stage === 'form' ? retake() : navigate('/wardrobe', { replace: true }))}
-        backDisabled={busy}
+        // Крестик на всех шагах (3.4–3.6) — выйти из добавления; вернуться к фото — «Переснять фото»
+        close
+        onBack={() => navigate('/wardrobe', { replace: true })}
         right={stage === 'form' ? '2 / 2' : '1 / 2'}
       />
 
@@ -112,18 +113,7 @@ export default function AddItem() {
         <>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-          {(auto.category || auto.color) && (
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="h2" sx={{ mb: 0.5 }}>Заполнили автоматически</Typography>
-              <Typography sx={{ color: 'text.secondary' }}>Проверь поля — любое можно исправить</Typography>
-            </Box>
-          )}
-
-          {preview && (
-            <PhotoRow src={preview}>
-              <Button variant="outlined" onClick={retake}>Переснять фото</Button>
-            </PhotoRow>
-          )}
+          {preview && <AutoCard src={preview} auto={auto.category || auto.color} onRetake={retake} />}
 
           {attrs && (
             <ItemForm
