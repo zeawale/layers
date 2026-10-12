@@ -15,3 +15,17 @@ export function createItem(item) {
 export function recognizeItem(photoId) {
   return api('/items/recognize', { method: 'POST', body: JSON.stringify({ photo_id: photoId }) })
 }
+
+export function getItem(id) {
+  return api(`/items/${id}`)
+}
+
+// Передаём только то, что меняем; photo_id: null отвязывает фото
+export function updateItem(id, changes) {
+  return api(`/items/${id}`, { method: 'PATCH', body: JSON.stringify(changes) })
+}
+
+// Вещь удаляется вместе с фото; из прошлых комплектов она пропадает, сами дни остаются
+export function deleteItem(id) {
+  return api(`/items/${id}`, { method: 'DELETE' })
+}

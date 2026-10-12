@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { Alert, Box, Button, CircularProgress, Typography } from '@mui/material'
+import { Alert, Box, Button, Typography } from '@mui/material'
 
 import { getToken } from '../api/client.js'
 import { createItem, recognizeItem } from '../api/items.js'
 import { uploadPhoto } from '../api/photos.js'
 import ItemForm, { EMPTY_ITEM, itemFieldErrors } from '../components/ItemForm.jsx'
+import { LoadError, Loading } from '../components/LoadState.jsx'
 import ScreenHeader from '../components/ScreenHeader.jsx'
 import useAttributes from '../hooks/useAttributes.js'
+import PhotoRow from './wardrobe/PhotoRow.jsx'
 import PhotoStep from './wardrobe/PhotoStep.jsx'
 import RecognizingStep from './wardrobe/RecognizingStep.jsx'
 
@@ -85,7 +87,7 @@ export default function AddItem() {
     try {
       const created = await createItem({ ...item, name: item.name.trim(), photo_id: photo?.id })
       // Гардероб покажет уведомление «добавлена» (макет 3.7)
-      navigate('/wardrobe', { replace: true, state: { added: created.name } })
+      navigate('/wardrobe', { replace: true, state: { notice: `«${created.name}» в гардеробе` } })
     } catch (err) {
       if (err.fields) setFieldErrors(itemFieldErrors(err.fields))
       else setError(err.message)
@@ -118,15 +120,9 @@ export default function AddItem() {
           )}
 
           {preview && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-              <Box
-                component="img"
-                src={preview}
-                alt=""
-                sx={{ width: 88, height: 88, objectFit: 'cover', borderRadius: '16px', display: 'block' }}
-              />
+            <PhotoRow src={preview}>
               <Button variant="outlined" onClick={retake}>Переснять фото</Button>
-            </Box>
+            </PhotoRow>
           )}
 
           {attrs && (
@@ -141,15 +137,8 @@ export default function AddItem() {
               loading={saving}
             />
           )}
-          {!attrs && !attrsError && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress size={28} /></Box>
-          )}
-          {attrsError && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              <Typography sx={{ color: 'text.secondary' }}>{attrsError}</Typography>
-              <Button variant="outlined" onClick={retryAttrs}>Повторить</Button>
-            </Box>
-          )}
+          {!attrs && !attrsError && <Loading />}
+          {attrsError && <LoadError message={attrsError} onRetry={retryAttrs} />}
         </>
       )}
     </Box>

@@ -44,7 +44,8 @@ function ToggleRow({ label, options, isActive, onToggle }) {
   )
 }
 
-export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {}, onSubmit, submitLabel, loading }) {
+// loading — идёт сохранение («Сохраняем…»); disabled — кнопка неактивна по другой причине (грузится фото)
+export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {}, onSubmit, submitLabel, loading, disabled }) {
   const set = (field) => (v) => onChange({ ...value, [field]: v })
 
   function toggleSeason(s) {
@@ -119,7 +120,7 @@ export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {
         onToggle={set('water_resistance')}
       />
 
-      <Button type="submit" variant="contained" size="large" fullWidth disabled={loading || !ready} sx={{ mt: 1 }}>
+      <Button type="submit" variant="contained" size="large" fullWidth disabled={loading || disabled || !ready} sx={{ mt: 1 }}>
         {loading ? 'Сохраняем…' : submitLabel}
       </Button>
     </Box>
