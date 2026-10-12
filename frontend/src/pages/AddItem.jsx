@@ -3,23 +3,25 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { Alert, Box, Button, CircularProgress, Typography } from '@mui/material'
 
 import { getToken } from '../api/client.js'
-import { createItem } from '../api/items.js'
+import { createItem, recognizeItem } from '../api/items.js'
 import { uploadPhoto } from '../api/photos.js'
 import ItemForm, { EMPTY_ITEM, itemFieldErrors } from '../components/ItemForm.jsx'
 import ScreenHeader from '../components/ScreenHeader.jsx'
 import useAttributes from '../hooks/useAttributes.js'
 import PhotoStep from './wardrobe/PhotoStep.jsx'
+import RecognizingStep from './wardrobe/RecognizingStep.jsx'
 
-// Добавление вещи — макеты 3.4 «Фото» → 3.6 «Проверка полей», после сохранения — гардероб (3.7)
+// Добавление вещи — макеты 3.4 «Фото» → 3.5 «Распознаём» → 3.6 «Проверка полей», после сохранения — гардероб (3.7).
+// Распознавание только предзаполняет форму, сохраняет человек кнопкой (HANDBOOK, раздел 7)
 export default function AddItem() {
   const navigate = useNavigate()
   const { attrs, error: attrsError, retry: retryAttrs } = useAttributes()
-  const [stage, setStage] = useState('photo') // photo → form
+  const [stage, setStage] = useState('photo') // photo → upload → recognize → form
   const [preview, setPreview] = useState(null)
   const [photo, setPhoto] = useState(null)
-  const [uploading, setUploading] = useState(false)
   const [photoError, setPhotoError] = useState('')
   const [item, setItem] = useState(EMPTY_ITEM)
+  const [auto, setAuto] = useState({}) // какие поля предзаполнило распознавание
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
   const [saving, setSaving] = useState(false)
@@ -29,24 +31,42 @@ export default function AddItem() {
 
   if (!getToken()) return <Navigate to="/login" replace />
 
+  const busy = stage === 'upload' || stage === 'recognize'
+
   async function handleFile(file) {
     setPhotoError('')
-    setUploading(true)
+    setPreview(URL.createObjectURL(file))
+    setStage('upload')
+    let uploaded
     try {
-      setPhoto(await uploadPhoto(file))
-      setPreview(URL.createObjectURL(file))
-      setStage('form')
+      uploaded = await uploadPhoto(file)
+      setPhoto(uploaded)
     } catch (err) {
       // 413 и 415 бэк присылает по-русски: «Фото больше 10 МБ…», «Подходят только фото в JPEG, PNG или WebP»
       setPhotoError(err.message)
-    } finally {
-      setUploading(false)
+      setPreview(null)
+      setStage('photo')
+      return
     }
+    // Первое распознавание после старта бэка — около 20 секунд: на экране чек-лист со спиннером, а не «зависло»
+    setStage('recognize')
+    try {
+      const r = await recognizeItem(uploaded.id)
+      setItem({ ...EMPTY_ITEM, category: r.category.value, color: r.color.value })
+      setAuto({ category: Boolean(r.category.value), color: Boolean(r.color.value) })
+    } catch {
+      // Не распознали — не беда: фото есть, поля заполнит человек
+      setItem(EMPTY_ITEM)
+      setAuto({})
+    }
+    setStage('form')
   }
 
   function manual() {
     setPhoto(null)
     setPreview(null)
+    setItem(EMPTY_ITEM)
+    setAuto({})
     setStage('form')
   }
 
@@ -54,6 +74,7 @@ export default function AddItem() {
     setPhoto(null)
     setPreview(null)
     setPhotoError('')
+    setAuto({})
     setStage('photo')
   }
 
@@ -77,15 +98,24 @@ export default function AddItem() {
       <ScreenHeader
         title="Новая вещь"
         onBack={() => (stage === 'form' ? retake() : navigate('/wardrobe', { replace: true }))}
-        backDisabled={uploading}
+        backDisabled={busy}
         right={stage === 'form' ? '2 / 2' : '1 / 2'}
       />
 
-      {stage === 'photo' && <PhotoStep onFile={handleFile} onManual={manual} uploading={uploading} error={photoError} />}
+      {stage === 'photo' && <PhotoStep onFile={handleFile} onManual={manual} error={photoError} />}
+
+      {busy && <RecognizingStep preview={preview} stage={stage} />}
 
       {stage === 'form' && (
         <>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+          {(auto.category || auto.color) && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="h2" sx={{ mb: 0.5 }}>Заполнили автоматически</Typography>
+              <Typography sx={{ color: 'text.secondary' }}>Проверьте поля — любое можно исправить</Typography>
+            </Box>
+          )}
 
           {preview && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
@@ -104,6 +134,7 @@ export default function AddItem() {
               attrs={attrs}
               value={item}
               onChange={setItem}
+              auto={auto}
               errors={fieldErrors}
               onSubmit={save}
               submitLabel="Сохранить в гардероб"
