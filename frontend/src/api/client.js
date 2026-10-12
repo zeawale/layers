@@ -32,6 +32,10 @@ export async function api(path, options = {}) {
     const detail = Array.isArray(body.detail) ? body.detail.map((e) => e.msg).join('. ') : body.detail
     const error = new Error(detail ?? `HTTP ${response.status}`)
     error.status = response.status
+    // 422: какое поле не прошло — { email: '…', password: '…' }. Экран показывает под полем свой текст по-русски
+    if (Array.isArray(body.detail)) {
+      error.fields = Object.fromEntries(body.detail.map((e) => [e.loc?.[e.loc.length - 1], e.msg]))
+    }
     throw error
   }
 

@@ -1,20 +1,13 @@
 import { useState } from 'react'
 import { Link as RouterLink, useNavigate, useNavigationType } from 'react-router-dom'
-import {
-  Alert,
-  Box,
-  Button,
-  IconButton,
-  InputAdornment,
-  Link,
-  TextField,
-  Typography,
-} from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
+import { Alert, Box, Button, Link, Typography } from '@mui/material'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
 
-import { api, setToken } from '../api/client.js'
+import { login } from '../api/auth.js'
+import { setToken } from '../api/client.js'
+import BackButton from '../components/BackButton.jsx'
+import FormField from '../components/FormField.jsx'
+import PasswordField from '../components/PasswordField.jsx'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -31,14 +24,11 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      const data = await api('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-      })
+      const data = await login(email, password)
       setToken(data.access_token)
       navigate(data.user.onboarding_completed ? '/today' : '/onboarding')
     } catch (err) {
-      setError(err.message)
+      setError(err.fields?.email ? 'Проверьте адрес почты' : err.message)
     } finally {
       setLoading(false)
     }
@@ -46,70 +36,35 @@ export default function Login() {
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      {canGoBack && (
-        <IconButton onClick={() => navigate(-1)} sx={{ ml: -1, mb: 2, border: '1px solid', borderColor: 'divider', width: 40, height: 40 }}>
-          <ArrowBackIcon sx={{ fontSize: 20 }} />
-        </IconButton>
-      )}
+      {canGoBack && <BackButton onClick={() => navigate(-1)} sx={{ ml: -1, mb: 2 }} />}
 
-      <Typography variant="h1" sx={{ mb: 1.5 }}>
-        С возвращением
-      </Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 4, fontSize: 15, lineHeight: 1.5 }}>
-        Войдите, чтобы увидеть комплект на сегодня.
-      </Typography>
+      <Typography variant="h1" sx={{ mb: 1.5 }}>С возвращением</Typography>
+      <Typography sx={{ color: 'text.secondary', mb: 4 }}>Войдите, чтобы увидеть комплект на сегодня.</Typography>
 
       <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
         {error && <Alert severity="error">{error}</Alert>}
 
-        <Box>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.75 }}>
-            Электронная почта
-          </Typography>
-          <TextField
-            placeholder="sasha@mail.ru"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-            fullWidth
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MailOutlineIcon sx={{ color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </Box>
+        <FormField
+          label="Электронная почта"
+          icon={<MailOutlineIcon />}
+          placeholder="sasha@mail.ru"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+        />
 
         <Box>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.75 }}>
-            Пароль
-          </Typography>
-          <TextField
-            placeholder="••••••••"
-            type="password"
+          <PasswordField
+            label="Пароль"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
-            fullWidth
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockOutlinedIcon sx={{ color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
           />
           <Box sx={{ textAlign: 'right', mt: 1 }}>
-            <Link component={RouterLink} to="/forgot-password" variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+            <Link component={RouterLink} to="/forgot-password" variant="subtitle1" sx={{ color: 'text.secondary' }}>
               Забыли пароль?
             </Link>
           </Box>
@@ -121,7 +76,7 @@ export default function Login() {
 
         <Typography variant="body2" align="center" sx={{ color: 'text.secondary' }}>
           Нет аккаунта?{' '}
-          <Link component={RouterLink} to="/register" sx={{ fontWeight: 700, color: 'text.primary' }}>
+          <Link component={RouterLink} to="/register" variant="subtitle1" sx={{ color: 'text.primary' }}>
             Зарегистрироваться
           </Link>
         </Typography>
