@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Alert, Box, Button, CircularProgress, InputAdornment, TextField, Typography } from '@mui/material'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Alert, Box, Button, CircularProgress, IconButton, InputAdornment, Snackbar, TextField, Typography } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
 import SearchIcon from '@mui/icons-material/Search'
 
 import { listItems } from '../api/items.js'
@@ -22,6 +24,15 @@ const normalize = (s) => s.toLowerCase().replaceAll('ё', 'е')
 
 // Макеты 3.0 «Гардероб», 3.1 «Гардероб · пусто», 3.8 «Ничего не нашлось»
 export default function Wardrobe() {
+  const navigate = useNavigate()
+  // После добавления вещи экран добавления передаёт её название — показываем уведомление (макет 3.7).
+  // Запоминаем и сразу убираем из истории: иначе при обновлении страницы уведомление появится снова
+  const location = useLocation()
+  const [added, setAdded] = useState(location.state?.added ?? null)
+  useEffect(() => {
+    if (location.state?.added) navigate('.', { replace: true, state: null })
+  }, [location.state, navigate])
+  const addItem = () => navigate('/wardrobe/new')
   const { label, loading: attrsLoading, error: attrsError, retry: retryAttrs } = useAttributes()
   const [items, setItems] = useState(null)
   const [error, setError] = useState('')
@@ -48,9 +59,18 @@ export default function Wardrobe() {
 
   return (
     <Box sx={{ px: 3, pt: 4 }}>
-      <Typography variant="h1" sx={{ mb: 0.5 }}>
-        Гардероб
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+        <Typography variant="h1">Гардероб</Typography>
+        {items?.length > 0 && (
+          <IconButton
+            onClick={addItem}
+            aria-label="Добавить вещь"
+            sx={{ bgcolor: 'primary.main', color: 'common.white', width: 44, height: 44, '&:hover': { bgcolor: 'primary.dark' } }}
+          >
+            <AddIcon />
+          </IconButton>
+        )}
+      </Box>
       {/* Счётчик — только когда список загружен: до этого «Пока ни одной вещи» было бы неправдой */}
       <Typography sx={{ color: 'text.secondary', mb: 3, minHeight: '1.5em' }}>
         {items && (items.length ? `${items.length} ${itemsWord(items.length)} в гардеробе` : 'Пока ни одной вещи')}
@@ -69,7 +89,7 @@ export default function Wardrobe() {
         </Box>
       )}
 
-      {!loading && !failed && items.length === 0 && <EmptyWardrobe />}
+      {!loading && !failed && items.length === 0 && <EmptyWardrobe onAdd={addItem} />}
 
       {!loading && !failed && items.length > 0 && (
         <>
@@ -111,6 +131,15 @@ export default function Wardrobe() {
           )}
         </>
       )}
+
+      <Snackbar
+        open={Boolean(added)}
+        autoHideDuration={3000}
+        onClose={() => setAdded(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert severity="success" variant="filled">«{added}» в гардеробе</Alert>
+      </Snackbar>
     </Box>
   )
 }
