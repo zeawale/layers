@@ -9,7 +9,13 @@ export const STYLE_DESC = {
   business: 'Строго — для работы и учёбы',
 }
 
-// Шаг 1 онбординга — «Какой стиль вам ближе?»
+// Порядок стилей — как в макете: стиль, которого нет в словаре описаний, идёт в конец
+const STYLE_ORDER = Object.keys(STYLE_DESC)
+const styleRank = (value) => (STYLE_ORDER.includes(value) ? STYLE_ORDER.indexOf(value) : STYLE_ORDER.length)
+
+export const sortStyles = (styles) => [...styles].sort((a, b) => styleRank(a.value) - styleRank(b.value))
+
+// «Какой стиль вам ближе?» — шаг 1 онбординга и экран 4.4 в профиле
 export default function StyleStep({ styles, value, onChange }) {
   return (
     <>
