@@ -32,7 +32,7 @@ export default function Login() {
       setToken(data.access_token)
       navigate(data.user.onboarding_completed ? '/today' : '/onboarding')
     } catch (err) {
-      setError(err.fields?.email ? 'Проверьте адрес почты' : err.message)
+      setError(err.fields?.email ? 'Проверь адрес почты' : err.message)
     } finally {
       setLoading(false)
     }
@@ -48,14 +48,14 @@ export default function Login() {
         message={
           <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <LockOutlinedIcon fontSize="small" />
-            Сессия истекла — войдите заново
+            Сессия истекла — войди заново
           </Box>
         }
       />
       {canGoBack && <BackButton onClick={() => navigate(-1)} sx={{ ml: -1, mb: 2 }} />}
 
       <Typography variant="h1" sx={{ mb: 1.5 }}>С возвращением</Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 4 }}>Войдите, чтобы увидеть комплект на сегодня.</Typography>
+      <Typography sx={{ color: 'text.secondary', mb: 4 }}>Войди, чтобы увидеть комплект на сегодня.</Typography>
 
       <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
         {error && <Alert severity="error">{error}</Alert>}
@@ -81,7 +81,7 @@ export default function Login() {
           />
           <Box sx={{ textAlign: 'right', mt: 1 }}>
             <Link component={RouterLink} to="/forgot-password" variant="subtitle1" sx={{ color: 'text.secondary' }}>
-              Забыли пароль?
+              Не помнишь пароль?
             </Link>
           </Box>
         </Box>

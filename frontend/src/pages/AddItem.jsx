@@ -44,7 +44,7 @@ export default function AddItem() {
       uploaded = await uploadPhoto(file)
       setPhoto(uploaded)
     } catch (err) {
-      // 413 и 415 — текст из api/photos.js: «Фото больше 10 МБ — выберите поменьше», «Подойдёт фото в JPEG, PNG или WebP»
+      // 413 и 415 — текст из api/photos.js: «Фото больше 10 МБ — выбери поменьше», «Подойдёт фото в JPEG, PNG или WebP»
       setPhotoError(err.message)
       setPreview(null)
       setStage('photo')
@@ -115,7 +115,7 @@ export default function AddItem() {
           {(auto.category || auto.color) && (
             <Box sx={{ mb: 2 }}>
               <Typography variant="h2" sx={{ mb: 0.5 }}>Заполнили автоматически</Typography>
-              <Typography sx={{ color: 'text.secondary' }}>Проверьте поля — любое можно исправить</Typography>
+              <Typography sx={{ color: 'text.secondary' }}>Проверь поля — любое можно исправить</Typography>
             </Box>
           )}
 

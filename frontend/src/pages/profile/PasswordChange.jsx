@@ -50,7 +50,7 @@ export default function PasswordChange() {
     <Box component="form" onSubmit={submit}>
       <Typography variant="h2" sx={{ mb: 1 }}>Сменить пароль</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 3 }}>
-        Введите текущий пароль и придумайте новый. На других устройствах после этого нужно будет войти заново.
+        Введи текущий пароль и придумай новый. На других устройствах после этого нужно будет войти заново.
       </Typography>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>

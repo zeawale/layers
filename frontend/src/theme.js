@@ -53,7 +53,7 @@ const theme = createTheme({
     body1: { fontSize: 15, lineHeight: 1.5 },
     // Мелкие подсказки под блоками и полями
     caption: { fontSize: 12, lineHeight: 1.4 },
-    // Подписи капсом: «Ваша палитра»
+    // Подписи капсом: «Твоя палитра»
     overline: { fontSize: 12, fontWeight: 600, letterSpacing: 1, lineHeight: 1.4 },
     button: { textTransform: 'none', fontWeight: 600 }, // без капслока, как в макетах
     // Подпись активной вкладки нижней панели

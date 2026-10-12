@@ -15,7 +15,7 @@ const COOLDOWN = 60
 // «0:42»
 const formatCountdown = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
-// «Забыли пароль?» — макеты 1.2.1 и 1.2.2. Ответ всегда один, есть такой email или нет
+// «Не помнишь пароль?» — макеты 1.2.1 и 1.2.2. Ответ всегда один, есть такой email или нет
 export default function ForgotPassword() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
@@ -43,7 +43,7 @@ export default function ForgotPassword() {
       setSent(true)
       setLeft(COOLDOWN)
     } catch (err) {
-      if (err.fields?.email) setEmailError('Проверьте адрес почты')
+      if (err.fields?.email) setEmailError('Проверь адрес почты')
       else setError(err.message)
     } finally {
       setLoading(false)
@@ -55,7 +55,7 @@ export default function ForgotPassword() {
       <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
         <AuthStatus
           icon={<MailOutlineIcon />}
-          title="Проверьте почту"
+          title="Проверь почту"
           text="Если аккаунт с этим адресом есть, мы отправили на него ссылку. Она действует 60 минут."
         >
           {error && <Alert severity="error">{error}</Alert>}
@@ -74,9 +74,9 @@ export default function ForgotPassword() {
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
       <BackButton onClick={toLogin} sx={{ ml: -1, mb: 2 }} />
 
-      <Typography variant="h1" sx={{ mb: 1.5 }}>Забыли пароль?</Typography>
+      <Typography variant="h1" sx={{ mb: 1.5 }}>Не помнишь пароль?</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 4 }}>
-        Введите почту, на которую регистрировались, — пришлём ссылку для сброса пароля.
+        Введи почту от аккаунта — пришлём ссылку для сброса пароля.
       </Typography>
 
       <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>

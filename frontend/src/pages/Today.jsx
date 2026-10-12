@@ -94,7 +94,7 @@ export default function Today() {
     const w = outfit?.weather
     const style = me?.preferences?.style
     const steps = [
-      `Погода: ${me?.city ?? 'ваш город'}${w ? `, ${formatTemp(w.temp_min)}, ветер ${Math.round(w.wind_speed)} м/с` : ''}`,
+      `Погода: ${me?.city ?? 'твой город'}${w ? `, ${formatTemp(w.temp_min)}, ветер ${Math.round(w.wind_speed)} м/с` : ''}`,
       `Стиль: ${style && attrs ? label('style', style).toLowerCase() : 'любой'}`,
       'Сочетаем цвета и вещи',
       'Пишем объяснение',

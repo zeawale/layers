@@ -141,11 +141,11 @@ export const EMPTY_ITEM = {
 // Ошибки 422 по полям вещи — свой текст по-русски вместо английского текста валидатора
 const FIELD_ERRORS = {
   name: 'Название — от 1 до 100 символов',
-  category: 'Выберите категорию',
-  color: 'Выберите цвет',
-  warmth: 'Выберите теплоту',
+  category: 'Выбери категорию',
+  color: 'Выбери цвет',
+  warmth: 'Выбери теплоту',
 }
 
 export function itemFieldErrors(fields = {}) {
-  return Object.fromEntries(Object.keys(fields).map((f) => [f, FIELD_ERRORS[f] ?? 'Проверьте это поле']))
+  return Object.fromEntries(Object.keys(fields).map((f) => [f, FIELD_ERRORS[f] ?? 'Проверь это поле']))
 }

@@ -32,7 +32,7 @@ export default function FirstOutfit({ steps, done }) {
       <Box sx={{ maxWidth: 390, mx: 'auto', px: 3, pt: 6.5, pb: 4, textAlign: 'center' }}>
         <Box component="img" src="/today/first-outfit.png" alt="" sx={{ width: 260, height: 242, display: 'block', mx: 'auto', mb: 5 }} />
         <AutoAwesomeOutlined sx={{ color: 'gold.main', width: 24, height: 24, mb: 1.5 }} />
-        <Typography variant="h2" component="h1" sx={{ mb: 1.5 }}>Собираем ваш первый комплект</Typography>
+        <Typography variant="h2" component="h1" sx={{ mb: 1.5 }}>Собираем твой первый комплект</Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3.5 }}>Обычно это занимает пару секунд</Typography>
         <Panel sx={{ px: 2.5, py: 1.25, mb: 3.5, textAlign: 'left' }}>
           {steps.map((text, i) => (

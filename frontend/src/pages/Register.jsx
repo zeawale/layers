@@ -12,7 +12,7 @@ import PasswordField from '../components/PasswordField.jsx'
 
 // Ошибки 422 по полям — свой текст по-русски вместо английского текста валидатора
 const FIELD_ERRORS = {
-  email: 'Проверьте адрес почты',
+  email: 'Проверь адрес почты',
   password: 'Пароль — минимум 8 символов',
   name: 'Имя — не длиннее 50 символов',
 }
@@ -48,14 +48,14 @@ export default function Register() {
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
       <BackButton onClick={() => navigate('/login', { replace: true })} sx={{ ml: -1, mb: 2 }} />
 
-      <Typography variant="h1" sx={{ mb: 1.5 }}>Создадим ваш{'\n'}гардероб</Typography>
+      <Typography variant="h1" sx={{ mb: 1.5 }}>Создадим твой{'\n'}гардероб</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 4 }}>Минута на регистрацию — и сервис начнёт подбирать комплекты.</Typography>
 
       <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
         {error && <Alert severity="error">{error}</Alert>}
 
         <FormField
-          label="Как к вам обращаться · необязательно, до 50 символов"
+          label="Как к тебе обращаться · необязательно, до 50 символов"
           icon={<PersonOutlineIcon />}
           placeholder="Саша"
           value={name}

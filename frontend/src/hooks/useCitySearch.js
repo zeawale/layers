@@ -41,7 +41,7 @@ export default function useCitySearch(initialQuery = '') {
 
   function geolocate() {
     if (!navigator.geolocation) {
-      setError('Браузер не умеет определять местоположение — введите город')
+      setError('Браузер не умеет определять местоположение — введи город')
       return
     }
     navigator.geolocation.getCurrentPosition(
@@ -50,7 +50,7 @@ export default function useCitySearch(initialQuery = '') {
         setSelected({ lat: pos.coords.latitude, lon: pos.coords.longitude })
         setQuery('Определяем…')
       },
-      () => setError('Не удалось определить местоположение — введите город'),
+      () => setError('Не удалось определить местоположение — введи город'),
     )
   }
 

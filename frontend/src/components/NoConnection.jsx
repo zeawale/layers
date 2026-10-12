@@ -23,7 +23,7 @@ export default function NoConnection({ onRetry }) {
       <Box sx={{ width: '100%', maxWidth: 342, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
         <IconCircle tone="neutral" sx={{ mb: 2.5 }}><InfoOutlined /></IconCircle>
         <Typography variant="h2" sx={{ mb: 1.5 }}>Нет соединения</Typography>
-        <Typography sx={{ color: 'text.secondary', mb: 3 }}>Проверьте интернет и попробуйте ещё раз.</Typography>
+        <Typography sx={{ color: 'text.secondary', mb: 3 }}>Проверь интернет и попробуй ещё раз.</Typography>
         <Button variant="contained" size="large" fullWidth startIcon={<RefreshIcon />} onClick={onRetry}>
           Повторить
         </Button>
