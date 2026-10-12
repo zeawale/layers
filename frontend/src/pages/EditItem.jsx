@@ -6,8 +6,7 @@ import { getToken, mediaUrl } from '../api/client.js'
 import { getItem, updateItem } from '../api/items.js'
 import { uploadPhoto } from '../api/photos.js'
 import ItemForm, { EMPTY_ITEM, itemFieldErrors } from '../components/ItemForm.jsx'
-import LoadError from '../components/LoadError.jsx'
-import Loading from '../components/Loading.jsx'
+import { LoadError, Loading } from '../components/LoadState.jsx'
 import ScreenHeader from '../components/ScreenHeader.jsx'
 import useAttributes from '../hooks/useAttributes.js'
 import ItemMissing from './wardrobe/ItemMissing.jsx'
@@ -56,7 +55,7 @@ export default function EditItem() {
     try {
       setPhoto(await uploadPhoto(file))
     } catch (err) {
-      // 413 и 415 бэк присылает по-русски — показываем под фото
+      // 413 и 415 — текст из api/photos.js, показываем под фото
       setPhotoError(err.message)
     } finally {
       setUploading(false)

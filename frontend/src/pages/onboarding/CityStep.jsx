@@ -9,7 +9,7 @@ import FormField from '../../components/FormField.jsx'
 // Одноимённых городов бывает несколько (два Кировска) — различаем по координатам
 const sameCity = (a, b) => a?.lat === b.lat && a?.lon === b.lon
 
-// Шаг 3 онбординга — «Где вы живёте?». Подсказки (GET /geo/cities) ищет страница, сюда приходит список
+// «Где вы живёте?» — шаг 3 онбординга и экран 4.3 в профиле. Подсказки ищет useCitySearch, сюда приходит список
 export default function CityStep({ query, onQuery, cities, selected, onSelect, onGeolocate }) {
   return (
     <>

@@ -1,7 +1,7 @@
 import { Box, Button, IconButton, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 
-import itemsWord from './itemsWord.js'
+import { plural } from '../../format.js'
 
 // Шапка гардероба: заголовок, «+» (или «Готово» в режиме выбора) и строка под ним.
 // total — сколько вещей (null, пока список грузится); selected — id выбранных или null вне режима выбора
@@ -26,7 +26,7 @@ export default function WardrobeHeader({ total, selected, max, onAdd, onDone }) 
       {/* Счётчик — только когда список загружен: до этого «Пока ни одной вещи» было бы неправдой */}
       <Typography sx={{ color: 'text.secondary', mb: 3, minHeight: '1.5em' }}>
         {selected && `Выбрано: ${count}${count === max ? ' — больше за раз не удалить' : ''}`}
-        {!selected && total !== null && (total ? `${total} ${itemsWord(total)} в гардеробе` : 'Пока ни одной вещи')}
+        {!selected && total !== null && (total ? `${total} ${plural(total, ['вещь', 'вещи', 'вещей'])} в гардеробе` : 'Пока ни одной вещи')}
       </Typography>
     </>
   )
