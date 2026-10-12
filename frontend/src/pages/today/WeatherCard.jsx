@@ -6,6 +6,7 @@ import DeviceThermostatOutlined from '@mui/icons-material/DeviceThermostatOutlin
 import FilterDramaOutlined from '@mui/icons-material/FilterDramaOutlined'
 import PlaceOutlined from '@mui/icons-material/PlaceOutlined'
 import UmbrellaOutlined from '@mui/icons-material/UmbrellaOutlined'
+import WaterDropOutlined from '@mui/icons-material/WaterDropOutlined'
 import WbSunnyOutlined from '@mui/icons-material/WbSunnyOutlined'
 
 import { formatTemp } from '../../format.js'
@@ -17,6 +18,8 @@ const CONDITION_ICON = {
   rain: UmbrellaOutlined,
   snow: AcUnitOutlined,
 }
+// В дождь и снег погода решает комплект — пишем её словами рядом с «ощущается как» (макет 2.2)
+const WET_TEXT = { rain: 'дождь', snow: 'снег' }
 
 function Stat({ icon: Icon, value, label }) {
   return (
@@ -33,10 +36,13 @@ function Stat({ icon: Icon, value, label }) {
 export default function WeatherCard({ weather }) {
   const Icon = CONDITION_ICON[weather.condition] ?? FilterDramaOutlined
   const rain = weather.precipitation_probability
+  const wet = WET_TEXT[weather.condition]
   return (
     <Box
       sx={(t) => {
-        const { sky, sun } = t.palette.weather
+        // Ясно и облачно — тёплое пятно солнца на голубом (2.0), дождь и снег — холодное пятно на бежевом (2.2)
+        const base = wet ? t.palette.tint.neutral : t.palette.weather.sky
+        const spot = wet ? t.palette.weather.rain : t.palette.weather.sun
         return {
           position: 'relative',
           overflow: 'hidden',
@@ -45,8 +51,7 @@ export default function WeatherCard({ weather }) {
           pt: 2.375,
           pb: 2.375,
           mb: 2.5,
-          // Тёплое пятно «солнца» в правом верхнем углу на голубом фоне
-          background: `radial-gradient(circle at 89% 22%, ${sun} 0, ${sun} 50px, ${alpha(sun, 0)} 130px), ${sky}`,
+          background: `radial-gradient(circle at 89% 22%, ${spot} 0, ${spot} 50px, ${alpha(spot, 0)} 130px), ${base}`,
         }
       }}
     >
@@ -56,10 +61,10 @@ export default function WeatherCard({ weather }) {
         <Typography variant="body2" noWrap>{weather.city} · сегодня</Typography>
       </Box>
       <Typography variant="temperature" component="p" sx={{ mb: 0.25 }}>{formatTemp(weather.temp_min)}</Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 2 }}>Ощущается как {formatTemp(weather.feels_like)}</Typography>
+      <Typography sx={{ color: 'text.secondary', mb: 2 }}>Ощущается как {formatTemp(weather.feels_like)}{wet && ` · ${wet}`}</Typography>
       <Box sx={(t) => ({ display: 'flex', borderTop: `1px solid ${alpha(t.palette.text.primary, 0.08)}`, pt: 2 })}>
-        {/* Вероятности может не быть, если Open-Meteo её не отдал */}
-        <Stat icon={UmbrellaOutlined} value={rain == null ? '—' : `${rain}%`} label="осадки" />
+        {/* Вероятности может не быть, если Open-Meteo её не отдал. В дождь зонт уже крупно — у осадков капля (2.2) */}
+        <Stat icon={wet ? WaterDropOutlined : UmbrellaOutlined} value={rain == null ? '—' : `${rain}%`} label="осадки" />
         <Stat icon={AirOutlined} value={`${Math.round(weather.wind_speed)} м/с`} label="ветер" />
         <Stat icon={DeviceThermostatOutlined} value={`до ${formatTemp(weather.temp_max)}`} label="днём" />
       </Box>

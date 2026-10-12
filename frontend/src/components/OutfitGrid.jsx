@@ -1,7 +1,9 @@
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 
 import { mediaUrl } from '../api/client.js'
+import CategoryPill from './CategoryPill.jsx'
 import ItemPhoto from './ItemPhoto.jsx'
+import MissingSlot from './MissingSlot.jsx'
 
 // Порядок плиток — как в макете 2.13: верхняя одежда первой (крупно слева), обувь последней
 const ORDER = ['outerwear', 'top', 'dress', 'accessory', 'bottom', 'footwear']
@@ -18,32 +20,33 @@ const LAYOUTS = {
 }
 const MANY = { columns: 'repeat(2, minmax(0, 1fr))', rows: '130px' }
 
-function Tile({ item, label, tall }) {
+function Tile({ item, label, sx }) {
   return (
-    <ItemPhoto
-      src={mediaUrl(item.photo?.url)}
-      sx={{ aspectRatio: 'auto', height: '100%', borderRadius: '16px', bgcolor: 'background.default', ...(tall && { gridRow: 'span 2' }) }}
-    >
-      {/* Подпись категории — белая «таблетка» в углу фото */}
-      <Typography
-        variant="overline"
-        sx={{ position: 'absolute', top: 10, left: 10, bgcolor: 'background.paper', color: 'text.secondary', borderRadius: 999, px: 1.25, py: 0.5 }}
-      >
-        {label}
-      </Typography>
+    <ItemPhoto src={mediaUrl(item.photo?.url)} sx={{ aspectRatio: 'auto', height: '100%', borderRadius: '16px', bgcolor: 'background.default', ...sx }}>
+      <CategoryPill>{label}</CategoryPill>
     </ItemPhoto>
   )
 }
 
-// Плитки комплекта: столько, сколько вещей пришло в items. label — подпись категории из справочника
-export default function OutfitGrid({ items, label }) {
-  const sorted = [...items].sort((a, b) => rank(a.category) - rank(b.category))
-  const layout = LAYOUTS[sorted.length] ?? MANY
+// Плитки комплекта: вещи из items и пустые слоты для missing (макет 2.2). label — подпись категории из справочника.
+// Пустой слот — только для категории, которой нет среди вещей: заглушка движка в дождь кладёт
+// непромокаемую верхнюю одежду в missing, даже если обычное пальто уже в items
+export default function OutfitGrid({ items, missing = [], label }) {
+  const present = new Set(items.map((i) => i.category))
+  const slots = [
+    ...items.map((item) => ({ key: `i${item.id}`, category: item.category, item })),
+    ...missing.filter((c) => !present.has(c)).map((c) => ({ key: `m${c}`, category: c })),
+  ].sort((a, b) => rank(a.category) - rank(b.category))
+  const layout = LAYOUTS[slots.length] ?? MANY
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: layout.columns, gridAutoRows: layout.rows, gridTemplateRows: layout.rows, gap: 1 }}>
-      {sorted.map((item, i) => (
-        <Tile key={item.id} item={item} label={label('category', item.category)} tall={layout.tall && i === 0} />
-      ))}
+      {slots.map((slot, i) => {
+        const sx = layout.tall && i === 0 ? { gridRow: 'span 2' } : undefined
+        const name = label('category', slot.category)
+        return slot.item
+          ? <Tile key={slot.key} item={slot.item} label={name} sx={sx} />
+          : <MissingSlot key={slot.key} label={name} sx={sx} />
+      })}
     </Box>
   )
 }
