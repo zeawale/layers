@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
-import { Alert, Box, Button, CircularProgress } from '@mui/material'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Alert, Box, Button } from '@mui/material'
 
 import { getToken } from '../api/client.js'
 import { searchCities } from '../api/geo.js'
 import { updateMe } from '../api/users.js'
+import LoadError from '../components/LoadError.jsx'
+import Loading from '../components/Loading.jsx'
 import useAttributes from '../hooks/useAttributes.js'
 import CityStep from './onboarding/CityStep.jsx'
 import ColorsStep from './onboarding/ColorsStep.jsx'
@@ -18,10 +20,13 @@ function styleRank(value) {
   return i === -1 ? STYLE_ORDER.length : i
 }
 
-// Онбординг: стиль → цвета → город. Стиль и цвета можно пропустить, город — нет (HANDBOOK, раздел 8)
+// Онбординг: стиль → цвета → город. Стиль и цвета можно пропустить, город — нет (HANDBOOK, раздел 8).
+// С главного экрана по 400 «нет города» приходят с state.step = 'city': только шаг города,
+// без «назад», и стиль с цветами не отправляем — preferences заменяется целиком и стёр бы их
 export default function Onboarding() {
   const navigate = useNavigate()
-  const [step, setStep] = useState(0)
+  const cityOnly = useLocation().state?.step === 'city'
+  const [step, setStep] = useState(cityOnly ? 2 : 0)
   const [style, setStyle] = useState(null)
   const [palette, setPalette] = useState({ liked: [], disliked: [] })
   const [cityQuery, setCityQuery] = useState('')
@@ -71,10 +76,13 @@ export default function Onboarding() {
     setError('')
     setLoading(true)
     try {
-      const body = { preferences: {} }
-      if (style) body.preferences.style = style
-      if (palette.liked.length) body.preferences.liked_colors = palette.liked
-      if (palette.disliked.length) body.preferences.disliked_colors = palette.disliked
+      const body = {}
+      if (!cityOnly) {
+        body.preferences = {}
+        if (style) body.preferences.style = style
+        if (palette.liked.length) body.preferences.liked_colors = palette.liked
+        if (palette.disliked.length) body.preferences.disliked_colors = palette.disliked
+      }
       if (selectedCity?.lat != null && selectedCity?.lon != null) {
         body.lat = selectedCity.lat
         body.lon = selectedCity.lon
@@ -83,7 +91,8 @@ export default function Onboarding() {
         body.city = cityQuery.trim()
       }
       await updateMe(body)
-      navigate('/today')
+      // Первый подбор показываем экраном 1.7 «Подбираем первый комплект», а не скелетоном
+      navigate('/today', { replace: true, state: { first: !cityOnly } })
     } catch (err) {
       setError(err.message)
     } finally {
@@ -103,7 +112,7 @@ export default function Onboarding() {
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <StepHeader step={step} total={3} onBack={() => setStep(step - 1)} onSkip={step < 2 ? next : null} />
+      <StepHeader step={step} total={3} onBack={cityOnly ? null : () => setStep(step - 1)} onSkip={step < 2 ? next : null} />
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
@@ -123,17 +132,8 @@ export default function Onboarding() {
       )}
 
       {/* Стили и цвета приходят из справочника: пока он грузится — спиннер, не пришёл — ошибка и «Повторить» */}
-      {step < 2 && attrsLoading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
-          <CircularProgress size={28} />
-        </Box>
-      )}
-      {step < 2 && attrsError && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mb: 4 }}>
-          <Alert severity="error" sx={{ width: '100%' }}>{attrsError}</Alert>
-          <Button variant="outlined" onClick={retryAttrs}>Повторить</Button>
-        </Box>
-      )}
+      {step < 2 && attrsLoading && <Loading />}
+      {step < 2 && attrsError && <LoadError message={attrsError} onRetry={retryAttrs} />}
 
       <Button
         variant="contained"
