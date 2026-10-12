@@ -73,7 +73,7 @@ export default function ItemDetails() {
           {/* Название до 100 символов без пробелов не должно вылезать за экран */}
           <Typography variant="h1" sx={{ mb: 2.5, overflowWrap: 'anywhere' }}>{item.name}</Typography>
 
-          <ItemFacts item={item} label={label} />
+          <ItemFacts item={item} label={label} warmthMax={attrs.warmth.length} />
 
           <Box sx={{ display: 'flex', gap: 1.5 }}>
             <Button variant="contained" size="large" fullWidth onClick={() => navigate(`/wardrobe/${id}/edit`)}>

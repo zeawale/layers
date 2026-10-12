@@ -1,13 +1,16 @@
 import { Box, Typography } from '@mui/material'
 
+import WarmthDots from '../../components/WarmthDots.jsx'
+
 // «2 сентября 2026»
 export function formatDate(iso, withYear = true) {
   const opts = withYear ? { day: 'numeric', month: 'long', year: 'numeric' } : { day: 'numeric', month: 'long' }
   return new Date(iso).toLocaleDateString('ru-RU', opts).replace(' г.', '')
 }
 
-// Список полей вещи на карточке (макет 3.2). label — подпись из справочника (useAttributes)
-export default function ItemFacts({ item, label }) {
+// Список полей вещи на карточке (макет 3.2). label — подпись из справочника (useAttributes),
+// warmthMax — сколько уровней теплоты в справочнике
+export default function ItemFacts({ item, label, warmthMax }) {
   const seasons = item.season.map((s, i) => (i ? label('season', s).toLowerCase() : label('season', s)))
   const rows = [
     ['Категория', label('category', item.category)],
@@ -16,7 +19,13 @@ export default function ItemFacts({ item, label }) {
     ['Сезон', seasons.length ? seasons.join(', ') : 'Всесезонная'],
     // Без стиля вещь подходит под любой
     ['Стиль', item.style ? label('style', item.style) : 'Любой'],
-    ['Теплота', `${'●'.repeat(item.warmth)}${'○'.repeat(5 - item.warmth)}  ${label('warmth', item.warmth).toLowerCase()}`],
+    [
+      'Теплота',
+      <Box component="span" key="w" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+        <WarmthDots value={item.warmth} max={warmthMax} />
+        {label('warmth', item.warmth).toLowerCase()}
+      </Box>,
+    ],
     ['Защита от осадков', label('water_resistance', item.water_resistance)],
     ['Добавлена', formatDate(item.created_at)],
   ]
@@ -36,7 +45,7 @@ export default function ItemFacts({ item, label }) {
           }}
         >
           <Typography component="dt" sx={{ color: 'text.secondary', flexShrink: 0 }}>{name}</Typography>
-          <Typography component="dd" variant="subtitle1" sx={{ m: 0, textAlign: 'right', whiteSpace: 'pre-wrap', minWidth: 0 }}>
+          <Typography component="dd" sx={{ m: 0, textAlign: 'right', minWidth: 0 }}>
             {value}
           </Typography>
         </Box>
