@@ -5,3 +5,7 @@ import { api } from './client.js'
 export function listItems() {
   return api('/items')
 }
+
+export function createItem(item) {
+  return api('/items', { method: 'POST', body: JSON.stringify(item) })
+}

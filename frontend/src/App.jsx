@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 
 import AppLayout from './components/AppLayout.jsx'
+import AddItem from './pages/AddItem.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
 import History from './pages/History.jsx'
 import Login from './pages/Login.jsx'
@@ -29,6 +30,7 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/wardrobe/new" element={<AddItem />} />
 
       {/* Правка профиля (4.3–4.7): без нижней панели, со стрелкой «назад» */}
       <Route element={<EditLayout />}>
