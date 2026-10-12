@@ -45,13 +45,13 @@ export default function Register() {
   }
 
   return (
-    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <BackButton onClick={() => navigate('/login', { replace: true })} sx={{ ml: -1, mb: 2 }} />
+    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2.5, pb: 4 }}>
+      <BackButton onClick={() => navigate('/welcome', { replace: true })} sx={{ mb: 3.5 }} />
 
-      <Typography variant="h1" sx={{ mb: 1.5 }}>Создадим твой{'\n'}гардероб</Typography>
+      <Typography variant="h1" sx={{ mb: 1.5, whiteSpace: 'pre-line' }}>Создадим твой{'\n'}гардероб</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 4 }}>Минута на регистрацию — и сервис начнёт подбирать комплекты.</Typography>
 
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.25 }}>
         {error && <Alert severity="error">{error}</Alert>}
 
         <FormField
@@ -101,9 +101,9 @@ export default function Register() {
           {loading ? 'Регистрируем…' : 'Создать аккаунт'}
         </Button>
 
-        <Typography variant="body2" align="center" sx={{ color: 'text.secondary' }}>
+        <Typography variant="body2" align="center" sx={{ color: 'text.disabled' }}>
           Уже есть аккаунт?{' '}
-          <Link component={RouterLink} to="/login" variant="subtitle1" sx={{ color: 'text.primary' }}>
+          <Link component={RouterLink} to="/login" variant="subtitle1" sx={{ color: 'primary.main', ml: 0.5 }}>
             Войти
           </Link>
         </Typography>

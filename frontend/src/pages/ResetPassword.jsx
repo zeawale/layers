@@ -6,7 +6,6 @@ import CheckIcon from '@mui/icons-material/Check'
 
 import { confirmPasswordReset } from '../api/auth.js'
 import AuthStatus from '../components/AuthStatus.jsx'
-import BackButton from '../components/BackButton.jsx'
 import PasswordField from '../components/PasswordField.jsx'
 
 // Сюда ведёт ссылка из письма: /reset-password?token=... Макеты 1.2.3–1.2.5
@@ -49,7 +48,7 @@ export default function ResetPassword() {
 
   if (done || linkBroken) {
     return (
-      <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
+      <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2.5, pb: 4 }}>
         {done ? (
           <AuthStatus icon={<CheckIcon />} title="Пароль изменён" text="Теперь войди с новым паролем.">
             <Button variant="contained" size="large" fullWidth onClick={toLogin}>Ко входу</Button>
@@ -71,15 +70,14 @@ export default function ResetPassword() {
   }
 
   return (
-    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <BackButton onClick={toLogin} sx={{ ml: -1, mb: 2 }} />
-
-      <Typography variant="h1" sx={{ mb: 1.5 }}>Новый пароль</Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 4 }}>
+    // Сюда приходят по ссылке из письма — возвращаться некуда, «назад» нет (макет 1.2.3)
+    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 11, pb: 4 }}>
+      <Typography variant="h2" component="h1" sx={{ mb: 1.5 }}>Новый пароль</Typography>
+      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2.25 }}>
         Придумай новый пароль. После сохранения старый перестанет работать.
       </Typography>
 
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 1.75 }}>
         {error && <Alert severity="error">{error}</Alert>}
 
         <PasswordField
@@ -103,10 +101,10 @@ export default function ResetPassword() {
             minLength={8}
             autoComplete="new-password"
           />
-          <Typography variant="caption" component="p" sx={{ color: 'text.secondary', mt: 0.75 }}>Минимум 8 символов</Typography>
+          <Typography variant="caption" component="p" sx={{ color: 'text.disabled', mt: 1.25 }}>Минимум 8 символов</Typography>
         </Box>
 
-        <Button type="submit" variant="contained" size="large" disabled={loading} fullWidth>
+        <Button type="submit" variant="contained" size="large" disabled={loading} fullWidth sx={{ mt: 1 }}>
           {loading ? 'Сохраняем…' : 'Сохранить пароль'}
         </Button>
       </Box>

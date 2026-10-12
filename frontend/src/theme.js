@@ -23,12 +23,13 @@ const theme = createTheme({
     // Карточка погоды на главном: небо, тёплое пятно солнца, холодное пятно дождя (2.2) и иконки
     weather: { sky: '#dde8f1', sun: '#dbd0b3', rain: '#c0ccd4', icon: '#6f9cc4' },
     // Кружки справочника цветов (GET /attributes, color). Ключи — машинные значения цветов
+    // Значения сняты с макета 1.5 — приглушённые, в тон интерфейсу
     swatch: {
-      black: '#1c1b18', white: '#ffffff', gray: '#9e9e9e', beige: '#d4c5a9',
-      brown: '#6d4c30', navy: '#1a237e', blue: '#1565c0', light_blue: '#64b5f6',
-      green: '#388e3c', khaki: '#827717', yellow: '#fdd835', orange: '#ef6c00',
-      red: '#c62828', maroon: '#6a1b34', pink: '#e91e90',
-      multicolor: 'conic-gradient(red, orange, yellow, green, blue, violet, red)',
+      black: '#1c1b18', white: '#ffffff', gray: '#9a9a95', beige: '#d8c3a5',
+      brown: '#7a5230', navy: '#2b3a55', blue: '#3f6fb5', light_blue: '#a9c1d9',
+      green: '#4f7a4a', khaki: '#6f7f5f', yellow: '#e3b93c', orange: '#c96f4a',
+      red: '#b8432f', maroon: '#7a2e35', pink: '#e8b4b8',
+      multicolor: 'linear-gradient(135deg, #c96f4a, #e3b93c 50%, #3f6fb5)',
       unknown: '#cccccc',
     },
   },
@@ -45,7 +46,8 @@ const theme = createTheme({
     // Manrope — весь интерфейс, Cormorant Garamond — крупные заголовки.
     // Шрифты подключаются в index.html.
     fontFamily: '"Manrope", system-ui, sans-serif',
-    h1: { fontFamily: '"Cormorant Garamond", serif', fontWeight: 500, fontSize: 40, lineHeight: 1.1 },
+    // h1 — заголовки входа и приветствия (44 px, 1.1–1.3); заголовки вкладок «Гардероб», «История» — h2 (32 px)
+    h1: { fontFamily: '"Cormorant Garamond", serif', fontWeight: 500, fontSize: 44, lineHeight: 1.1 },
     h2: { fontFamily: '"Cormorant Garamond", serif', fontWeight: 500, fontSize: 32, lineHeight: 1.15 },
     h3: { fontWeight: 700, fontSize: 20 },
     h4: { fontWeight: 600, fontSize: 17 },
@@ -53,8 +55,9 @@ const theme = createTheme({
     subtitle1: { fontWeight: 600, fontSize: 15, lineHeight: 1.4 },
     // Пояснение под заголовком карточки: «Удобно каждый день», выбранные цвета
     subtitle2: { fontWeight: 400, fontSize: 13, lineHeight: 1.4 },
-    // Основной текст и подзаголовки экранов
-    body1: { fontSize: 15, lineHeight: 1.5 },
+    // Основной текст и подзаголовки экранов — 16 px (ширина строк в макетах 1.2, 1.3, 3.1 совпадает с Manrope 16).
+    // Текст внутри карточек («Почему этот комплект», 2.9) — body2, 14 px
+    body1: { fontSize: 16, lineHeight: 1.5 },
     // Мелкие подсказки под блоками и полями
     caption: { fontSize: 12, lineHeight: 1.4 },
     // Подписи капсом: «Твоя палитра»
@@ -62,6 +65,9 @@ const theme = createTheme({
     button: { textTransform: 'none', fontWeight: 600 }, // без капслока, как в макетах
     // Подпись активной вкладки нижней панели
     tab: { fontSize: 13, fontWeight: 600, lineHeight: 1.2 },
+    // Логотип «layers» на заставке (1.0) и подпись под ним курсивом
+    logo: { fontFamily: '"Cormorant Garamond", serif', fontWeight: 500, fontSize: 48, lineHeight: 1 },
+    tagline: { fontFamily: '"Cormorant Garamond", serif', fontWeight: 500, fontStyle: 'italic', fontSize: 22, lineHeight: 1.3 },
     // Крупная температура на карточке погоды
     temperature: { fontSize: 56, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.03em' },
   },
@@ -93,6 +99,10 @@ const theme = createTheme({
         },
       ],
     },
+    MuiLink: {
+      // Ссылки в макетах без подчёркивания — оно появляется только при наведении
+      defaultProps: { underline: 'hover' },
+    },
     MuiSkeleton: {
       // Скелетоны загрузки в макете (2.4) — бежевые плашки, одинаковые на фоне и на белой карточке
       styleOverrides: { root: ({ theme }) => ({ backgroundColor: theme.palette.tint.neutral }) },
@@ -123,8 +133,8 @@ const theme = createTheme({
         notchedOutline: ({ theme }) => ({ borderColor: theme.palette.divider }),
         // Автозаполнение Chrome и Edge красит поле в голубой, оставляем белым
         input: ({ theme }) => ({
-          paddingTop: 15,
-          paddingBottom: 15,
+          paddingTop: 14.5,
+          paddingBottom: 14.5,
           '&:-webkit-autofill': {
             WebkitBoxShadow: `0 0 0 100px ${theme.palette.background.paper} inset`,
             WebkitTextFillColor: theme.palette.text.primary,

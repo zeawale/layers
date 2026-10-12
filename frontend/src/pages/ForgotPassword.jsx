@@ -52,8 +52,10 @@ export default function ForgotPassword() {
 
   if (sent) {
     return (
-      <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
+      <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2.5, pb: 4 }}>
+        <BackButton onClick={toLogin} />
         <AuthStatus
+          withBack
           icon={<MailOutlineIcon />}
           title="Проверь почту"
           text="Если аккаунт с этим адресом есть, мы отправили на него ссылку. Она действует 60 минут."
@@ -62,7 +64,7 @@ export default function ForgotPassword() {
           <Button variant="outlined" size="large" fullWidth onClick={handleSubmit} disabled={loading || left > 0}>
             {loading ? 'Отправляем…' : left > 0 ? `Отправить ещё раз через ${formatCountdown(left)}` : 'Отправить ещё раз'}
           </Button>
-          <Button variant="outlined" size="large" fullWidth onClick={toLogin}>
+          <Button variant="outlined" size="large" fullWidth onClick={toLogin} sx={{ bgcolor: 'transparent' }}>
             Вернуться ко входу
           </Button>
         </AuthStatus>
@@ -71,11 +73,12 @@ export default function ForgotPassword() {
   }
 
   return (
-    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <BackButton onClick={toLogin} sx={{ ml: -1, mb: 2 }} />
+    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2.5, pb: 4 }}>
+      <BackButton onClick={toLogin} sx={{ mb: 2.75 }} />
 
-      <Typography variant="h1" sx={{ mb: 1.5 }}>Не помнишь пароль?</Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 4 }}>
+      {/* Экраны пароля мельче входа: заголовок 32, текст 14 (макеты 1.2.1–1.2.5) */}
+      <Typography variant="h2" component="h1" sx={{ mb: 1.5 }}>Не помнишь пароль?</Typography>
+      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2.75 }}>
         Введи почту от аккаунта — пришлём ссылку для сброса пароля.
       </Typography>
 

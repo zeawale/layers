@@ -60,7 +60,7 @@ export default function Onboarding() {
   const attrsReady = !attrsLoading && !attrsError
 
   return (
-    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
+    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2.5, pb: 4 }}>
       <StepHeader step={step} total={3} onBack={cityOnly ? null : () => setStep(step - 1)} onSkip={step < 2 ? next : null} />
 
       {(error || city.error) && <Alert severity="error" sx={{ mb: 2 }}>{error || city.error}</Alert>}
@@ -77,6 +77,8 @@ export default function Onboarding() {
           selected={city.selected}
           onSelect={city.select}
           onGeolocate={city.geolocate}
+          notFound={city.notFound}
+          geo={city.geo}
         />
       )}
 

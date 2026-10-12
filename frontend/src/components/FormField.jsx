@@ -9,7 +9,7 @@ export default function FormField({ id, label, icon, error, end, slotProps, ...p
   const fieldId = id ?? autoId
   return (
     <Box>
-      <Typography component="label" htmlFor={fieldId} variant="body2" sx={{ display: 'block', color: 'text.secondary', mb: 0.75 }}>
+      <Typography component="label" htmlFor={fieldId} variant="caption" sx={{ display: 'block', color: 'text.secondary', mb: 1 }}>
         {label}
       </Typography>
       <TextField

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link as RouterLink, useNavigate, useNavigationType, useSearchParams } from 'react-router-dom'
+import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom'
 import { Alert, Box, Button, Link, Snackbar, Typography } from '@mui/material'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
@@ -12,9 +12,6 @@ import PasswordField from '../components/PasswordField.jsx'
 
 export default function Login() {
   const navigate = useNavigate()
-  // Вход часто открывается первым экраном, и тогда «назад» увёл бы из приложения.
-  // Кнопку показываем, только если сюда перешли с другого экрана, например с регистрации.
-  const canGoBack = useNavigationType() === 'PUSH'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -39,7 +36,7 @@ export default function Login() {
   }
 
   return (
-    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
+    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2.5, pb: 4 }}>
       <Snackbar
         open={expired}
         onClose={() => setExpired(false)}
@@ -52,12 +49,13 @@ export default function Login() {
           </Box>
         }
       />
-      {canGoBack && <BackButton onClick={() => navigate(-1)} sx={{ ml: -1, mb: 2 }} />}
+      {/* «Назад» — на приветствие (1.1): с него сюда приходят, а не из глубины приложения (макет 1.2) */}
+      <BackButton onClick={() => navigate('/welcome', { replace: true })} sx={{ mb: 3.5 }} />
 
       <Typography variant="h1" sx={{ mb: 1.5 }}>С возвращением</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 4 }}>Войди, чтобы увидеть комплект на сегодня.</Typography>
 
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.25 }}>
         {error && <Alert severity="error">{error}</Alert>}
 
         <FormField
@@ -79,21 +77,28 @@ export default function Login() {
             required
             autoComplete="current-password"
           />
-          <Box sx={{ textAlign: 'right', mt: 1 }}>
-            <Link component={RouterLink} to="/forgot-password" variant="subtitle1" sx={{ color: 'text.secondary' }}>
+          <Box sx={{ textAlign: 'right', mt: 2 }}>
+            <Link component={RouterLink} to="/forgot-password" variant="subtitle1" sx={{ color: 'primary.main' }}>
               Не помнишь пароль?
             </Link>
           </Box>
         </Box>
 
-        <Button type="submit" variant="contained" size="large" disabled={loading} fullWidth>
+        <Button type="submit" variant="contained" size="large" disabled={loading} fullWidth sx={{ mt: 1 }}>
           {loading ? 'Входим…' : 'Войти'}
         </Button>
 
-        <Typography variant="body2" align="center" sx={{ color: 'text.secondary' }}>
+        {/* Разделитель «или» (1.2) */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'text.disabled', mt: 2 }}>
+          <Box sx={{ flex: 1, height: 2, bgcolor: 'tint.neutral' }} />
+          <Typography variant="body2">или</Typography>
+          <Box sx={{ flex: 1, height: 2, bgcolor: 'tint.neutral' }} />
+        </Box>
+
+        <Typography variant="body2" align="center" sx={{ color: 'text.disabled', mt: 2 }}>
           Нет аккаунта?{' '}
-          <Link component={RouterLink} to="/register" variant="subtitle1" sx={{ color: 'text.primary' }}>
-            Зарегистрироваться
+          <Link component={RouterLink} to="/register" variant="subtitle1" sx={{ color: 'primary.main', ml: 0.5 }}>
+            Создать
           </Link>
         </Typography>
       </Box>
