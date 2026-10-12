@@ -21,3 +21,11 @@ export function requestPasswordReset(email) {
 export function confirmPasswordReset(token, password) {
   return api('/auth/password-reset/confirm', { method: 'POST', body: JSON.stringify({ token, password }) })
 }
+
+// Ответ — как у входа, с новым токеном: старые после смены перестают работать
+export function changePassword(currentPassword, newPassword) {
+  return api('/auth/password/change', {
+    method: 'POST',
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  })
+}
