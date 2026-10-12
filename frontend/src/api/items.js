@@ -9,3 +9,9 @@ export function listItems() {
 export function createItem(item) {
   return api('/items', { method: 'POST', body: JSON.stringify(item) })
 }
+
+// Только предзаполняет форму, вещь не сохраняет (раздел «Распознавание фото»).
+// Ниже порога бэк присылает value: null — такое поле не предзаполняем
+export function recognizeItem(photoId) {
+  return api('/items/recognize', { method: 'POST', body: JSON.stringify({ photo_id: photoId }) })
+}

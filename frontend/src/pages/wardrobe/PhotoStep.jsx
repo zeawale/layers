@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { Box, Button, CircularProgress, Link, Typography } from '@mui/material'
+import { Box, Button, Link, Typography } from '@mui/material'
 import CheckIcon from '@mui/icons-material/Check'
 import PhotoCameraOutlined from '@mui/icons-material/PhotoCameraOutlined'
 import PhotoLibraryOutlined from '@mui/icons-material/PhotoLibraryOutlined'
@@ -9,8 +9,8 @@ import IconCircle from '../../components/IconCircle.jsx'
 const TIPS = ['Вещь целиком в кадре', 'Однотонный фон — пол или кровать', 'Дневной свет, без вспышки']
 const ACCEPT = 'image/jpeg,image/png,image/webp'
 
-// Макет 3.4 «Добавление · фото». uploading — фото уходит на бэк, error — 413/415 под кнопками
-export default function PhotoStep({ onFile, onManual, uploading, error }) {
+// Макет 3.4 «Добавление · фото». error — 413/415 под кнопками; пока фото грузится, на экране «Распознаём» (3.5)
+export default function PhotoStep({ onFile, onManual, error }) {
   const cameraRef = useRef(null)
   const galleryRef = useRef(null)
 
@@ -39,19 +39,13 @@ export default function PhotoStep({ onFile, onManual, uploading, error }) {
           или загрузите из галереи. JPG, PNG или WEBP до 10 МБ
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5 }}>
-          <Button variant="contained" size="large" fullWidth startIcon={<PhotoCameraOutlined />} onClick={() => cameraRef.current.click()} disabled={uploading}>
+          <Button variant="contained" size="large" fullWidth startIcon={<PhotoCameraOutlined />} onClick={() => cameraRef.current.click()}>
             Камера
           </Button>
-          <Button variant="outlined" size="large" fullWidth startIcon={<PhotoLibraryOutlined />} onClick={() => galleryRef.current.click()} disabled={uploading}>
+          <Button variant="outlined" size="large" fullWidth startIcon={<PhotoLibraryOutlined />} onClick={() => galleryRef.current.click()}>
             Галерея
           </Button>
         </Box>
-        {uploading && (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mt: 2 }}>
-            <CircularProgress size={18} />
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>Загружаем фото…</Typography>
-          </Box>
-        )}
         {error && <Typography variant="body2" role="alert" sx={{ color: 'error.main', mt: 2 }}>{error}</Typography>}
         {/* На телефоне capture открывает камеру сразу, на компьютере — обычный выбор файла */}
         <input ref={cameraRef} type="file" accept={ACCEPT} capture="environment" hidden onChange={pick} />
