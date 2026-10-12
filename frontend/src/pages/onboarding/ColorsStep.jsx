@@ -4,7 +4,7 @@ import ColorPicker from '../../components/ColorPicker.jsx'
 
 const toggle = (list, value) => (list.includes(value) ? list.filter((c) => c !== value) : [...list, value])
 
-// Шаг 2 онбординга — «Цвета, которые вы любите»
+// «Цвета, которые вы любите» — шаг 2 онбординга и экран 4.5 в профиле
 export default function ColorsStep({ colors, liked, disliked, onChange }) {
   const likedColors = colors.filter((c) => liked.includes(c.value))
   return (

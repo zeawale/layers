@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Link as RouterLink, useNavigate, useNavigationType } from 'react-router-dom'
-import { Alert, Box, Button, Link, Typography } from '@mui/material'
+import { Link as RouterLink, useNavigate, useNavigationType, useSearchParams } from 'react-router-dom'
+import { Alert, Box, Button, Link, Snackbar, Typography } from '@mui/material'
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
 
 import { login } from '../api/auth.js'
@@ -18,6 +19,9 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  // Сюда выкидывает api/client.js на 401 с ?expired — показываем, почему (макет 2.12)
+  const [params] = useSearchParams()
+  const [expired, setExpired] = useState(params.has('expired'))
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -36,6 +40,18 @@ export default function Login() {
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
+      <Snackbar
+        open={expired}
+        onClose={() => setExpired(false)}
+        autoHideDuration={6000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        message={
+          <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <LockOutlinedIcon fontSize="small" />
+            Сессия истекла — войдите заново
+          </Box>
+        }
+      />
       {canGoBack && <BackButton onClick={() => navigate(-1)} sx={{ ml: -1, mb: 2 }} />}
 
       <Typography variant="h1" sx={{ mb: 1.5 }}>С возвращением</Typography>

@@ -75,6 +75,17 @@ const theme = createTheme({
         },
       ],
     },
+    MuiSnackbarContent: {
+      // Уведомления в макетах — тёмная плашка со скруглением: «Сессия истекла», «Вещь добавлена»
+      styleOverrides: {
+        root: ({ theme }) => ({
+          backgroundColor: theme.palette.text.primary,
+          color: theme.palette.background.paper,
+          borderRadius: theme.shape.borderRadius,
+          ...theme.typography.subtitle1,
+        }),
+      },
+    },
     MuiOutlinedInput: {
       // Поля ввода в макетах: белые, сильно скруглённые, с тонкой рамкой
       styleOverrides: {
