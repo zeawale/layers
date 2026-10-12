@@ -1,25 +1,13 @@
 import { Box, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import AcUnitOutlined from '@mui/icons-material/AcUnitOutlined'
 import AirOutlined from '@mui/icons-material/AirOutlined'
 import DeviceThermostatOutlined from '@mui/icons-material/DeviceThermostatOutlined'
-import FilterDramaOutlined from '@mui/icons-material/FilterDramaOutlined'
 import PlaceOutlined from '@mui/icons-material/PlaceOutlined'
 import UmbrellaOutlined from '@mui/icons-material/UmbrellaOutlined'
 import WaterDropOutlined from '@mui/icons-material/WaterDropOutlined'
-import WbSunnyOutlined from '@mui/icons-material/WbSunnyOutlined'
 
-import { formatTemp } from '../../format.js'
-
-// Состояний погоды ровно четыре (API.md, Weather)
-const CONDITION_ICON = {
-  clear: WbSunnyOutlined,
-  cloudy: FilterDramaOutlined,
-  rain: UmbrellaOutlined,
-  snow: AcUnitOutlined,
-}
-// В дождь и снег погода решает комплект — пишем её словами рядом с «ощущается как» (макет 2.2)
-const WET_TEXT = { rain: 'дождь', snow: 'снег' }
+import WeatherIcon from '../../components/WeatherIcon.jsx'
+import { conditionText, formatTemp } from '../../format.js'
 
 function Stat({ icon: Icon, value, label }) {
   return (
@@ -34,9 +22,9 @@ function Stat({ icon: Icon, value, label }) {
 // Карточка погоды — верх макета 2.0. Текущей температуры в API нет (Weather: минимум и максимум за день),
 // поэтому крупно — минимум дня с подписью «сегодня», ниже «ощущается как» и дневной максимум
 export default function WeatherCard({ weather }) {
-  const Icon = CONDITION_ICON[weather.condition] ?? FilterDramaOutlined
   const rain = weather.precipitation_probability
-  const wet = WET_TEXT[weather.condition]
+  // В дождь и снег погода решает комплект — пишем её словами рядом с «ощущается как» (макет 2.2)
+  const wet = ['rain', 'snow'].includes(weather.condition) ? conditionText(weather.condition) : null
   return (
     <Box
       sx={(t) => {
@@ -55,7 +43,7 @@ export default function WeatherCard({ weather }) {
         }
       }}
     >
-      <Icon sx={{ position: 'absolute', top: 44, right: 26, width: 76, height: 76, color: 'weather.icon' }} />
+      <WeatherIcon condition={weather.condition} sx={{ position: 'absolute', top: 44, right: 26, width: 76, height: 76 }} />
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
         <PlaceOutlined sx={{ width: 16, height: 16 }} />
         <Typography variant="body2" noWrap>{weather.city} · сегодня</Typography>

@@ -5,6 +5,7 @@ import AddItem from './pages/AddItem.jsx'
 import EditItem from './pages/EditItem.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
 import History from './pages/History.jsx'
+import HistoryDay from './pages/HistoryDay.jsx'
 import ItemDetails from './pages/ItemDetails.jsx'
 import Login from './pages/Login.jsx'
 import Onboarding from './pages/Onboarding.jsx'
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/today" element={<Today />} />
         <Route path="/wardrobe" element={<Wardrobe />} />
         <Route path="/history" element={<History />} />
+        <Route path="/history/:id" element={<HistoryDay />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
     </Routes>
