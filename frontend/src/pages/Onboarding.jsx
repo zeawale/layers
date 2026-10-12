@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Alert, Box, Button, CircularProgress } from '@mui/material'
 
-import { api, getToken } from '../api/client.js'
+import { getToken } from '../api/client.js'
 import { searchCities } from '../api/geo.js'
 import { updateMe } from '../api/users.js'
+import useAttributes from '../hooks/useAttributes.js'
 import CityStep from './onboarding/CityStep.jsx'
 import ColorsStep from './onboarding/ColorsStep.jsx'
 import StepHeader from './onboarding/StepHeader.jsx'
@@ -28,24 +29,10 @@ export default function Onboarding() {
   const [selectedCity, setSelectedCity] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [colors, setColors] = useState([])
-  const [styles, setStyles] = useState([])
-  const [attrsLoading, setAttrsLoading] = useState(true)
-  const [attrsError, setAttrsError] = useState('')
-  const [attrsAttempt, setAttrsAttempt] = useState(0)
+  const { attrs, loading: attrsLoading, error: attrsError, retry: retryAttrs } = useAttributes()
+  const colors = attrs?.color ?? []
+  const styles = useMemo(() => [...(attrs?.style ?? [])].sort((a, b) => styleRank(a.value) - styleRank(b.value)), [attrs])
   const debounceRef = useRef(null)
-
-  useEffect(() => {
-    setAttrsLoading(true)
-    setAttrsError('')
-    api('/attributes')
-      .then((data) => {
-        if (data.color) setColors(data.color)
-        if (data.style) setStyles([...data.style].sort((a, b) => styleRank(a.value) - styleRank(b.value)))
-      })
-      .catch((err) => setAttrsError(err.message))
-      .finally(() => setAttrsLoading(false))
-  }, [attrsAttempt])
 
   const findCities = useCallback((q) => {
     clearTimeout(debounceRef.current)
@@ -144,7 +131,7 @@ export default function Onboarding() {
       {step < 2 && attrsError && (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mb: 4 }}>
           <Alert severity="error" sx={{ width: '100%' }}>{attrsError}</Alert>
-          <Button variant="outlined" onClick={() => setAttrsAttempt((n) => n + 1)}>Повторить</Button>
+          <Button variant="outlined" onClick={retryAttrs}>Повторить</Button>
         </Box>
       )}
 

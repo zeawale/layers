@@ -5,6 +5,11 @@ export function getToken() {
   return localStorage.getItem(TOKEN_KEY)
 }
 
+// Фото бэк отдаёт относительным адресом (/media/...), базовый адрес знает только api/
+export function mediaUrl(path) {
+  return path ? `${BASE_URL}${path}` : null
+}
+
 export function setToken(token) {
   if (token) localStorage.setItem(TOKEN_KEY, token)
   else localStorage.removeItem(TOKEN_KEY)
@@ -17,7 +22,13 @@ export async function api(path, options = {}) {
   if (!(options.body instanceof FormData)) headers['Content-Type'] ??= 'application/json'
   if (token) headers.Authorization = `Bearer ${token}`
 
-  const response = await fetch(`${BASE_URL}${path}`, { ...options, headers })
+  let response
+  try {
+    response = await fetch(`${BASE_URL}${path}`, { ...options, headers })
+  } catch {
+    // fetch падает до ответа, когда нет сети или бэк не запущен — текст браузера «Failed to fetch» не показываем
+    throw new Error('Нет связи с сервером. Проверьте интернет и попробуйте ещё раз')
+  }
 
   // 401 на входе — неверный пароль, а не истёкшая сессия: его показываем на форме
   if (response.status === 401 && token && path !== '/auth/login') {

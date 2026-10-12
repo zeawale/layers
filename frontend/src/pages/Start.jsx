@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Alert, Box, Button, CircularProgress } from '@mui/material'
 
-import { api, getToken } from '../api/client.js'
+import { getToken } from '../api/client.js'
+import { getMe } from '../api/users.js'
 
 // Точка входа на «/»: решает, куда отправить человека.
 // Нет токена → вход. Есть → смотрим профиль: онбординг не пройден → онбординг, иначе «Сегодня».
@@ -15,7 +16,7 @@ export default function Start() {
   useEffect(() => {
     if (!hasToken) return
     setError('')
-    api('/users/me')
+    getMe()
       .then((user) => navigate(user.onboarding_completed ? '/today' : '/onboarding', { replace: true }))
       .catch((err) => setError(err.message))
   }, [hasToken, attempt, navigate])

@@ -23,6 +23,8 @@ const theme = createTheme({
     },
   },
   shape: { borderRadius: 16 },
+  // Тень плавающей нижней панели из макетов
+  custom: { tabBarShadow: '0 16px 40px -6px rgba(28, 27, 24, 0.18)' },
   typography: {
     // Manrope — весь интерфейс, Cormorant Garamond — крупные заголовки.
     // Шрифты подключаются в index.html.
@@ -42,6 +44,8 @@ const theme = createTheme({
     // Подписи капсом: «Ваша палитра»
     overline: { fontSize: 12, fontWeight: 600, letterSpacing: 1, lineHeight: 1.4 },
     button: { textTransform: 'none', fontWeight: 600 }, // без капслока, как в макетах
+    // Подпись активной вкладки нижней панели
+    tab: { fontSize: 13, fontWeight: 600, lineHeight: 1.2 },
   },
   components: {
     MuiButton: {
