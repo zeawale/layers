@@ -1,12 +1,19 @@
+import { useId } from 'react'
 import { Box, InputAdornment, TextField, Typography } from '@mui/material'
 
 // Подпись над полем + поле + ошибка под ним (422 по полю — по-русски, CLAUDE.md «Данные и запросы»).
 // icon — иконка слева в поле, остальные пропсы уходят в TextField.
-export default function FormField({ label, icon, error, end, slotProps, ...props }) {
+// Подпись — <label> для поля: по ней поле называет экранная читалка и на неё можно нажать
+export default function FormField({ id, label, icon, error, end, slotProps, ...props }) {
+  const autoId = useId()
+  const fieldId = id ?? autoId
   return (
     <Box>
-      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.75 }}>{label}</Typography>
+      <Typography component="label" htmlFor={fieldId} variant="body2" sx={{ display: 'block', color: 'text.secondary', mb: 0.75 }}>
+        {label}
+      </Typography>
       <TextField
+        id={fieldId}
         fullWidth
         error={Boolean(error)}
         helperText={error || undefined}
