@@ -12,6 +12,8 @@ const theme = createTheme({
     background: { default: '#f4f1ea', paper: '#ffffff' },
     text: { primary: '#1c1b18', secondary: '#6f6a60', disabled: '#a39d91' },
     divider: '#e2dcd0',
+    // Рамка контурных кнопок-«таблеток» — темнее разделителя (макеты 1.2.2, 2.0, 3.2)
+    outline: { main: '#cfc7b8' },
     // Сплошные светлые заливки кружков с иконкой (80 px) и скелетонов загрузки
     tint: { success: '#dce5dc', secondary: '#f3ded3', neutral: '#ebe6dc' },
     // Золотая «искра» — подбор комплекта и «Почему этот комплект»
@@ -80,7 +82,7 @@ const theme = createTheme({
         {
           props: { variant: 'outlined', color: 'primary' },
           style: ({ theme }) => ({
-            borderColor: theme.palette.divider,
+            borderColor: theme.palette.outline.main,
             color: theme.palette.text.primary,
             backgroundColor: theme.palette.background.paper,
           }),
