@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { Alert, Box, Button, CircularProgress, IconButton, InputAdornment, Snackbar, TextField, Typography } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
+import { Box, Button, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import SearchIcon from '@mui/icons-material/Search'
 
 import { listItems } from '../api/items.js'
 import { mediaUrl } from '../api/client.js'
+import LoadError from '../components/LoadError.jsx'
+import Loading from '../components/Loading.jsx'
+import Notice from '../components/Notice.jsx'
 import PhotoCard from '../components/PhotoCard.jsx'
 import useAttributes from '../hooks/useAttributes.js'
 import EmptyWardrobe from './wardrobe/EmptyWardrobe.jsx'
@@ -25,13 +28,6 @@ const normalize = (s) => s.toLowerCase().replaceAll('ё', 'е')
 // Макеты 3.0 «Гардероб», 3.1 «Гардероб · пусто», 3.8 «Ничего не нашлось»
 export default function Wardrobe() {
   const navigate = useNavigate()
-  // После добавления вещи экран добавления передаёт её название — показываем уведомление (макет 3.7).
-  // Запоминаем и сразу убираем из истории: иначе при обновлении страницы уведомление появится снова
-  const location = useLocation()
-  const [added, setAdded] = useState(location.state?.added ?? null)
-  useEffect(() => {
-    if (location.state?.added) navigate('.', { replace: true, state: null })
-  }, [location.state, navigate])
   const addItem = () => navigate('/wardrobe/new')
   const { label, loading: attrsLoading, error: attrsError, retry: retryAttrs } = useAttributes()
   const [items, setItems] = useState(null)
@@ -76,18 +72,9 @@ export default function Wardrobe() {
         {items && (items.length ? `${items.length} ${itemsWord(items.length)} в гардеробе` : 'Пока ни одной вещи')}
       </Typography>
 
-      {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={28} />
-        </Box>
-      )}
+      {loading && <Loading />}
 
-      {failed && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 4 }}>
-          <Alert severity="error" sx={{ width: '100%' }}>{failed}</Alert>
-          <Button variant="outlined" onClick={retry}>Повторить</Button>
-        </Box>
-      )}
+      {failed && <LoadError message={failed} onRetry={retry} />}
 
       {!loading && !failed && items.length === 0 && <EmptyWardrobe onAdd={addItem} />}
 
@@ -119,6 +106,7 @@ export default function Wardrobe() {
                   image={mediaUrl(item.photo?.url)}
                   title={item.name}
                   subtitle={`${label('category', item.category)} · ${label('color', item.color).toLowerCase()}`}
+                  onClick={() => navigate(`/wardrobe/${item.id}`)}
                 />
               ))}
             </Box>
@@ -132,14 +120,8 @@ export default function Wardrobe() {
         </>
       )}
 
-      <Snackbar
-        open={Boolean(added)}
-        autoHideDuration={3000}
-        onClose={() => setAdded(null)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert severity="success" variant="filled">«{added}» в гардеробе</Alert>
-      </Snackbar>
+      {/* «Вещь в гардеробе» после добавления (макет 3.7), «Удалили …» после удаления */}
+      <Notice />
     </Box>
   )
 }
