@@ -6,8 +6,7 @@ import { getToken } from '../api/client.js'
 import { createItem, recognizeItem } from '../api/items.js'
 import { uploadPhoto } from '../api/photos.js'
 import ItemForm, { EMPTY_ITEM, itemFieldErrors } from '../components/ItemForm.jsx'
-import LoadError from '../components/LoadError.jsx'
-import Loading from '../components/Loading.jsx'
+import { LoadError, Loading } from '../components/LoadState.jsx'
 import ScreenHeader from '../components/ScreenHeader.jsx'
 import useAttributes from '../hooks/useAttributes.js'
 import PhotoRow from './wardrobe/PhotoRow.jsx'
@@ -45,7 +44,7 @@ export default function AddItem() {
       uploaded = await uploadPhoto(file)
       setPhoto(uploaded)
     } catch (err) {
-      // 413 и 415 бэк присылает по-русски: «Фото больше 10 МБ…», «Подходят только фото в JPEG, PNG или WebP»
+      // 413 и 415 — текст из api/photos.js: «Фото больше 10 МБ — выберите поменьше», «Подойдёт фото в JPEG, PNG или WebP»
       setPhotoError(err.message)
       setPreview(null)
       setStage('photo')

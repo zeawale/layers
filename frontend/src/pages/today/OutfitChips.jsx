@@ -2,7 +2,7 @@ import { Box, Typography } from '@mui/material'
 import DeviceThermostatOutlined from '@mui/icons-material/DeviceThermostatOutlined'
 import LayersOutlined from '@mui/icons-material/LayersOutlined'
 
-import itemsWord from '../wardrobe/itemsWord.js'
+import { plural } from '../../format.js'
 
 function Chip({ icon: Icon, children }) {
   return (
@@ -21,7 +21,7 @@ export default function OutfitChips({ items, label }) {
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2.25 }}>
       <Chip icon={LayersOutlined}>
-        <Typography variant="subtitle2">{items.length} {itemsWord(items.length)}</Typography>
+        <Typography variant="subtitle2">{items.length} {plural(items.length, ['вещь', 'вещи', 'вещей'])}</Typography>
       </Chip>
       <Chip>
         <Box sx={{ display: 'flex' }} aria-label={`Цвета: ${colors.map((c) => label('color', c).toLowerCase()).join(', ')}`}>

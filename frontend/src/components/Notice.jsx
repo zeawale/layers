@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Alert, Snackbar } from '@mui/material'
+import { Snackbar } from '@mui/material'
 
 // Уведомление после действия на прошлом экране: navigate(путь, { state: { notice: 'текст' } }).
-// Запоминаем текст и сразу убираем из истории: иначе при обновлении страницы оно появится снова
+// Запоминаем текст и сразу убираем из истории: иначе при обновлении страницы оно появится снова.
+// Вид — тёмная плашка из темы (MuiSnackbarContent), как «Сессия истекла» в макете 2.12
 export default function Notice() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -22,8 +23,9 @@ export default function Notice() {
       autoHideDuration={3000}
       onClose={() => setText(null)}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-    >
-      <Alert severity="success" variant="filled" sx={{ overflowWrap: 'anywhere' }}>{text}</Alert>
-    </Snackbar>
+      message={text}
+      // Название вещи до 100 символов без пробелов переносится, а не вылезает за экран
+      slotProps={{ content: { sx: { overflowWrap: 'anywhere' } } }}
+    />
   )
 }
