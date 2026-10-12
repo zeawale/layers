@@ -15,11 +15,11 @@ function Chip({ icon: Icon, children }) {
 
 // Чипы под сеткой (макет 2.0): сколько вещей, палитра комплекта, теплота.
 // Всё считаем из items: палитра — цвета вещей без повторов, теплота — средняя по вещам, подпись из справочника
-export default function OutfitChips({ items, label }) {
+export default function OutfitChips({ items, label, sx }) {
   const colors = [...new Set(items.map((i) => i.color))]
   const warmth = Math.round(items.reduce((sum, i) => sum + i.warmth, 0) / items.length)
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2.25 }}>
+    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, ...sx }}>
       <Chip icon={LayersOutlined}>
         <Typography variant="subtitle2">{items.length} {plural(items.length, ['вещь', 'вещи', 'вещей'])}</Typography>
       </Chip>

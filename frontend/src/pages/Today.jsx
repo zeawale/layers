@@ -8,6 +8,7 @@ import { getMe } from '../api/users.js'
 import { LoadError } from '../components/LoadState.jsx'
 import NoConnection from '../components/NoConnection.jsx'
 import SourcesNote from '../components/SourcesNote.jsx'
+import Toast from '../components/Toast.jsx'
 import { formatTemp } from '../format.js'
 import useAttributes from '../hooks/useAttributes.js'
 import EmptyWardrobeCard from './today/EmptyWardrobeCard.jsx'
@@ -16,11 +17,12 @@ import ForecastError from './today/ForecastError.jsx'
 import OutfitCard from './today/OutfitCard.jsx'
 import TodayHeader from './today/TodayHeader.jsx'
 import TodaySkeleton from './today/TodaySkeleton.jsx'
+import useVariants from './today/useVariants.js'
 import WeatherCard from './today/WeatherCard.jsx'
 
 const STEP_MS = 700 // шаг «анимации» экрана первого подбора (1.7)
 
-// Главный экран — макеты 2.0, 2.4, 2.9–2.11, 2.13, после онбординга — 1.7 и 1.7b
+// Главный экран — макеты 2.0, 2.1, 2.4, 2.8–2.11, 2.13, после онбординга — 1.7 и 1.7b
 export default function Today() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -34,6 +36,7 @@ export default function Today() {
   // Убираем из истории, чтобы при обновлении страницы экран подбора не появлялся снова
   const [first] = useState(Boolean(location.state?.first))
   const [tick, setTick] = useState(0)
+  const variants = useVariants(day, setDay)
 
   useEffect(() => {
     if (location.state?.first) navigate('.', { replace: true, state: null })
@@ -107,10 +110,13 @@ export default function Today() {
           <WeatherCard weather={outfit.weather} />
           {wardrobeEmpty
             ? <EmptyWardrobeCard onAdd={() => navigate('/wardrobe/new')} />
-            : <OutfitCard outfit={outfit} label={label} />}
+            : <OutfitCard day={day} outfit={outfit} label={label} variants={variants} />}
           <SourcesNote sx={{ mt: 1 }} />
         </>
       )}
+
+      {/* 409 и 429 у «Другого варианта», ошибки переключения — текстом бэка как есть */}
+      <Toast text={variants.message} onClose={variants.clearMessage} />
     </Box>
   )
 }

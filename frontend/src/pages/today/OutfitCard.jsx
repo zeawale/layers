@@ -1,24 +1,43 @@
 import { Box, Typography } from '@mui/material'
+import { keyframes } from '@emotion/react'
 
 import OutfitGrid from '../../components/OutfitGrid.jsx'
 import Panel from '../../components/Panel.jsx'
+import useSwipe from '../../hooks/useSwipe.js'
 import Explanation from './Explanation.jsx'
 import OutfitChips from './OutfitChips.jsx'
+import VariantButton from './VariantButton.jsx'
+import VariantDots from './VariantDots.jsx'
 
-// Комплект дня (макет 2.0): заголовок, плитки вещей с чипами и «Почему этот комплект».
+const appear = keyframes`from { opacity: 0; } to { opacity: 1; }`
+
+// Комплект дня (макеты 2.0, 2.1, 2.8): заголовок с «↻ N из M», плитки вещей, точки вариантов, чипы
+// и «Почему этот комплект». Свайп по плиткам — соседний вариант.
 // Вещей может не найтись совсем — тогда только объяснение движка, почему
-export default function OutfitCard({ outfit, label }) {
+export default function OutfitCard({ day, outfit, label, variants }) {
   const { items } = outfit
+  const canMore = day.variants.length < day.variants_max
+  const swipe = useSwipe({ onLeft: () => variants.step(1), onRight: () => variants.step(-1) })
   return (
     <>
-      {/* Высота строки — под кнопку вариантов справа (макет 2.0) */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 37, mb: 2.5 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, minHeight: 38, mb: 2.5 }}>
         <Typography variant="h3" component="h2">Комплект на сегодня</Typography>
+        <VariantButton variant={outfit.variant} max={day.variants_max} canMore={canMore} busy={variants.busy} onClick={variants.another} />
       </Box>
       {items.length > 0 && (
         <Panel shadow sx={{ p: 1.5, pb: 2.5, mb: 2.5 }}>
-          <OutfitGrid items={items} label={label} />
-          <OutfitChips items={items} label={label} />
+          {/* Новый вариант проявляется, а не подменяется рывком; pan-y — вертикальная прокрутка работает как обычно */}
+          <Box key={outfit.id} {...swipe} sx={{ touchAction: 'pan-y', animation: `${appear} 0.2s ease-out` }}>
+            <OutfitGrid items={items} label={label} />
+          </Box>
+          <VariantDots
+            variants={day.variants}
+            selectedId={day.selected_id}
+            canMore={canMore}
+            disabled={variants.busy}
+            onSelect={variants.select}
+          />
+          <OutfitChips items={items} label={label} sx={{ mt: day.variants.length > 1 || !canMore ? 1.25 : 2.25 }} />
         </Panel>
       )}
       <Explanation text={outfit.explanation} />
