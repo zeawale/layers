@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { api } from '../api/client.js'
+import { getAttributes } from '../api/attributes.js'
 
 // Справочник атрибутов (GET /attributes) грузим один раз на приложение:
 // все экраны получают один и тот же запрос. При ошибке кеш сбрасывается, чтобы «Повторить» сработало.
@@ -8,7 +8,7 @@ let cached = null
 
 function loadAttributes() {
   if (!cached) {
-    cached = api('/attributes').catch((err) => {
+    cached = getAttributes().catch((err) => {
       cached = null
       throw err
     })
