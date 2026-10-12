@@ -18,8 +18,8 @@ const theme = createTheme({
     tint: { success: '#dce5dc', secondary: '#f3ded3', neutral: '#ebe6dc' },
     // Золотая «искра» — подбор комплекта и «Почему этот комплект»
     gold: { main: '#d9a441' },
-    // Карточка погоды на главном: небо, тёплое пятно солнца и иконки
-    weather: { sky: '#dde8f1', sun: '#dbd0b3', icon: '#6f9cc4' },
+    // Карточка погоды на главном: небо, тёплое пятно солнца, холодное пятно дождя (2.2) и иконки
+    weather: { sky: '#dde8f1', sun: '#dbd0b3', rain: '#c0ccd4', icon: '#6f9cc4' },
     // Кружки справочника цветов (GET /attributes, color). Ключи — машинные значения цветов
     swatch: {
       black: '#1c1b18', white: '#ffffff', gray: '#9e9e9e', beige: '#d4c5a9',

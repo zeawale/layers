@@ -13,9 +13,9 @@ const appear = keyframes`from { opacity: 0; } to { opacity: 1; }`
 
 // Комплект дня (макеты 2.0, 2.1, 2.8): заголовок с «↻ N из M», плитки вещей, точки вариантов, чипы
 // и «Почему этот комплект». Свайп по плиткам — соседний вариант.
-// Вещей может не найтись совсем — тогда только объяснение движка, почему
+// Чего не хватило — пустые слоты среди плиток (2.2). Не нашлось ничего — только объяснение движка, почему
 export default function OutfitCard({ day, outfit, label, variants }) {
-  const { items } = outfit
+  const { items, missing } = outfit
   const canMore = day.variants.length < day.variants_max
   const swipe = useSwipe({ onLeft: () => variants.step(1), onRight: () => variants.step(-1) })
   return (
@@ -24,11 +24,11 @@ export default function OutfitCard({ day, outfit, label, variants }) {
         <Typography variant="h3" component="h2">Комплект на сегодня</Typography>
         <VariantButton variant={outfit.variant} max={day.variants_max} canMore={canMore} busy={variants.busy} onClick={variants.another} />
       </Box>
-      {items.length > 0 && (
+      {(items.length > 0 || missing.length > 0) && (
         <Panel shadow sx={{ p: 1.5, pb: 2.5, mb: 2.5 }}>
           {/* Новый вариант проявляется, а не подменяется рывком; pan-y — вертикальная прокрутка работает как обычно */}
           <Box key={outfit.id} {...swipe} sx={{ touchAction: 'pan-y', animation: `${appear} 0.2s ease-out` }}>
-            <OutfitGrid items={items} label={label} />
+            <OutfitGrid items={items} missing={missing} label={label} />
           </Box>
           <VariantDots
             variants={day.variants}
@@ -37,7 +37,9 @@ export default function OutfitCard({ day, outfit, label, variants }) {
             disabled={variants.busy}
             onSelect={variants.select}
           />
-          <OutfitChips items={items} label={label} sx={{ mt: day.variants.length > 1 || !canMore ? 1.25 : 2.25 }} />
+          {items.length > 0 && (
+            <OutfitChips items={items} label={label} sx={{ mt: day.variants.length > 1 || !canMore ? 1.25 : 2.25 }} />
+          )}
         </Panel>
       )}
       <Explanation text={outfit.explanation} />
