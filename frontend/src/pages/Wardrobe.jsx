@@ -3,7 +3,8 @@ import { Alert, Box, Button, CircularProgress, InputAdornment, TextField, Typogr
 import SearchIcon from '@mui/icons-material/Search'
 
 import { listItems } from '../api/items.js'
-import ItemCard from '../components/ItemCard.jsx'
+import { mediaUrl } from '../api/client.js'
+import PhotoCard from '../components/PhotoCard.jsx'
 import useAttributes from '../hooks/useAttributes.js'
 import EmptyWardrobe from './wardrobe/EmptyWardrobe.jsx'
 
@@ -15,6 +16,9 @@ function itemsWord(n) {
   if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'вещи'
   return 'вещей'
 }
+
+// Поиск без учёта регистра и «ё»: «черн» находит «Чёрные джинсы»
+const normalize = (s) => s.toLowerCase().replaceAll('ё', 'е')
 
 // Макеты 3.0 «Гардероб», 3.1 «Гардероб · пусто», 3.8 «Ничего не нашлось»
 export default function Wardrobe() {
@@ -39,16 +43,17 @@ export default function Wardrobe() {
   const failed = error || attrsError
   const loading = !failed && (items === null || attrsLoading)
   // Поиск по названию — у себя, список уже загружен целиком (API.md, GET /items)
-  const q = query.trim().toLowerCase()
-  const shown = items?.filter((item) => item.name.toLowerCase().includes(q)) ?? []
+  const q = normalize(query.trim())
+  const shown = items?.filter((item) => normalize(item.name).includes(q)) ?? []
 
   return (
     <Box sx={{ px: 3, pt: 4 }}>
       <Typography variant="h1" sx={{ mb: 0.5 }}>
         Гардероб
       </Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 3, fontSize: 15 }}>
-        {items?.length ? `${items.length} ${itemsWord(items.length)} в гардеробе` : 'Пока ни одной вещи'}
+      {/* Счётчик — только когда список загружен: до этого «Пока ни одной вещи» было бы неправдой */}
+      <Typography sx={{ color: 'text.secondary', mb: 3, minHeight: '1.5em' }}>
+        {items && (items.length ? `${items.length} ${itemsWord(items.length)} в гардеробе` : 'Пока ни одной вещи')}
       </Typography>
 
       {loading && (
@@ -86,11 +91,13 @@ export default function Wardrobe() {
           />
 
           {shown.length > 0 ? (
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5, pb: 2 }}>
+            // minmax(0, 1fr): длинное название не раздвигает колонку шире экрана
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 1.5, pb: 2 }}>
               {shown.map((item) => (
-                <ItemCard
+                <PhotoCard
                   key={item.id}
-                  item={item}
+                  image={mediaUrl(item.photo?.url)}
+                  title={item.name}
                   subtitle={`${label('category', item.category)} · ${label('color', item.color).toLowerCase()}`}
                 />
               ))}
@@ -98,7 +105,7 @@ export default function Wardrobe() {
           ) : (
             <Box sx={{ textAlign: 'center', py: 6 }}>
               <Typography variant="h2" sx={{ mb: 1 }}>Ничего не нашлось</Typography>
-              <Typography sx={{ color: 'text.secondary', mb: 3, fontSize: 15 }}>Попробуйте другое название.</Typography>
+              <Typography sx={{ color: 'text.secondary', mb: 3 }}>Попробуйте другое название.</Typography>
               <Button variant="outlined" onClick={() => setQuery('')}>Очистить поиск</Button>
             </Box>
           )}

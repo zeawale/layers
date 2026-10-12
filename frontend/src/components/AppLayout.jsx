@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Box, Paper } from '@mui/material'
+import { Box, Paper, Typography } from '@mui/material'
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined'
 import CheckroomOutlined from '@mui/icons-material/CheckroomOutlined'
 import PersonOutline from '@mui/icons-material/PersonOutline'
@@ -47,7 +47,7 @@ export default function AppLayout() {
           p: 1,
           borderRadius: 999,
           bgcolor: 'text.primary',
-          boxShadow: '0 16px 40px -6px rgba(28, 27, 24, 0.18)',
+          boxShadow: (t) => t.custom.tabBarShadow,
           zIndex: 10,
         }}
       >
@@ -73,14 +73,14 @@ export default function AppLayout() {
                   opacity: active ? 1 : 0.62,
                   bgcolor: active ? 'background.paper' : 'transparent',
                   ...(active && { color: 'text.primary' }),
-                  '& svg': { fontSize: 22 },
+                  '& svg': { width: 22, height: 22 },
                 }}
               >
                 {tab.icon}
                 {active && (
-                  <Box component="span" sx={{ fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>
+                  <Typography variant="tab" component="span" sx={{ whiteSpace: 'nowrap' }}>
                     {tab.label}
-                  </Box>
+                  </Typography>
                 )}
               </Box>
             )
