@@ -29,3 +29,8 @@ export function updateItem(id, changes) {
 export function deleteItem(id) {
   return api(`/items/${id}`, { method: 'DELETE' })
 }
+
+// Всё или ничего: одна чужая или несуществующая — не удаляется ни одна. Не больше 100 за раз
+export function bulkDeleteItems(ids) {
+  return api('/items/bulk-delete', { method: 'POST', body: JSON.stringify({ ids }) })
+}
