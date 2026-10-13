@@ -4,13 +4,22 @@ import { listItems } from '../../api/items.js'
 import { getHistory } from '../../api/outfit.js'
 
 // Счётчики под шапкой профиля — полей в API нет, считаем сами (HANDBOOK, раздел 8): вещи — из гардероба,
-// комплекты и доля «Нравится» — из истории с даты регистрации
+// комплекты и доля «Нравится» — из истории с даты регистрации.
+// Зависим от даты регистрации, а не от объекта user: смена фото кладёт новый user, гардероб и историю заново не грузим
 export default function useProfileStats(user) {
+  const from = user?.created_at.slice(0, 10)
   const [stats, setStats] = useState(null)
+  const [error, setError] = useState(null)
+  const [attempt, setAttempt] = useState(0)
+
   useEffect(() => {
-    if (!user) return
-    Promise.all([listItems(), getHistory({ from: user.created_at.slice(0, 10) })])
+    if (!from) return
+    let alive = true
+    setStats(null)
+    setError(null)
+    Promise.all([listItems(), getHistory({ from })])
       .then(([wardrobe, history]) => {
+        if (!alive) return
         const rated = history.outfits.filter((outfit) => outfit.feedback?.rating)
         const liked = rated.filter((outfit) => outfit.feedback.rating === 'like').length
         setStats({
@@ -19,8 +28,10 @@ export default function useProfileStats(user) {
           liked: rated.length ? `${Math.round((liked / rated.length) * 100)}%` : '—',
         })
       })
-      // Счётчики — не главное на экране: не пришли — просто не показываем
-      .catch(() => setStats(null))
-  }, [user])
-  return stats
+      // Истёкшая сессия — уже идёт переход на вход, ошибку не показываем
+      .catch((err) => alive && !err.expired && setError(err))
+    return () => { alive = false }
+  }, [from, attempt])
+
+  return { stats, error, retry: () => setAttempt((n) => n + 1) }
 }

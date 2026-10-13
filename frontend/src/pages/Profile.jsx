@@ -12,13 +12,12 @@ import { getMe } from '../api/users.js'
 import Avatar from '../components/Avatar.jsx'
 import { LoadError, Loading } from '../components/LoadState.jsx'
 import SourcesNote from '../components/SourcesNote.jsx'
-import { plural } from '../format.js'
 import useAttributes from '../hooks/useAttributes.js'
 import ColorRow from './profile/ColorRow.jsx'
 import PhotoSheet from './profile/PhotoSheet.jsx'
 import ProfileCard, { CardHeader } from './profile/ProfileCard.jsx'
+import ProfileStats from './profile/ProfileStats.jsx'
 import SettingsRow from './profile/SettingsRow.jsx'
-import StatTile from './profile/StatTile.jsx'
 import useProfileStats from './profile/useProfileStats.js'
 
 function since(createdAt) {
@@ -35,7 +34,7 @@ export default function Profile() {
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
   const [photoOpen, setPhotoOpen] = useState(false)
-  const stats = useProfileStats(user)
+  const { stats, error: statsError, retry: retryStats } = useProfileStats(user)
 
   useEffect(() => {
     setError('')
@@ -85,13 +84,7 @@ export default function Profile() {
         </Box>
       </ProfileCard>
 
-      {stats && (
-        <Box sx={{ display: 'flex', gap: 1.5 }}>
-          <StatTile value={stats.items} label={plural(stats.items, ['вещь', 'вещи', 'вещей'])} />
-          <StatTile value={stats.outfits} label={plural(stats.outfits, ['комплект', 'комплекта', 'комплектов'])} />
-          <StatTile value={stats.liked} label="понравилось" />
-        </Box>
-      )}
+      <ProfileStats stats={stats} error={statsError} onRetry={retryStats} />
 
       <ProfileCard>
         <CardHeader title="Мой стиль" onEdit={() => navigate('/profile/style')} />
