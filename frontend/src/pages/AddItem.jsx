@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Alert, Box } from '@mui/material'
 
-import { getToken } from '../api/client.js'
+import { getToken, mediaUrl } from '../api/client.js'
 import { createItem, recognizeItem } from '../api/items.js'
 import { uploadPhoto } from '../api/photos.js'
 import ItemForm, { EMPTY_ITEM, itemFieldErrors } from '../components/ItemForm.jsx'
@@ -28,8 +28,8 @@ export default function AddItem() {
   const [fieldErrors, setFieldErrors] = useState({})
   const [saving, setSaving] = useState(false)
 
-  // Локальный адрес превью освобождаем, когда он больше не нужен
-  useEffect(() => () => preview && URL.revokeObjectURL(preview), [preview])
+  // Локальный адрес (blob:) освобождаем, когда он больше не нужен; адрес фото с бэка освобождать не надо
+  useEffect(() => () => preview?.startsWith('blob:') && URL.revokeObjectURL(preview), [preview])
   // Экран закрыли (крестик во время загрузки) — распознавание уже не запускаем: первое грузит бэк секунд на 20
   const closed = useRef(false)
   useEffect(() => {
@@ -49,6 +49,8 @@ export default function AddItem() {
     try {
       uploaded = await uploadPhoto(file)
       setPhoto(uploaded)
+      // Дальше показываем JPEG с бэка: HEIC с iPhone, кроме Safari, браузеры сами не рисуют
+      setPreview(mediaUrl(uploaded.url))
     } catch (err) {
       // 413 и 415 — текст из api/photos.js: «Фото больше 10 МБ — выбери поменьше», «Подойдёт фото в JPEG, PNG, WebP или HEIC»
       setPhotoError(err.message)
