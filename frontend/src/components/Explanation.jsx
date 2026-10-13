@@ -18,7 +18,7 @@ export default function Explanation({ text, title = 'Почему этот ко�
         </Box>
         <Typography variant="h4" component="h2">{title}</Typography>
       </Box>
-      <Typography sx={(t) => ({ color: alpha(t.palette.common.white, 0.88) })}>{text}</Typography>
+      <Typography variant="body2" sx={(t) => ({ color: alpha(t.palette.common.white, 0.88) })}>{text}</Typography>
     </Box>
   )
 }

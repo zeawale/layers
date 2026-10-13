@@ -8,7 +8,7 @@ import BackButton from '../../components/BackButton.jsx'
 export default function StepHeader({ step, total, onBack, onSkip }) {
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2.25 }}>
         <BackButton onClick={onBack} sx={{ visibility: step === 0 || !onBack ? 'hidden' : 'visible' }} />
         <Typography variant="body2" sx={{ flex: 1, textAlign: 'center', color: 'text.secondary' }}>
           Шаг {step + 1} из {total}

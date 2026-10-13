@@ -30,7 +30,7 @@ export default function History() {
 
   return (
     <Box sx={{ px: 3, pt: 2.5 }}>
-      <Typography variant="h1">История</Typography>
+      <Typography variant="h2" component="h1">История</Typography>
       <Typography variant="body2" sx={{ color: 'text.secondary', mt: -0.5, mb: 2.375 }}>Твои комплекты по дням</Typography>
 
       {error && <LoadError message={error.message} onRetry={retry} />}

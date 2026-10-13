@@ -134,7 +134,7 @@ export default function Profile() {
 
   return (
     <Box sx={{ px: 3, pt: 4, pb: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-      <Typography variant="h1" sx={{ mb: 1.5 }}>Профиль</Typography>
+      <Typography variant="h2" component="h1" sx={{ mb: 1.5 }}>Профиль</Typography>
 
       <Card sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Box

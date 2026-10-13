@@ -11,7 +11,7 @@ export default function WardrobeHeader({ total, selected, max, onAdd, onDone }) 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, mb: 1.75 }}>
       <Box sx={{ minWidth: 0 }}>
-        <Typography variant="h1">Гардероб</Typography>
+        <Typography variant="h2" component="h1">Гардероб</Typography>
         {/* Счётчик — только когда список загружен: до этого «Пока ни одной вещи» было бы неправдой */}
         <Typography variant="body2" sx={{ color: 'text.secondary', minHeight: '1.43em' }}>
           {selected && `Выбрано: ${count}${count === max ? ' — больше за раз не удалить' : ''}`}

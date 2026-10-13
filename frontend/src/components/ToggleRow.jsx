@@ -9,7 +9,7 @@ export default function ToggleRow({ label, options, isActive, onToggle }) {
   const labelId = useId()
   return (
     <Box role="group" aria-labelledby={labelId}>
-      <Typography id={labelId} variant="body2" sx={{ color: 'text.secondary', mb: 0.75 }}>{label}</Typography>
+      <Typography id={labelId} variant="caption" component="p" sx={{ color: 'text.secondary', mb: 1 }}>{label}</Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
         {options.map((o) => {
           const active = isActive(o.value)

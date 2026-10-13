@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Link as RouterLink, useNavigate, useNavigationType, useSearchParams } from 'react-router-dom'
-import { Alert, Box, Button, Link, Snackbar, Typography } from '@mui/material'
+import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom'
+import { Alert, Box, Button, Divider, Link, Snackbar, Typography } from '@mui/material'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
 
@@ -9,12 +9,12 @@ import { setToken } from '../api/client.js'
 import BackButton from '../components/BackButton.jsx'
 import FormField from '../components/FormField.jsx'
 import PasswordField from '../components/PasswordField.jsx'
+import useGoBack from '../hooks/useGoBack.js'
 
 export default function Login() {
   const navigate = useNavigate()
-  // Вход часто открывается первым экраном, и тогда «назад» увёл бы из приложения.
-  // Кнопку показываем, только если сюда перешли с другого экрана, например с регистрации.
-  const canGoBack = useNavigationType() === 'PUSH'
+  // «Назад» — на приветствие (1.1) или регистрацию, откуда пришли (макет 1.2)
+  const back = useGoBack('/welcome')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -39,7 +39,7 @@ export default function Login() {
   }
 
   return (
-    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
+    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2.5, pb: 4 }}>
       <Snackbar
         open={expired}
         onClose={() => setExpired(false)}
@@ -52,12 +52,12 @@ export default function Login() {
           </Box>
         }
       />
-      {canGoBack && <BackButton onClick={() => navigate(-1)} sx={{ mb: 2 }} />}
+      <BackButton onClick={back} sx={{ mb: 3.5 }} />
 
       <Typography variant="h1" sx={{ mb: 1.5 }}>С возвращением</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 4 }}>Войди, чтобы увидеть комплект на сегодня.</Typography>
 
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.25 }}>
         {error && <Alert severity="error">{error}</Alert>}
 
         <FormField
@@ -79,21 +79,24 @@ export default function Login() {
             required
             autoComplete="current-password"
           />
-          <Box sx={{ textAlign: 'right', mt: 1 }}>
-            <Link component={RouterLink} to="/forgot-password" variant="subtitle1" sx={{ color: 'text.secondary' }}>
+          <Box sx={{ textAlign: 'right', mt: 2 }}>
+            <Link component={RouterLink} to="/forgot-password" variant="subtitle1">
               Не помнишь пароль?
             </Link>
           </Box>
         </Box>
 
-        <Button type="submit" variant="contained" size="large" disabled={loading} fullWidth>
+        <Button type="submit" variant="contained" size="large" disabled={loading} fullWidth sx={{ mt: 1 }}>
           {loading ? 'Входим…' : 'Войти'}
         </Button>
 
-        <Typography variant="body2" align="center" sx={{ color: 'text.secondary' }}>
+        {/* Разделитель «или» (1.2) */}
+        <Divider sx={{ mt: 2 }}>или</Divider>
+
+        <Typography variant="body2" align="center" sx={{ color: 'text.disabled', mt: 2 }}>
           Нет аккаунта?{' '}
-          <Link component={RouterLink} to="/register" variant="subtitle1" sx={{ color: 'text.primary' }}>
-            Зарегистрироваться
+          <Link component={RouterLink} to="/register" variant="subtitle1" sx={{ ml: 0.5 }}>
+            Создать
           </Link>
         </Typography>
       </Box>

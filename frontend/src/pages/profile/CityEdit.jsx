@@ -21,9 +21,11 @@ export default function CityEdit() {
         selected={city.selected}
         onSelect={city.select}
         onGeolocate={city.geolocate}
+        notFound={city.notFound}
+        geo={city.geo}
       />
       <SaveButton
-        onClick={() => run(city.fields)}
+        onClick={() => run(city.fields, city.fail)}
         saving={saving}
         disabled={!city.fields || unchanged}
         error={error || city.error}

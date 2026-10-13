@@ -10,7 +10,7 @@ export default function ColorsStep({ colors, liked, disliked, onChange }) {
   return (
     <>
       <Typography variant="h2" sx={{ mb: 1 }}>Цвета, которые ты любишь</Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 3 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
         Любимые цвета чаще попадут в комплекты, а нелюбимые — не попадут совсем.
       </Typography>
 
@@ -26,15 +26,15 @@ export default function ColorsStep({ colors, liked, disliked, onChange }) {
         colors={colors}
         selected={disliked}
         taken={liked}
-        tone="error"
+        tone="secondary"
         onToggle={(c) => onChange({ liked, disliked: toggle(disliked, c) })}
         hint="Цвета из «Люблю носить» здесь недоступны — и наоборот"
       />
 
       {likedColors.length > 0 && (
         <Box sx={{ mb: 4 }}>
-          <Typography variant="overline" component="p" sx={{ color: 'text.secondary', mb: 1 }}>Твоя палитра</Typography>
-          <Box sx={{ display: 'flex', borderRadius: 3, overflow: 'hidden', height: 48 }}>
+          <Typography variant="overline" component="p" sx={{ color: 'text.disabled', mb: 1 }}>Твоя палитра</Typography>
+          <Box sx={{ display: 'flex', borderRadius: '16px', overflow: 'hidden', height: 56 }}>
             {likedColors.map((c) => (
               <Box key={c.value} sx={(t) => ({ flex: 1, background: t.palette.swatch[c.value] ?? t.palette.swatch.unknown })} />
             ))}

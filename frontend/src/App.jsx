@@ -21,6 +21,7 @@ import ResetPassword from './pages/ResetPassword.jsx'
 import Start from './pages/Start.jsx'
 import Today from './pages/Today.jsx'
 import Wardrobe from './pages/Wardrobe.jsx'
+import Welcome from './pages/Welcome.jsx'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
       <Route path="/" element={<Start />} />
 
       {/* Экраны без нижней панели */}
+      <Route path="/welcome" element={<Welcome />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />

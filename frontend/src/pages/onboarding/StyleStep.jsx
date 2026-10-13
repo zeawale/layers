@@ -20,7 +20,7 @@ export default function StyleStep({ styles, value, onChange }) {
   return (
     <>
       <Typography variant="h2" sx={{ mb: 1 }}>Какой стиль тебе ближе?</Typography>
-      <Typography sx={{ color: 'text.secondary', mb: 3 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
         Выбери стиль, который тебе ближе. Дальше сервис будет учиться на твоих оценках.
       </Typography>
 
