@@ -84,7 +84,7 @@ export default function PhotoSheet({ open, user, onClose, onChange }) {
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0, mb: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', mb: 2 }}>
           <Action icon={<PhotoCameraOutlinedIcon />} label="Сделать фото" onClick={() => camera.current.click()} disabled={busy} />
           <Action icon={<ImageOutlinedIcon />} label="Выбрать из галереи" onClick={() => gallery.current.click()} disabled={busy} />
           {user.avatar && (

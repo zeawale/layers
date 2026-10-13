@@ -5,7 +5,7 @@ const ICON_COLOR = { success: 'primary.main', secondary: 'secondary.main', neutr
 
 // Кружок с иконкой на сплошной светлой заливке (palette.tint).
 // size — диаметр: 80 на экранах-итогах, в пустых состояниях и ошибках (макеты 1.2.x, 2.9–2.11, 3.1, 3.4),
-// 40 в строках профиля и шторке фото (4.2, 4.8). Иконка — меньше кружка пропорционально (36 px при 80).
+// 36 в строках профиля (4.2), 40 в шторке фото (4.8). Иконка — меньше кружка пропорционально (36 px при 80).
 // tone — success (зелёный), secondary (терракота, для ошибок) или neutral (бежевый)
 export default function IconCircle({ children, tone = 'success', size = 80, sx }) {
   return (
