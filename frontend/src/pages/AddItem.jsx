@@ -50,7 +50,7 @@ export default function AddItem() {
       uploaded = await uploadPhoto(file)
       setPhoto(uploaded)
     } catch (err) {
-      // 413 и 415 — текст из api/photos.js: «Фото больше 10 МБ — выбери поменьше», «Подойдёт фото в JPEG, PNG или WebP»
+      // 413 и 415 — текст из api/photos.js: «Фото больше 10 МБ — выбери поменьше», «Подойдёт фото в JPEG, PNG, WebP или HEIC»
       setPhotoError(err.message)
       setPreview(null)
       setStage('photo')

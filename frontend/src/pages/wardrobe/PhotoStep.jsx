@@ -4,11 +4,11 @@ import CheckIcon from '@mui/icons-material/Check'
 import PhotoCameraOutlined from '@mui/icons-material/PhotoCameraOutlined'
 import PhotoLibraryOutlined from '@mui/icons-material/PhotoLibraryOutlined'
 
+import { PHOTO_ACCEPT } from '../../api/photos.js'
 import IconCircle from '../../components/IconCircle.jsx'
 import Panel from '../../components/Panel.jsx'
 
 const TIPS = ['Вещь целиком в кадре', 'Однотонный фон — пол или кровать', 'Дневной свет, без вспышки']
-const ACCEPT = 'image/jpeg,image/png,image/webp'
 
 // Макет 3.4 «Добавление · фото». error — 413/415 под кнопками; пока фото грузится, на экране «Распознаём» (3.5)
 export default function PhotoStep({ onFile, onManual, error }) {
@@ -39,7 +39,7 @@ export default function PhotoStep({ onFile, onManual, error }) {
         <IconCircle sx={{ mx: 'auto', mb: 2.5 }}><PhotoCameraOutlined /></IconCircle>
         <Typography variant="h3" component="h2" sx={{ mb: 1.5 }}>Сфотографируй вещь</Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-          или загрузи из галереи. JPG, PNG или WEBP до 10 МБ
+          или загрузи из галереи. JPG, PNG, WEBP или HEIC до 10 МБ
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5 }}>
           <Button variant="contained" size="large" fullWidth startIcon={<PhotoCameraOutlined />} onClick={() => cameraRef.current.click()}>
@@ -51,8 +51,8 @@ export default function PhotoStep({ onFile, onManual, error }) {
         </Box>
         {error && <Typography variant="body2" role="alert" sx={{ color: 'error.main', mt: 2 }}>{error}</Typography>}
         {/* На телефоне capture открывает камеру сразу, на компьютере — обычный выбор файла */}
-        <input ref={cameraRef} type="file" accept={ACCEPT} capture="environment" hidden onChange={pick} />
-        <input ref={galleryRef} type="file" accept={ACCEPT} hidden onChange={pick} />
+        <input ref={cameraRef} type="file" accept={PHOTO_ACCEPT} capture="environment" hidden onChange={pick} />
+        <input ref={galleryRef} type="file" accept={PHOTO_ACCEPT} hidden onChange={pick} />
       </Box>
 
       <Panel radius={20} sx={{ p: 2.5, mb: 3 }}>
