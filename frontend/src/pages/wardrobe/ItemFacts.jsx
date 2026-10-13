@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material'
 
-import ColorDot from '../../components/ColorDot.jsx'
+import ColorLabel from '../../components/ColorLabel.jsx'
 import Panel from '../../components/Panel.jsx'
 import WarmthDots from '../../components/WarmthDots.jsx'
 
@@ -18,10 +18,7 @@ export default function ItemFacts({ item, label, warmthMax }) {
     ['Категория', label('category', item.category)],
     [
       'Цвет',
-      <Box component="span" key="c" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
-        <ColorDot value={item.color} size={14} />
-        {label('color', item.color)}
-      </Box>,
+      <ColorLabel key="c" value={item.color} label={label('color', item.color)} size={14} />,
     ],
     // Пустой список сезонов — вещь всесезонная (API.md, Item)
     ['Сезон', seasons.length ? seasons.join(', ') : 'Всесезонная'],
