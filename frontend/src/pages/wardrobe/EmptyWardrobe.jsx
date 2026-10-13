@@ -2,6 +2,8 @@ import { Box, Button, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import PhotoCameraOutlined from '@mui/icons-material/PhotoCameraOutlined'
 
+import Panel from '../../components/Panel.jsx'
+
 const TIPS = [
   '10–15 базовых вещей на сезон',
   'Верхняя одежда и обувь — они важнее всего для погоды',
@@ -53,7 +55,7 @@ export default function EmptyWardrobe({ onAdd }) {
         </Button>
       </Box>
 
-      <Box sx={{ bgcolor: 'background.paper', borderRadius: '20px', p: 2.25 }}>
+      <Panel radius={20} sx={{ p: 2.25 }}>
         <Typography variant="subtitle1" sx={{ mb: 1.5 }}>С чего начать</Typography>
         <Box component="ol" sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, m: 0, p: 0, listStyle: 'none' }}>
           {TIPS.map((tip, i) => (
@@ -70,7 +72,7 @@ export default function EmptyWardrobe({ onAdd }) {
             </Box>
           ))}
         </Box>
-      </Box>
+      </Panel>
     </Box>
   )
 }

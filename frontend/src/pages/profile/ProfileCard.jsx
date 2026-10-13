@@ -1,8 +1,10 @@
 import { Box, Button, Typography } from '@mui/material'
 
-// Белая карточка профиля (макет 4.2): скругление 20, отступ 18
+import Panel from '../../components/Panel.jsx'
+
+// Белая карточка профиля (макет 4.2) — Panel со скруглением 20 и отступом 18
 export default function ProfileCard({ children, sx }) {
-  return <Box sx={{ bgcolor: 'background.paper', borderRadius: '20px', p: 2.25, ...sx }}>{children}</Box>
+  return <Panel radius={20} sx={{ p: 2.25, ...sx }}>{children}</Panel>
 }
 
 // Заголовок карточки и зелёная «Изменить» справа

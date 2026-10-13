@@ -16,9 +16,9 @@ import { plural } from '../format.js'
 import useAttributes from '../hooks/useAttributes.js'
 import ColorRow from './profile/ColorRow.jsx'
 import PhotoSheet from './profile/PhotoSheet.jsx'
-import Card, { CardHeader } from './profile/ProfileCard.jsx'
+import ProfileCard, { CardHeader } from './profile/ProfileCard.jsx'
 import SettingsRow from './profile/SettingsRow.jsx'
-import Stat from './profile/StatTile.jsx'
+import StatTile from './profile/StatTile.jsx'
 import useProfileStats from './profile/useProfileStats.js'
 
 function since(createdAt) {
@@ -57,7 +57,7 @@ export default function Profile() {
     <Box sx={{ px: 3, pt: 2.5, pb: 2, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
       <Typography variant="h2" component="h1">Профиль</Typography>
 
-      <Card sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <ProfileCard sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Box
           component="button"
           type="button"
@@ -83,17 +83,17 @@ export default function Profile() {
           <Typography variant="body2" noWrap sx={{ color: 'text.secondary' }}>{user.email}</Typography>
           <Typography variant="body2" sx={{ color: 'text.disabled' }}>В сервисе с {since(user.created_at)}</Typography>
         </Box>
-      </Card>
+      </ProfileCard>
 
       {stats && (
         <Box sx={{ display: 'flex', gap: 1.5 }}>
-          <Stat value={stats.items} label={plural(stats.items, ['вещь', 'вещи', 'вещей'])} />
-          <Stat value={stats.outfits} label={plural(stats.outfits, ['комплект', 'комплекта', 'комплектов'])} />
-          <Stat value={stats.liked} label="понравилось" />
+          <StatTile value={stats.items} label={plural(stats.items, ['вещь', 'вещи', 'вещей'])} />
+          <StatTile value={stats.outfits} label={plural(stats.outfits, ['комплект', 'комплекта', 'комплектов'])} />
+          <StatTile value={stats.liked} label="понравилось" />
         </Box>
       )}
 
-      <Card>
+      <ProfileCard>
         <CardHeader title="Мой стиль" onEdit={() => navigate('/profile/style')} />
         {prefs.style ? (
           <Box
@@ -109,21 +109,21 @@ export default function Profile() {
         ) : (
           <Typography variant="body2" sx={{ color: 'text.disabled' }}>Не выбран — подбираем вещи любого стиля</Typography>
         )}
-      </Card>
+      </ProfileCard>
 
-      <Card>
+      <ProfileCard>
         <CardHeader title="Цвета" onEdit={() => navigate('/profile/colors')} />
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.75 }}>
           <ColorRow title="Люблю" values={prefs.liked_colors} label={label} />
           <ColorRow title="Не ношу" values={prefs.disliked_colors} label={label} />
         </Box>
-      </Card>
+      </ProfileCard>
 
-      <Card sx={{ py: 2 }}>
+      <ProfileCard sx={{ py: 2 }}>
         <SettingsRow icon={<PersonOutlineIcon fontSize="small" />} title="Имя" value={user.name} onClick={() => navigate('/profile/name')} />
         <SettingsRow icon={<LocationOnOutlinedIcon fontSize="small" />} title="Город" value={user.city} onClick={() => navigate('/profile/city')} />
         <SettingsRow icon={<LockOutlinedIcon fontSize="small" />} title="Сменить пароль" onClick={() => navigate('/profile/password')} />
-      </Card>
+      </ProfileCard>
 
       <Button variant="text" color="error" onClick={logout} sx={{ alignSelf: 'center', minHeight: 36 }}>
         Выйти из аккаунта
