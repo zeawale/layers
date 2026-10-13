@@ -78,17 +78,17 @@ const theme = createTheme({
       styleOverrides: { root: { borderRadius: 999, minHeight: 52, paddingInline: 24 } },
       // Второстепенные кнопки в макетах — белые с тонкой рамкой и тёмным текстом
       variants: [
-        // Неактивная главная кнопка («Сохраняем…», «Готово» без города) — бледная, но текст читается.
-        // Иначе MUI красит её в серый с серым текстом
-        {
-          props: { variant: 'contained', color: 'primary' },
+        // Неактивная главная кнопка («Сохраняем…», «Готово» без города, «Удалить (0)» в 3.10) — бледная,
+        // но текст читается. Иначе MUI красит её в серый с серым текстом
+        ...['primary', 'error'].map((color) => ({
+          props: { variant: 'contained', color },
           style: ({ theme }) => ({
             '&.Mui-disabled': {
-              backgroundColor: alpha(theme.palette.primary.main, 0.6),
+              backgroundColor: alpha(theme.palette[color].main, 0.6),
               color: theme.palette.common.white,
             },
           }),
-        },
+        })),
         {
           props: { variant: 'outlined', color: 'primary' },
           style: ({ theme }) => ({

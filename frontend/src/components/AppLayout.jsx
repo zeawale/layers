@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Box, Paper, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined'
 import CheckroomOutlined from '@mui/icons-material/CheckroomOutlined'
 import PersonOutline from '@mui/icons-material/PersonOutline'
 import WbSunnyOutlined from '@mui/icons-material/WbSunnyOutlined'
 
 import { getToken } from '../api/client.js'
+import BottomBar from './BottomBar.jsx'
 
 // Вкладки нижней панели: порядок и названия — как в макетах.
 const TABS = [
@@ -37,24 +38,8 @@ export default function AppLayout() {
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', pb: 14 }}>
       <Outlet context={{ setTabBarHidden }} />
 
-      {/* Плавающая тёмная «таблетка» внизу, как в макетах */}
       {!tabBarHidden && (
-        <Paper
-          elevation={0}
-          sx={{
-            position: 'fixed',
-            bottom: 22,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 'calc(100% - 32px)',
-            maxWidth: 358,
-            p: 1,
-            borderRadius: 999,
-            bgcolor: 'text.primary',
-            boxShadow: (t) => t.custom.tabBarShadow,
-            zIndex: 10,
-          }}
-        >
+        <BottomBar>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', height: 52 }}>
             {TABS.map((tab) => {
               const active = tab.path === current
@@ -90,7 +75,7 @@ export default function AppLayout() {
               )
             })}
           </Box>
-        </Paper>
+        </BottomBar>
       )}
     </Box>
   )

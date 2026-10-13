@@ -133,7 +133,7 @@ export default function Wardrobe() {
         </>
       )}
 
-      {count > 0 && <DeleteBar count={count} onClick={() => { setDeleteError(''); setConfirmOpen(true) }} />}
+      {selecting && <DeleteBar count={count} onClick={() => { setDeleteError(''); setConfirmOpen(true) }} />}
 
       <ConfirmDialog
         open={confirmOpen}
