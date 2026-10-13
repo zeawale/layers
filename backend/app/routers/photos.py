@@ -35,6 +35,6 @@ def upload_photo(
     except photos.UnsupportedPhoto:
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            detail="Подходят только фото в JPEG, PNG или WebP",
+            detail="Подходят только фото в JPEG, PNG, WebP или HEIC",
         )
     return PhotoOut.from_photo(photo)
