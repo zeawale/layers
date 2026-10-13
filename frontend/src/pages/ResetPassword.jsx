@@ -72,7 +72,7 @@ export default function ResetPassword() {
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <BackButton onClick={toLogin} sx={{ ml: -1, mb: 2 }} />
+      <BackButton onClick={toLogin} sx={{ mb: 2 }} />
 
       <Typography variant="h1" sx={{ mb: 1.5 }}>Новый пароль</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 4 }}>

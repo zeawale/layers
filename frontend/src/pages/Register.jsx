@@ -46,7 +46,7 @@ export default function Register() {
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <BackButton onClick={() => navigate('/login', { replace: true })} sx={{ ml: -1, mb: 2 }} />
+      <BackButton onClick={() => navigate('/login', { replace: true })} sx={{ mb: 2 }} />
 
       <Typography variant="h1" sx={{ mb: 1.5 }}>Создадим твой{'\n'}гардероб</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 4 }}>Минута на регистрацию — и сервис начнёт подбирать комплекты.</Typography>
