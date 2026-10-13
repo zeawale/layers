@@ -35,7 +35,6 @@ export default function StyleStep({ styles, value, onChange }) {
             subtitle={STYLE_DESC[s.value]}
             selected={value === s.value}
             onClick={() => onChange(s.value)}
-            wrap
           />
         ))}
       </Box>
