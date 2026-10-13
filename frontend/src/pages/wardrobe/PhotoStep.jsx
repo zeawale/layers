@@ -5,6 +5,7 @@ import PhotoCameraOutlined from '@mui/icons-material/PhotoCameraOutlined'
 import PhotoLibraryOutlined from '@mui/icons-material/PhotoLibraryOutlined'
 
 import IconCircle from '../../components/IconCircle.jsx'
+import Panel from '../../components/Panel.jsx'
 
 const TIPS = ['Вещь целиком в кадре', 'Однотонный фон — пол или кровать', 'Дневной свет, без вспышки']
 const ACCEPT = 'image/jpeg,image/png,image/webp'
@@ -54,7 +55,7 @@ export default function PhotoStep({ onFile, onManual, error }) {
         <input ref={galleryRef} type="file" accept={ACCEPT} hidden onChange={pick} />
       </Box>
 
-      <Box sx={{ bgcolor: 'background.paper', borderRadius: '20px', p: 2.5, mb: 3 }}>
+      <Panel radius={20} sx={{ p: 2.5, mb: 3 }}>
         <Typography variant="subtitle1" sx={{ mb: 1.5 }}>Как получить хорошее фото</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}>
           {TIPS.map((tip) => (
@@ -64,10 +65,10 @@ export default function PhotoStep({ onFile, onManual, error }) {
             </Box>
           ))}
         </Box>
-      </Box>
+      </Panel>
 
       <Typography align="center">
-        <Link component="button" type="button" variant="subtitle1" onClick={onManual} sx={{ color: 'primary.main' }}>
+        <Link component="button" type="button" variant="subtitle1" onClick={onManual}>
           Заполнить вручную, без фото
         </Link>
       </Typography>

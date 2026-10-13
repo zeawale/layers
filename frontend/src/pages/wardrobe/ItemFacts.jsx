@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material'
 
 import ColorDot from '../../components/ColorDot.jsx'
+import Panel from '../../components/Panel.jsx'
 import WarmthDots from '../../components/WarmthDots.jsx'
 
 // «2 сентября 2026»
@@ -38,7 +39,7 @@ export default function ItemFacts({ item, label, warmthMax }) {
   ]
 
   return (
-    <Box component="dl" sx={{ bgcolor: 'background.paper', borderRadius: '20px', px: 2, mt: 0, mb: 3.5 }}>
+    <Panel component="dl" radius={20} sx={{ px: 2, py: 0, mt: 0, mb: 3.5 }}>
       {rows.map(([name, value], i) => (
         <Box
           key={name}
@@ -57,6 +58,6 @@ export default function ItemFacts({ item, label, warmthMax }) {
           </Typography>
         </Box>
       ))}
-    </Box>
+    </Panel>
   )
 }
