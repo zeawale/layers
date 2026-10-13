@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material'
 
+import ColorDot from '../../components/ColorDot.jsx'
 import WarmthDots from '../../components/WarmthDots.jsx'
 
 // «2 сентября 2026»
@@ -14,7 +15,13 @@ export default function ItemFacts({ item, label, warmthMax }) {
   const seasons = item.season.map((s, i) => (i ? label('season', s).toLowerCase() : label('season', s)))
   const rows = [
     ['Категория', label('category', item.category)],
-    ['Цвет', label('color', item.color)],
+    [
+      'Цвет',
+      <Box component="span" key="c" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+        <ColorDot value={item.color} size={14} />
+        {label('color', item.color)}
+      </Box>,
+    ],
     // Пустой список сезонов — вещь всесезонная (API.md, Item)
     ['Сезон', seasons.length ? seasons.join(', ') : 'Всесезонная'],
     // Без стиля вещь подходит под любой
@@ -31,7 +38,7 @@ export default function ItemFacts({ item, label, warmthMax }) {
   ]
 
   return (
-    <Box component="dl" sx={{ bgcolor: 'background.paper', borderRadius: '20px', px: 2, mt: 0, mb: 3 }}>
+    <Box component="dl" sx={{ bgcolor: 'background.paper', borderRadius: '20px', px: 2, mt: 0, mb: 3.5 }}>
       {rows.map(([name, value], i) => (
         <Box
           key={name}

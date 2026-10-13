@@ -1,22 +1,16 @@
-import { Box, Button } from '@mui/material'
+import { Button } from '@mui/material'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 
-// «Удалить (N)» в режиме выбора (макет 3.10) — висит над нижней панелью приложения
+import BottomBar from '../../components/BottomBar.jsx'
+
+// «Удалить (N)» в режиме выбора (макет 3.10) — в тёмной оболочке на месте нижней панели, она в это время спрятана.
+// Пока ничего не отмечено — «Удалить (0)», неактивная: низ экрана не пустеет
 export default function DeleteBar({ count, onClick }) {
   return (
-    <Box
-      sx={{
-        position: 'fixed',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        bottom: 100,
-        width: 'calc(100% - 48px)',
-        maxWidth: 342,
-        zIndex: 11,
-      }}
-    >
-      <Button variant="contained" color="error" size="large" fullWidth onClick={onClick}>
+    <BottomBar>
+      <Button variant="contained" color="error" size="large" fullWidth disabled={count === 0} startIcon={<DeleteOutlineIcon />} onClick={onClick}>
         Удалить ({count})
       </Button>
-    </Box>
+    </BottomBar>
   )
 }

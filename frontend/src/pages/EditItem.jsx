@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import { Alert, Box, Button, Typography } from '@mui/material'
+import { Alert, Box } from '@mui/material'
 
 import { getToken, mediaUrl } from '../api/client.js'
 import { getItem, updateItem } from '../api/items.js'
@@ -10,7 +10,7 @@ import { LoadError, Loading } from '../components/LoadState.jsx'
 import ScreenHeader from '../components/ScreenHeader.jsx'
 import useAttributes from '../hooks/useAttributes.js'
 import ItemMissing from './wardrobe/ItemMissing.jsx'
-import PhotoRow from './wardrobe/PhotoRow.jsx'
+import PhotoEditCard from './wardrobe/PhotoEditCard.jsx'
 
 const FIELDS = Object.keys(EMPTY_ITEM)
 
@@ -89,8 +89,8 @@ export default function EditItem() {
   const failed = (!missing && loadError?.message) || attrsError
 
   return (
-    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <ScreenHeader title="Редактировать вещь" onBack={() => toItem()} backDisabled={saving} />
+    <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2.5, pb: 4 }}>
+      <ScreenHeader title="Редактировать вещь" close onBack={() => toItem()} backDisabled={saving} />
 
       {missing && <ItemMissing onBack={() => navigate('/wardrobe', { replace: true })} />}
 
@@ -102,17 +102,15 @@ export default function EditItem() {
         <>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.75 }}>Фото вещи</Typography>
-          <PhotoRow src={mediaUrl(photo?.url)} uploading={uploading} error={photoError}>
-            <Button variant="outlined" onClick={() => fileRef.current.click()} disabled={uploading || saving}>
-              {photo ? 'Заменить фото' : 'Добавить фото'}
-            </Button>
-            {photo && (
-              <Button onClick={() => setPhoto(null)} disabled={uploading || saving} sx={{ color: 'error.main', minHeight: 36 }}>
-                Удалить фото
-              </Button>
-            )}
-          </PhotoRow>
+          <PhotoEditCard
+            src={mediaUrl(photo?.url)}
+            hasPhoto={Boolean(photo)}
+            uploading={uploading}
+            disabled={uploading || saving}
+            error={photoError}
+            onPick={() => fileRef.current.click()}
+            onRemove={() => setPhoto(null)}
+          />
           <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={replacePhoto} />
 
           <ItemForm

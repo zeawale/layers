@@ -1,49 +1,15 @@
-import { useId } from 'react'
-import { Box, Button, Chip, MenuItem, Typography } from '@mui/material'
+import { Box, Button, MenuItem } from '@mui/material'
+import EditOutlined from '@mui/icons-material/EditOutlined'
 
+import AutoChip from './AutoChip.jsx'
+import ColorDot from './ColorDot.jsx'
 import FormField from './FormField.jsx'
+import ToggleRow from './ToggleRow.jsx'
 
 // Форма вещи — макеты 3.6 «Проверка полей» и 3.9 «Редактировать вещь».
 // Значения и подписи — только из справочника (attrs = ответ GET /attributes).
-// auto — какие поля предзаполнило распознавание: у них метка «авто».
+// auto — какие поля предзаполнило распознавание: у них метка «авто» внутри поля, перед стрелкой (3.6).
 // errors — ошибки 422 по полям, уже по-русски: { name: '…' }.
-
-function AutoLabel({ text, auto }) {
-  return (
-    <>
-      {text}
-      {auto && <Chip label="авто" size="small" color="success" variant="outlined" sx={{ ml: 1, height: 20 }} />}
-    </>
-  )
-}
-
-// Ряд «таблеток»: один выбор (стиль, защита от осадков) или несколько (сезон).
-// Подпись группы связана с ней через aria-labelledby — читалка назовёт группу
-function ToggleRow({ label, options, isActive, onToggle }) {
-  const labelId = useId()
-  return (
-    <Box role="group" aria-labelledby={labelId}>
-      <Typography id={labelId} variant="body2" sx={{ color: 'text.secondary', mb: 0.75 }}>{label}</Typography>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-        {options.map((o) => {
-          const active = isActive(o.value)
-          return (
-            <Chip
-              key={String(o.value)}
-              label={o.label}
-              onClick={() => onToggle(o.value)}
-              aria-pressed={active}
-              color={active ? 'primary' : 'default'}
-              variant={active ? 'filled' : 'outlined'}
-              sx={{ height: 40, borderRadius: 999, px: 1, bgcolor: active ? undefined : 'background.paper' }}
-            />
-          )
-        })}
-      </Box>
-    </Box>
-  )
-}
-
 // loading — идёт сохранение («Сохраняем…»); disabled — кнопка неактивна по другой причине (грузится фото)
 export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {}, onSubmit, submitLabel, loading, disabled }) {
   const set = (field) => (v) => onChange({ ...value, [field]: v })
@@ -63,6 +29,7 @@ export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {
       <FormField
         label="Название"
         placeholder="Например, серый свитер"
+        icon={<EditOutlined />}
         value={value.name}
         onChange={(e) => set('name')(e.target.value)}
         required
@@ -72,7 +39,8 @@ export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {
 
       <FormField
         select
-        label={<AutoLabel text="Категория" auto={auto.category} />}
+        label="Категория"
+        end={auto.category && <AutoChip />}
         value={value.category ?? ''}
         onChange={(e) => set('category')(e.target.value)}
         required
@@ -83,7 +51,9 @@ export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {
 
       <FormField
         select
-        label={<AutoLabel text="Цвет" auto={auto.color} />}
+        label="Цвет"
+        icon={value.color && <ColorDot value={value.color} size={20} />}
+        end={auto.color && <AutoChip />}
         value={value.color ?? ''}
         onChange={(e) => set('color')(e.target.value)}
         required

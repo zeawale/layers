@@ -1,11 +1,13 @@
+import { useState } from 'react'
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Box, Paper, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined'
 import CheckroomOutlined from '@mui/icons-material/CheckroomOutlined'
 import PersonOutline from '@mui/icons-material/PersonOutline'
 import WbSunnyOutlined from '@mui/icons-material/WbSunnyOutlined'
 
 import { getToken } from '../api/client.js'
+import BottomBar from './BottomBar.jsx'
 
 // Вкладки нижней панели: порядок и названия — как в макетах.
 const TABS = [
@@ -24,6 +26,8 @@ export default function AppLayout() {
   // Активная вкладка — та, с чего начинается адрес: /wardrobe/5 тоже подсветит «Гардероб».
   // Если адрес не подошёл ни к одной вкладке, ни одна не подсвечивается (false).
   const current = TABS.find((tab) => pathname.startsWith(tab.path))?.path ?? false
+  // Экран может спрятать панель: в режиме выбора гардероба на её месте «Удалить (N)» (макет 3.10)
+  const [tabBarHidden, setTabBarHidden] = useState(false)
 
   // Экраны приложения без входа не открываем
   if (!getToken()) return <Navigate to="/login" replace />
@@ -32,61 +36,47 @@ export default function AppLayout() {
     // Интерфейс только под мобильный экран шириной 390 px, поэтому на большом экране он по центру.
     // Нижний отступ нужен, чтобы панель не закрывала конец страницы.
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', pb: 14 }}>
-      <Outlet />
+      <Outlet context={{ setTabBarHidden }} />
 
-      {/* Плавающая тёмная «таблетка» внизу, как в макетах */}
-      <Paper
-        elevation={0}
-        sx={{
-          position: 'fixed',
-          bottom: 22,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 'calc(100% - 32px)',
-          maxWidth: 358,
-          p: 1,
-          borderRadius: 999,
-          bgcolor: 'text.primary',
-          boxShadow: (t) => t.custom.tabBarShadow,
-          zIndex: 10,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', height: 52 }}>
-          {TABS.map((tab) => {
-            const active = tab.path === current
-            return (
-              <Box
-                key={tab.path}
-                onClick={() => navigate(tab.path)}
-                role="tab"
-                aria-selected={active}
-                aria-label={tab.label}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.75,
-                  px: active ? 2 : 1.5,
-                  py: 1,
-                  borderRadius: 999,
-                  cursor: 'pointer',
-                  color: 'common.white',
-                  opacity: active ? 1 : 0.62,
-                  bgcolor: active ? 'background.paper' : 'transparent',
-                  ...(active && { color: 'text.primary' }),
-                  '& svg': { width: 22, height: 22 },
-                }}
-              >
-                {tab.icon}
-                {active && (
-                  <Typography variant="tab" component="span" sx={{ whiteSpace: 'nowrap' }}>
-                    {tab.label}
-                  </Typography>
-                )}
-              </Box>
-            )
-          })}
-        </Box>
-      </Paper>
+      {!tabBarHidden && (
+        <BottomBar>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', height: 52 }}>
+            {TABS.map((tab) => {
+              const active = tab.path === current
+              return (
+                <Box
+                  key={tab.path}
+                  onClick={() => navigate(tab.path)}
+                  role="tab"
+                  aria-selected={active}
+                  aria-label={tab.label}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                    px: active ? 2 : 1.5,
+                    py: 1,
+                    borderRadius: 999,
+                    cursor: 'pointer',
+                    color: 'common.white',
+                    opacity: active ? 1 : 0.62,
+                    bgcolor: active ? 'background.paper' : 'transparent',
+                    ...(active && { color: 'text.primary' }),
+                    '& svg': { width: 22, height: 22 },
+                  }}
+                >
+                  {tab.icon}
+                  {active && (
+                    <Typography variant="tab" component="span" sx={{ whiteSpace: 'nowrap' }}>
+                      {tab.label}
+                    </Typography>
+                  )}
+                </Box>
+              )
+            })}
+          </Box>
+        </BottomBar>
+      )}
     </Box>
   )
 }

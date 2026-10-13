@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import { Alert, Box } from '@mui/material'
 
 import { bulkDeleteItems, listItems } from '../api/items.js'
-import { mediaUrl } from '../api/client.js'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import { LoadError, Loading } from '../components/LoadState.jsx'
 import Notice from '../components/Notice.jsx'
-import PhotoCard from '../components/PhotoCard.jsx'
 import { plural } from '../format.js'
 import useAttributes from '../hooks/useAttributes.js'
 import DeleteBar from './wardrobe/DeleteBar.jsx'
 import EmptyWardrobe from './wardrobe/EmptyWardrobe.jsx'
+import ItemGrid from './wardrobe/ItemGrid.jsx'
 import NothingFound from './wardrobe/NothingFound.jsx'
 import SearchRow from './wardrobe/SearchRow.jsx'
 import WardrobeHeader from './wardrobe/WardrobeHeader.jsx'
@@ -25,6 +24,7 @@ const ITEMS = ['вещь', 'вещи', 'вещей']
 // Макеты 3.0 «Гардероб», 3.1 «пусто», 3.8 «ничего не нашлось», 3.10 «выбор», 3.11 «удалить выбранные»
 export default function Wardrobe() {
   const navigate = useNavigate()
+  const { setTabBarHidden } = useOutletContext()
   const addItem = () => navigate('/wardrobe/new')
   const { label, loading: attrsLoading, error: attrsError, retry: retryAttrs } = useAttributes()
   const [items, setItems] = useState(null)
@@ -81,6 +81,12 @@ export default function Wardrobe() {
   // Вещей не осталось — выбирать нечего, режим выбора не показываем
   const selecting = selected !== null && items?.length > 0
   const count = selecting ? selected.length : 0
+
+  // В режиме выбора нижняя панель уступает место «Удалить (N)» (макет 3.10)
+  useEffect(() => {
+    setTabBarHidden(selecting)
+    return () => setTabBarHidden(false)
+  }, [selecting, setTabBarHidden])
   const failed = error || attrsError
   const loading = !failed && (items === null || attrsLoading)
   // Поиск по названию — у себя, список уже загружен целиком (API.md, GET /items)
@@ -88,7 +94,7 @@ export default function Wardrobe() {
   const shown = items?.filter((item) => normalize(item.name).includes(q)) ?? []
 
   return (
-    <Box sx={{ px: 3, pt: 4 }}>
+    <Box sx={{ px: 3, pt: 2 }}>
       <WardrobeHeader
         total={items?.length ?? null}
         selected={selecting ? selected : null}
@@ -114,27 +120,20 @@ export default function Wardrobe() {
           />
 
           {shown.length > 0 ? (
-            // minmax(0, 1fr): длинное название не раздвигает колонку шире экрана.
-            // В режиме выбора снизу место под «Удалить (N)», чтобы кнопка не закрывала последние карточки
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 1.5, pb: count ? 9 : 2 }}>
-              {shown.map((item) => (
-                <PhotoCard
-                  key={item.id}
-                  image={mediaUrl(item.photo?.url)}
-                  title={item.name}
-                  subtitle={`${label('category', item.category)} · ${label('color', item.color).toLowerCase()}`}
-                  selected={selecting && selected.includes(item.id)}
-                  onClick={() => (selecting ? toggle(item.id) : navigate(`/wardrobe/${item.id}`))}
-                />
-              ))}
-            </Box>
+            <ItemGrid
+              items={shown}
+              label={label}
+              selected={selecting ? selected : null}
+              onOpen={(id) => navigate(`/wardrobe/${id}`)}
+              onToggle={toggle}
+            />
           ) : (
             <NothingFound onClear={() => setQuery('')} />
           )}
         </>
       )}
 
-      {count > 0 && <DeleteBar count={count} onClick={() => { setDeleteError(''); setConfirmOpen(true) }} />}
+      {selecting && <DeleteBar count={count} onClick={() => { setDeleteError(''); setConfirmOpen(true) }} />}
 
       <ConfirmDialog
         open={confirmOpen}

@@ -3,19 +3,23 @@ import CheckIcon from '@mui/icons-material/Check'
 
 import ItemPhoto from './ItemPhoto.jsx'
 
-// Карточка с квадратным фото, названием и подписью — вещь в гардеробе, стиль в онбординге.
+// Карточка с квадратным фото, названием и описанием в несколько строк — стиль в онбординге (1.4).
+// Вещи в гардеробе — pages/wardrobe/ItemTile.
 // selected — выбранная: галочка на фото и тёмная рамка.
 // imagePosition — какую часть фото оставить в квадрате (у вертикальных фото людей — чуть выше центра).
-// wrap — подпись в несколько строк (описание стиля); у вещей название и подпись в одну строку с «…»
-export default function PhotoCard({ image, imagePosition = 'center', title, subtitle, selected = false, onClick, wrap = false }) {
+export default function PhotoCard({ image, imagePosition = 'center', title, subtitle, selected = false, onClick }) {
   return (
     <Box
       onClick={onClick}
-      // Карточку можно открыть и с клавиатуры: Tab и Enter
+      // Карточку можно выбрать и с клавиатуры: Tab, затем Enter или пробел (без прокрутки страницы)
       {...(onClick && {
         role: 'button',
         tabIndex: 0,
-        onKeyDown: (e) => e.key === 'Enter' && onClick(),
+        onKeyDown: (e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return
+          e.preventDefault()
+          onClick()
+        },
       })}
       sx={{
         minWidth: 0,
@@ -43,8 +47,8 @@ export default function PhotoCard({ image, imagePosition = 'center', title, subt
         )}
       </ItemPhoto>
       <Box sx={{ px: 0.5, pb: 0.5 }}>
-        <Typography variant="subtitle1" noWrap={!wrap} sx={{ mb: 0.25 }}>{title}</Typography>
-        {subtitle && <Typography variant="subtitle2" noWrap={!wrap} sx={{ color: 'text.secondary' }}>{subtitle}</Typography>}
+        <Typography variant="subtitle1" sx={{ mb: 0.25 }}>{title}</Typography>
+        {subtitle && <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>{subtitle}</Typography>}
       </Box>
     </Box>
   )

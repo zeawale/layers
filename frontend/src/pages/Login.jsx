@@ -52,7 +52,7 @@ export default function Login() {
           </Box>
         }
       />
-      {canGoBack && <BackButton onClick={() => navigate(-1)} sx={{ ml: -1, mb: 2 }} />}
+      {canGoBack && <BackButton onClick={() => navigate(-1)} sx={{ mb: 2 }} />}
 
       <Typography variant="h1" sx={{ mb: 1.5 }}>С возвращением</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 4 }}>Войди, чтобы увидеть комплект на сегодня.</Typography>

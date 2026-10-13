@@ -40,7 +40,7 @@ export default function EditLayout() {
 
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2, pb: 4 }}>
-      <BackButton onClick={leave} sx={{ ml: -1, mb: 2 }} />
+      <BackButton onClick={leave} sx={{ mb: 2 }} />
 
       {error && <LoadError message={error} onRetry={() => setAttempt((n) => n + 1)} />}
       {!error && !user && <Loading />}
