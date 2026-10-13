@@ -22,6 +22,9 @@ const theme = createTheme({
     gold: { main: '#d9a441', dark: '#9a6f16' },
     // Карточка погоды на главном: небо, тёплое пятно солнца, холодное пятно дождя (2.2) и иконки
     weather: { sky: '#dde8f1', sun: '#dbd0b3', rain: '#c0ccd4', icon: '#6f9cc4' },
+    // «Определить автоматически» на шаге города (1.6): кружок и иконка. Пока совпадают с погодой,
+    // но свои: поменяют карточку погоды — шаг города не изменится
+    locate: { circle: '#dde8f1', icon: '#6f9cc4' },
     // Кружки справочника цветов (GET /attributes, color). Ключи — машинные значения цветов
     // Значения сняты с макета 1.5 — приглушённые, в тон интерфейсу
     swatch: {
@@ -78,17 +81,17 @@ const theme = createTheme({
       styleOverrides: { root: { borderRadius: 999, minHeight: 52, paddingInline: 24 } },
       // Второстепенные кнопки в макетах — белые с тонкой рамкой и тёмным текстом
       variants: [
-        // Неактивная главная кнопка («Сохраняем…», «Готово» без города) — бледная, но текст читается.
-        // Иначе MUI красит её в серый с серым текстом
-        {
-          props: { variant: 'contained', color: 'primary' },
+        // Неактивная главная кнопка («Сохраняем…», «Готово» без города, «Удалить (0)» в 3.10) — бледная,
+        // но текст читается. Иначе MUI красит её в серый с серым текстом
+        ...['primary', 'error'].map((color) => ({
+          props: { variant: 'contained', color },
           style: ({ theme }) => ({
             '&.Mui-disabled': {
-              backgroundColor: alpha(theme.palette.primary.main, 0.6),
+              backgroundColor: alpha(theme.palette[color].main, 0.6),
               color: theme.palette.common.white,
             },
           }),
-        },
+        })),
         {
           props: { variant: 'outlined', color: 'primary' },
           style: ({ theme }) => ({
@@ -97,7 +100,31 @@ const theme = createTheme({
             backgroundColor: theme.palette.background.paper,
           }),
         },
+        // Контурная без заливки — фон страницы просвечивает: «Вернуться ко входу» (1.2.2).
+        // Свой вариант, а не outlined: у того белая заливка; размер шрифта — как у остальных size="large"
+        {
+          props: { variant: 'outlinedClear' },
+          style: ({ theme }) => ({
+            border: `1px solid ${theme.palette.outline.main}`,
+            color: theme.palette.text.primary,
+            backgroundColor: 'transparent',
+            fontSize: theme.typography.pxToRem(15),
+          }),
+        },
       ],
+    },
+    MuiDivider: {
+      // Разделитель с подписью — «или» на входе (1.2): линии 2 px светлой заливкой, подпись серая 14
+      styleOverrides: {
+        withChildren: ({ theme }) => ({
+          '&::before, &::after': { borderTopWidth: 2, borderTopColor: theme.palette.tint.neutral },
+        }),
+        wrapper: ({ theme }) => ({
+          ...theme.typography.body2,
+          color: theme.palette.text.disabled,
+          paddingInline: theme.spacing(2),
+        }),
+      },
     },
     MuiLink: {
       // Ссылки в макетах без подчёркивания — оно появляется только при наведении

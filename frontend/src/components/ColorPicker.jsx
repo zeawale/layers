@@ -2,6 +2,8 @@ import { Box, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import CheckIcon from '@mui/icons-material/Check'
 
+import Panel from './Panel.jsx'
+
 // Кружок цвета справочника 38 px (макет 1.5). Цвет — из theme.palette.swatch по машинному значению.
 // Выбранный — тёмное кольцо через белый зазор и галочка; занятый в другом списке — бледный, нажать нельзя
 function Swatch({ color, active, taken, onClick }) {
@@ -57,14 +59,15 @@ function Swatch({ color, active, taken, onClick }) {
 export default function ColorPicker({ title, colors, selected, taken = [], tone = 'primary', onToggle, hint }) {
   const labels = colors.filter((c) => selected.includes(c.value)).map((c) => c.label)
   return (
-    <Box sx={{ bgcolor: 'background.paper', borderRadius: '20px', py: 2.25, px: 2.625, mb: 2.5 }}>
+    <Panel radius={20} sx={{ py: 2.25, px: 2.625, mb: 2.5 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mb: 2 }}>
         <Typography variant="h4" component="h2">{title}</Typography>
         <Typography variant="body2" sx={{ color: selected.length ? `${tone}.main` : 'text.secondary' }}>
           {selected.length} выбрано
         </Typography>
       </Box>
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 38px)', columnGap: 1.75, rowGap: 1.5 }}>
+      {/* Столбцы сжимаются, а промежутки делят остаток: на 375 px шестой кружок не вылезает за карточку */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 38px))', justifyContent: 'space-between', rowGap: 1.5 }}>
         {colors.map((c) => (
           <Swatch
             key={c.value}
@@ -79,6 +82,6 @@ export default function ColorPicker({ title, colors, selected, taken = [], tone 
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 2 }}>{labels.join(' · ')}</Typography>
       )}
       {hint && <Typography variant="caption" component="p" sx={{ color: 'text.disabled', mt: 1.5 }}>{hint}</Typography>}
-    </Box>
+    </Panel>
   )
 }

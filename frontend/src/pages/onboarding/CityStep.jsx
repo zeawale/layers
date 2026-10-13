@@ -4,15 +4,16 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
 import SearchIcon from '@mui/icons-material/Search'
 
 import FormField from '../../components/FormField.jsx'
+import Panel from '../../components/Panel.jsx'
 
 // Одноимённых городов бывает несколько (два Кировска) — различаем по координатам
 const sameCity = (a, b) => a?.lat === b.lat && a?.lon === b.lon
 
 // Строка «Определить автоматически» в каждом состоянии (макеты 1.6, 1.6.1–1.6.3)
 const GEO = {
-  idle: { text: 'Определить автоматически', color: 'weather.icon', circle: 'weather.sky', icon: 'weather.icon' },
-  locating: { text: 'Определяем город…', color: 'text.secondary', circle: 'weather.sky', icon: 'weather.icon' },
-  located: { text: 'Город определён автоматически', color: 'primary.main', circle: 'weather.sky', icon: 'weather.icon' },
+  idle: { text: 'Определить автоматически', color: 'locate.icon', circle: 'locate.circle', icon: 'locate.icon' },
+  locating: { text: 'Определяем город…', color: 'text.secondary', circle: 'locate.circle', icon: 'locate.icon' },
+  located: { text: 'Город определён автоматически', color: 'primary.main', circle: 'locate.circle', icon: 'locate.icon' },
   failed: { text: 'Не удалось определить город — введи вручную', color: 'error.main', circle: 'tint.secondary', icon: 'error.main' },
 }
 
@@ -39,7 +40,7 @@ export default function CityStep({ query, onQuery, cities, selected, onSelect, o
       </Box>
 
       {cities.length > 0 && (
-        <Box sx={{ bgcolor: 'background.paper', borderRadius: '20px', p: 0.75, mb: 2.5, boxShadow: (t) => t.custom.cardShadow }}>
+        <Panel radius={20} shadow sx={{ p: 0.75, mb: 2.5 }}>
           {cities.map((city) => {
             const chosen = sameCity(selected, city)
             return (
@@ -62,7 +63,7 @@ export default function CityStep({ query, onQuery, cities, selected, onSelect, o
               </ButtonBase>
             )
           })}
-        </Box>
+        </Panel>
       )}
 
       <ButtonBase

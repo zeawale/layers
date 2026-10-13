@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Alert, Box, Button, Typography } from '@mui/material'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
 
@@ -7,6 +6,7 @@ import { requestPasswordReset } from '../api/auth.js'
 import AuthStatus from '../components/AuthStatus.jsx'
 import BackButton from '../components/BackButton.jsx'
 import FormField from '../components/FormField.jsx'
+import useGoBack from '../hooks/useGoBack.js'
 
 // Бэк шлёт письмо на один адрес не чаще раза в минуту и всё равно отвечает 204 (API.md):
 // столько же держим «Отправить ещё раз» выключенной, чтобы нажатие не уходило в пустоту
@@ -17,7 +17,6 @@ const formatCountdown = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(
 
 // «Не помнишь пароль?» — макеты 1.2.1 и 1.2.2. Ответ всегда один, есть такой email или нет
 export default function ForgotPassword() {
-  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
@@ -31,7 +30,8 @@ export default function ForgotPassword() {
     return () => clearTimeout(timer)
   }, [left])
 
-  const toLogin = () => navigate('/login', { replace: true })
+  // Сюда приходят со входа — туда и возвращаемся шагом назад, а по прямой ссылке — на вход
+  const toLogin = useGoBack('/login')
 
   async function handleSubmit(e) {
     e?.preventDefault()
@@ -64,7 +64,7 @@ export default function ForgotPassword() {
           <Button variant="outlined" size="large" fullWidth onClick={handleSubmit} disabled={loading || left > 0}>
             {loading ? 'Отправляем…' : left > 0 ? `Отправить ещё раз через ${formatCountdown(left)}` : 'Отправить ещё раз'}
           </Button>
-          <Button variant="outlined" size="large" fullWidth onClick={toLogin} sx={{ bgcolor: 'transparent' }}>
+          <Button variant="outlinedClear" size="large" fullWidth onClick={toLogin}>
             Вернуться ко входу
           </Button>
         </AuthStatus>

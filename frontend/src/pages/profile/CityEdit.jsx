@@ -25,7 +25,7 @@ export default function CityEdit() {
         geo={city.geo}
       />
       <SaveButton
-        onClick={() => run(city.fields)}
+        onClick={() => run(city.fields, city.fail)}
         saving={saving}
         disabled={!city.fields || unchanged}
         error={error || city.error}

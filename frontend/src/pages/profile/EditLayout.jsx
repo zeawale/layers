@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
 import { Box } from '@mui/material'
 
 import { getToken } from '../../api/client.js'
 import { getMe, updateMe } from '../../api/users.js'
 import BackButton from '../../components/BackButton.jsx'
 import { LoadError, Loading } from '../../components/LoadState.jsx'
+import useGoBack from '../../hooks/useGoBack.js'
 
 // Обёртка экранов правки профиля (4.3–4.7): без нижней панели, со стрелкой «назад».
 // Грузит профиль один раз и отдаёт экрану через useOutletContext: { user, save, leave }
 export default function EditLayout() {
-  const navigate = useNavigate()
-  const location = useLocation()
   const [user, setUser] = useState(null)
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
@@ -25,10 +24,7 @@ export default function EditLayout() {
 
   // Назад — туда, откуда пришли (профиль или главный экран после «Укажи город»).
   // Открыли экран по прямой ссылке — истории нет, тогда в профиль
-  function leave() {
-    if (location.key === 'default') navigate('/profile', { replace: true })
-    else navigate(-1)
-  }
+  const leave = useGoBack('/profile')
 
   // preferences бэк заменяет целиком, поэтому экраны присылают объект полностью
   async function save(changes) {

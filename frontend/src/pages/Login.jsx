@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom'
-import { Alert, Box, Button, Link, Snackbar, Typography } from '@mui/material'
+import { Alert, Box, Button, Divider, Link, Snackbar, Typography } from '@mui/material'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
 
@@ -9,9 +9,12 @@ import { setToken } from '../api/client.js'
 import BackButton from '../components/BackButton.jsx'
 import FormField from '../components/FormField.jsx'
 import PasswordField from '../components/PasswordField.jsx'
+import useGoBack from '../hooks/useGoBack.js'
 
 export default function Login() {
   const navigate = useNavigate()
+  // «Назад» — на приветствие (1.1) или регистрацию, откуда пришли (макет 1.2)
+  const back = useGoBack('/welcome')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -49,8 +52,7 @@ export default function Login() {
           </Box>
         }
       />
-      {/* «Назад» — на приветствие (1.1): с него сюда приходят, а не из глубины приложения (макет 1.2) */}
-      <BackButton onClick={() => navigate('/welcome', { replace: true })} sx={{ mb: 3.5 }} />
+      <BackButton onClick={back} sx={{ mb: 3.5 }} />
 
       <Typography variant="h1" sx={{ mb: 1.5 }}>С возвращением</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 4 }}>Войди, чтобы увидеть комплект на сегодня.</Typography>
@@ -78,7 +80,7 @@ export default function Login() {
             autoComplete="current-password"
           />
           <Box sx={{ textAlign: 'right', mt: 2 }}>
-            <Link component={RouterLink} to="/forgot-password" variant="subtitle1" sx={{ color: 'primary.main' }}>
+            <Link component={RouterLink} to="/forgot-password" variant="subtitle1">
               Не помнишь пароль?
             </Link>
           </Box>
@@ -89,15 +91,11 @@ export default function Login() {
         </Button>
 
         {/* Разделитель «или» (1.2) */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'text.disabled', mt: 2 }}>
-          <Box sx={{ flex: 1, height: 2, bgcolor: 'tint.neutral' }} />
-          <Typography variant="body2">или</Typography>
-          <Box sx={{ flex: 1, height: 2, bgcolor: 'tint.neutral' }} />
-        </Box>
+        <Divider sx={{ mt: 2 }}>или</Divider>
 
         <Typography variant="body2" align="center" sx={{ color: 'text.disabled', mt: 2 }}>
           Нет аккаунта?{' '}
-          <Link component={RouterLink} to="/register" variant="subtitle1" sx={{ color: 'primary.main', ml: 0.5 }}>
+          <Link component={RouterLink} to="/register" variant="subtitle1" sx={{ ml: 0.5 }}>
             Создать
           </Link>
         </Typography>

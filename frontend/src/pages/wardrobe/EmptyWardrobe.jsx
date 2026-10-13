@@ -11,7 +11,8 @@ const TIPS = [
 // Карточка иллюстрации 132×164: пунктирная белая (по бокам, повёрнута) или зелёная с «+» (по центру)
 const CARD = { position: 'absolute', top: 0, left: '50%', width: 132, height: 164, ml: '-66px', borderRadius: '20px' }
 
-// Иллюстрация 3.1: три карточки веером — пустые места под вещи и зелёная с «+» посередине
+// Иллюстрация 3.1: три карточки веером — пустые места под вещи и зелёная с «+» посередине.
+// «+» нажимается мышью, но для читалки и Tab его нет: «Добавить вещь» уже есть в шапке и кнопкой ниже
 function Illustration({ onAdd }) {
   return (
     <Box sx={{ position: 'relative', width: 216, height: 166, mx: 'auto', mb: 5.5 }}>
@@ -26,7 +27,8 @@ function Illustration({ onAdd }) {
           component="button"
           type="button"
           onClick={onAdd}
-          aria-label="Добавить вещь"
+          aria-hidden
+          tabIndex={-1}
           sx={{ width: 64, height: 64, borderRadius: '50%', border: 0, cursor: 'pointer', bgcolor: 'background.paper', color: 'text.primary', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
           <AddIcon sx={{ width: 32, height: 32 }} />

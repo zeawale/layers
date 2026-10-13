@@ -1,4 +1,4 @@
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, Link as RouterLink, useNavigate } from 'react-router-dom'
 import { Box, Button, Link, Typography } from '@mui/material'
 
 import { getToken } from '../api/client.js'
@@ -13,7 +13,8 @@ export default function Welcome() {
   return (
     <Box sx={{ maxWidth: 390, mx: 'auto', minHeight: '100vh', px: 3, pt: 2.5, pb: 4 }}>
       <Typography variant="h2" component="p" sx={{ mb: 1.5 }}>layers</Typography>
-      <Box component="img" src="/welcome/hero.png" alt="" sx={{ display: 'block', width: 360, maxWidth: 'calc(100% + 18px)', ml: '-4px', mb: 3.5 }} />
+      {/* aspectRatio держит место под коллаж, пока он грузится, — текст ниже не прыгает */}
+      <Box component="img" src="/welcome/hero.png" alt="" sx={{ display: 'block', width: 360, maxWidth: 'calc(100% + 18px)', height: 'auto', aspectRatio: '360 / 280', ml: '-4px', mb: 3.5 }} />
       {/* Перенос строк как в макете: «Что надеть / сегодня — решим / вместе» */}
       <Typography variant="h1" sx={{ mb: 1.75, maxWidth: 330 }}>Что надеть сегодня — решим вместе</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 4 }}>
@@ -21,7 +22,7 @@ export default function Welcome() {
       </Typography>
       <Button variant="contained" size="large" fullWidth onClick={() => navigate('/register')} sx={{ mb: 3 }}>Начать</Button>
       <Typography align="center">
-        <Link component="button" type="button" variant="subtitle1" onClick={() => navigate('/login')} sx={{ color: 'text.primary' }}>
+        <Link component={RouterLink} to="/login" variant="subtitle1" sx={{ color: 'text.primary' }}>
           У меня уже есть аккаунт
         </Link>
       </Typography>

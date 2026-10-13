@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Alert, Box } from '@mui/material'
 
@@ -30,6 +30,12 @@ export default function AddItem() {
 
   // Локальный адрес превью освобождаем, когда он больше не нужен
   useEffect(() => () => preview && URL.revokeObjectURL(preview), [preview])
+  // Экран закрыли (крестик во время загрузки) — распознавание уже не запускаем: первое грузит бэк секунд на 20
+  const closed = useRef(false)
+  useEffect(() => {
+    closed.current = false // StrictMode в dev монтирует экран дважды
+    return () => { closed.current = true }
+  }, [])
 
   if (!getToken()) return <Navigate to="/login" replace />
 
@@ -50,6 +56,7 @@ export default function AddItem() {
       setStage('photo')
       return
     }
+    if (closed.current) return
     // Первое распознавание после старта бэка — около 20 секунд: на экране чек-лист со спиннером, а не «зависло»
     setStage('recognize')
     try {
