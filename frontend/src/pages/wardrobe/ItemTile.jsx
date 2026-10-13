@@ -12,7 +12,12 @@ export default function ItemTile({ image, title, subtitle, selecting, selected, 
       role="button"
       tabIndex={0}
       aria-pressed={selecting ? selected : undefined}
-      onKeyDown={(e) => e.key === 'Enter' && onClick()}
+      // Как у кнопки: Enter и пробел; пробел без прокрутки страницы
+      onKeyDown={(e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return
+        e.preventDefault()
+        onClick()
+      }}
       sx={{ minWidth: 0, cursor: 'pointer' }}
     >
       <ItemPhoto
