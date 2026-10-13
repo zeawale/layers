@@ -8,6 +8,7 @@ from io import BytesIO
 from pathlib import Path
 
 from PIL import Image, ImageOps, UnidentifiedImageError
+from pillow_heif import register_heif_opener
 from sqlalchemy import delete, exists
 from sqlalchemy.orm import Session
 
@@ -16,13 +17,16 @@ from app.models import Item, Photo, User
 
 logger = logging.getLogger(__name__)
 
+# Учим Pillow открывать HEIC и HEIF: фото из галереи iPhone приходят в них (HANDBOOK 8)
+register_heif_opener()
+
 # backend/media: в .gitignore, в Docker приезжает вместе с примонтированным кодом
 MEDIA_DIR = Path(__file__).resolve().parents[2] / "media"
 PHOTOS_DIR = "photos"
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 MAX_SIDE = 1024
-ALLOWED_FORMATS = {"JPEG", "PNG", "WEBP"}
+ALLOWED_FORMATS = {"JPEG", "PNG", "WEBP", "HEIF"}
 JPEG_QUALITY = 85
 
 ORPHAN_TTL = timedelta(days=1)
@@ -34,7 +38,7 @@ class PhotoTooLarge(Exception):
 
 
 class UnsupportedPhoto(Exception):
-    """Не картинка или не JPEG/PNG/WebP."""
+    """Не картинка или не JPEG/PNG/WebP/HEIC."""
 
 
 def to_jpeg(data: bytes) -> bytes:
