@@ -9,7 +9,7 @@ export default function ColorsStep({ colors, liked, disliked, onChange }) {
   const likedColors = colors.filter((c) => liked.includes(c.value))
   return (
     <>
-      <Typography variant="h2" sx={{ mb: 1 }}>Цвета, которые ты любишь</Typography>
+      <Typography variant="h2" sx={{ mb: 1.25 }}>Цвета, которые ты любишь</Typography>
       <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
         Любимые цвета чаще попадут в комплекты, а нелюбимые — не попадут совсем.
       </Typography>
