@@ -2,7 +2,7 @@ import { Box, Button, MenuItem } from '@mui/material'
 import EditOutlined from '@mui/icons-material/EditOutlined'
 
 import AutoChip from './AutoChip.jsx'
-import ColorDot from './ColorDot.jsx'
+import ColorLabel from './ColorLabel.jsx'
 import FormField from './FormField.jsx'
 import ToggleRow from './ToggleRow.jsx'
 
@@ -19,6 +19,7 @@ export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {
   }
 
   const ready = value.name.trim() && value.category && value.color && value.warmth
+  const colorLabel = (v) => attrs.color.find((o) => o.value === v)?.label ?? v
 
   return (
     <Box
@@ -52,14 +53,17 @@ export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {
       <FormField
         select
         label="Цвет"
-        icon={value.color && <ColorDot value={value.color} size={20} />}
         end={auto.color && <AutoChip />}
         value={value.color ?? ''}
         onChange={(e) => set('color')(e.target.value)}
         required
         error={errors.color}
+        // Кружок цвета и в списке, и в поле рядом с названием (HANDBOOK, раздел 8)
+        slotProps={{ select: { renderValue: (v) => <ColorLabel value={v} label={colorLabel(v)} /> } }}
       >
-        {attrs.color.map((o) => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
+        {attrs.color.map((o) => (
+          <MenuItem key={o.value} value={o.value}><ColorLabel value={o.value} label={o.label} /></MenuItem>
+        ))}
       </FormField>
 
       <FormField

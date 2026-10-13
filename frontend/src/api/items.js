@@ -17,6 +17,12 @@ export function recognizeItem(photoId) {
 }
 
 export function getItem(id) {
+  // Адрес вида /wardrobe/abc — такой вещи нет. Бэк ответил бы 422 по-английски, экраны же умеют 404
+  if (!/^\d+$/.test(String(id))) {
+    const error = new Error('Такой вещи нет')
+    error.status = 404
+    return Promise.reject(error)
+  }
   return api(`/items/${id}`)
 }
 

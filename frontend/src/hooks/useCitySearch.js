@@ -68,11 +68,16 @@ export default function useCitySearch(initialQuery = '') {
     }, 300)
   }
 
-  // Список после выбора не прячем, как в макетах 1.6 и 4.3: видно, какой из одноимённых городов выбран
+  // После выбора подсказки скрываются, в поле остаётся выбранный город (HANDBOOK, раздел 8).
+  // Правка поля снова показывает подсказки — через changeQuery
   function select(city) {
-    // Выбрали город, пока шла геолокация, — её поздний ответ выбор не затрёт
+    // Выбрали город, пока шла геолокация или ждал поиск, — их поздний ответ не вернёт список и «Город не найден»
     seq.current += 1
+    clearTimeout(timer.current)
     setGeo('idle')
+    setCities([])
+    setNotFound(false)
+    setError('')
     setSelected(city)
     setQuery(city.name)
   }

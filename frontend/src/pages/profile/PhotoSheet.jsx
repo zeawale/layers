@@ -4,11 +4,9 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined'
 import PhotoCameraOutlinedIcon from '@mui/icons-material/PhotoCameraOutlined'
 
-import { uploadPhoto } from '../../api/photos.js'
+import { PHOTO_ACCEPT, uploadPhoto } from '../../api/photos.js'
 import { updateMe } from '../../api/users.js'
 import IconCircle from '../../components/IconCircle.jsx'
-
-const ACCEPT = 'image/jpeg,image/png,image/webp'
 
 function Action({ icon, label, danger, onClick, disabled }) {
   return (
@@ -106,8 +104,8 @@ export default function PhotoSheet({ open, user, onClose, onChange }) {
         <Button variant="outlined" size="large" fullWidth onClick={close} disabled={busy}>Отмена</Button>
 
         {/* На телефоне capture открывает фронтальную камеру, на компьютере — обычный выбор файла */}
-        <input ref={camera} type="file" accept={ACCEPT} capture="user" hidden onChange={pick} />
-        <input ref={gallery} type="file" accept={ACCEPT} hidden onChange={pick} />
+        <input ref={camera} type="file" accept={PHOTO_ACCEPT} capture="user" hidden onChange={pick} />
+        <input ref={gallery} type="file" accept={PHOTO_ACCEPT} hidden onChange={pick} />
       </Box>
     </Drawer>
   )

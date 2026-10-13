@@ -4,7 +4,7 @@ import { Alert, Box } from '@mui/material'
 
 import { getToken, mediaUrl } from '../api/client.js'
 import { getItem, updateItem } from '../api/items.js'
-import { uploadPhoto } from '../api/photos.js'
+import { PHOTO_ACCEPT, uploadPhoto } from '../api/photos.js'
 import ItemForm, { EMPTY_ITEM, itemFieldErrors } from '../components/ItemForm.jsx'
 import { LoadError, Loading } from '../components/LoadState.jsx'
 import ScreenHeader from '../components/ScreenHeader.jsx'
@@ -111,7 +111,7 @@ export default function EditItem() {
             onPick={() => fileRef.current.click()}
             onRemove={() => setPhoto(null)}
           />
-          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={replacePhoto} />
+          <input ref={fileRef} type="file" accept={PHOTO_ACCEPT} hidden onChange={replacePhoto} />
 
           <ItemForm
             attrs={attrs}
