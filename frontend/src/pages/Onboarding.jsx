@@ -75,7 +75,6 @@ export default function Onboarding() {
           query={city.query}
           onQuery={city.changeQuery}
           cities={city.cities}
-          selected={city.selected}
           onSelect={city.select}
           onGeolocate={city.geolocate}
           notFound={city.notFound}
