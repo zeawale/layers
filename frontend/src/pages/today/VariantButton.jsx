@@ -6,15 +6,15 @@ const spin = keyframes`to { transform: rotate(360deg); }`
 
 // «↻ 2 из 3» справа от «Комплект на сегодня» (макеты 2.0, 2.1): нажатие — новый вариант.
 // Число — variant выбранного и variants_max (API.md, OutfitDay). Лимит исчерпан — кнопка как на 2.8:
-// без белой заливки, серый текст, неактивна. Пока собирается вариант, стрелки крутятся
-// locked — комплект отмечен «надет»: новый вариант не просим, кнопка неактивна
-export default function VariantButton({ variant, max, canMore, busy, locked, onClick }) {
+// без белой заливки, серый текст, неактивна. Пока собирается вариант или сохраняется переключение
+// (busy), стрелки крутятся. disabled — комплект отмечен «надет» или сохраняется оценка: кнопка неактивна
+export default function VariantButton({ variant, max, canMore, busy, disabled, onClick }) {
   return (
     <Button
       variant="outlined"
       onClick={onClick}
-      disabled={!canMore || busy || locked}
-      aria-label={canMore && !locked ? `Другой вариант. Сейчас ${variant} из ${max}` : `Вариант ${variant} из ${max}`}
+      disabled={!canMore || busy || disabled}
+      aria-label={canMore && !disabled ? `Другой вариант. Сейчас ${variant} из ${max}` : `Вариант ${variant} из ${max}`}
       aria-busy={busy}
       startIcon={<AutorenewOutlined sx={busy ? { animation: `${spin} 1s linear infinite` } : undefined} />}
       sx={{
