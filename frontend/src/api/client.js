@@ -38,7 +38,10 @@ export async function api(path, options = {}) {
     setToken(null)
     // Экран входа по ?expired показывает «Сессия истекла — войди заново» (макет 2.12)
     window.location.href = '/login?expired=1'
-    throw new Error('Сессия истекла')
+    // expired — редирект уже идёт: экраны эту ошибку не показывают
+    const error = new Error('Сессия истекла')
+    error.expired = true
+    throw error
   }
 
   if (!response.ok) {
