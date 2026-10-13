@@ -1,61 +1,15 @@
-import { useId } from 'react'
-import { Box, Button, Chip, MenuItem, Typography } from '@mui/material'
-import AutoAwesomeOutlined from '@mui/icons-material/AutoAwesomeOutlined'
-import CheckIcon from '@mui/icons-material/Check'
+import { Box, Button, MenuItem } from '@mui/material'
 import EditOutlined from '@mui/icons-material/EditOutlined'
 
+import AutoChip from './AutoChip.jsx'
 import ColorDot from './ColorDot.jsx'
 import FormField from './FormField.jsx'
+import ToggleRow from './ToggleRow.jsx'
 
 // Форма вещи — макеты 3.6 «Проверка полей» и 3.9 «Редактировать вещь».
 // Значения и подписи — только из справочника (attrs = ответ GET /attributes).
 // auto — какие поля предзаполнило распознавание: у них метка «авто» внутри поля, перед стрелкой (3.6).
 // errors — ошибки 422 по полям, уже по-русски: { name: '…' }.
-
-function AutoChip() {
-  return (
-    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, height: 24, px: 1, borderRadius: 999, bgcolor: 'tint.gold', color: 'gold.dark' }}>
-      <AutoAwesomeOutlined sx={{ width: 14, height: 14 }} />
-      <Typography variant="subtitle2">авто</Typography>
-    </Box>
-  )
-}
-
-// Ряд «таблеток»: один выбор (стиль, защита от осадков) или несколько (сезон).
-// Выбранная — тёмная с галочкой, остальные — белые с тонкой рамкой (3.6).
-// Подпись группы связана с ней через aria-labelledby — читалка назовёт группу
-function ToggleRow({ label, options, isActive, onToggle }) {
-  const labelId = useId()
-  return (
-    <Box role="group" aria-labelledby={labelId}>
-      <Typography id={labelId} variant="body2" sx={{ color: 'text.secondary', mb: 0.75 }}>{label}</Typography>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-        {options.map((o) => {
-          const active = isActive(o.value)
-          return (
-            <Chip
-              key={String(o.value)}
-              label={o.label}
-              icon={active ? <CheckIcon /> : undefined}
-              onClick={() => onToggle(o.value)}
-              aria-pressed={active}
-              variant="outlined"
-              sx={{
-                height: 40,
-                borderRadius: 999,
-                px: 1,
-                ...(active
-                  ? { bgcolor: 'text.primary', borderColor: 'text.primary', color: 'common.white', '& .MuiChip-icon': { color: 'common.white', width: 16, height: 16 }, '&&:hover': { bgcolor: 'text.primary' } }
-                  : { bgcolor: 'background.paper', borderColor: 'divider' }),
-              }}
-            />
-          )
-        })}
-      </Box>
-    </Box>
-  )
-}
-
 // loading — идёт сохранение («Сохраняем…»); disabled — кнопка неактивна по другой причине (грузится фото)
 export default function ItemForm({ attrs, value, onChange, auto = {}, errors = {}, onSubmit, submitLabel, loading, disabled }) {
   const set = (field) => (v) => onChange({ ...value, [field]: v })
