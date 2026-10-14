@@ -1,15 +1,34 @@
+<div align="center">
+
 # Layers
 
-Веб-сервис персональных рекомендаций одежды. Пользователь заносит вещи в
-цифровой гардероб, сервис каждый день предлагает комплект по прогнозу погоды,
-стилевым предпочтениям и истории оценок — и объясняет свой выбор словами.
-Если подходящей вещи нет, предлагает товар партнёрского магазина.
+**Веб-сервис персональных рекомендаций одежды по погоде и цифровому гардеробу**
 
-Учебный проект по предмету «проектная деятельность», СПбГУТ им. Бонч-Бруевича.
+<a href="https://github.com/users/zeawale/projects/2"><img src="https://img.shields.io/badge/%D0%94%D0%BE%D1%81%D0%BA%D0%B0_%D0%B7%D0%B0%D0%B4%D0%B0%D1%87-2e4636?style=for-the-badge&logo=github&logoColor=white" alt="Доска задач"></a> <a href="docs/API.md"><img src="https://img.shields.io/badge/API-c96f4a?style=for-the-badge&logo=swagger&logoColor=white" alt="API"></a> <a href="docs/HANDBOOK.md"><img src="https://img.shields.io/badge/Handbook-6f6a60?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Handbook"></a> <a href="docs/ideas.md"><img src="https://img.shields.io/badge/%D0%98%D0%B4%D0%B5%D0%B8-9a7428?style=for-the-badge" alt="Идеи"></a>
 
+<img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"> <img src="https://img.shields.io/badge/SQLAlchemy-2-D71F00?style=flat-square&logo=sqlalchemy&logoColor=white" alt="SQLAlchemy"> <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL"> <img src="https://img.shields.io/badge/React-18-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React"> <img src="https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite"> <img src="https://img.shields.io/badge/MUI-007FFF?style=flat-square&logo=mui&logoColor=white" alt="MUI"> <img src="https://img.shields.io/badge/PyTorch-CLIP-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" alt="PyTorch"> <img src="https://img.shields.io/badge/Open--Meteo-FF8C00?style=flat-square" alt="Open-Meteo"> <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"> <img src="https://img.shields.io/badge/Figma-F24E1E?style=flat-square&logo=figma&logoColor=white" alt="Figma">
+
+<img src="https://img.shields.io/github/last-commit/zeawale/layers?style=flat-square&color=2e4636&label=%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D0%B9%20%D0%BA%D0%BE%D0%BC%D0%BC%D0%B8%D1%82" alt="последний коммит"> <img src="https://img.shields.io/github/issues-pr-closed/zeawale/layers?style=flat-square&color=2e4636&label=pull%20request" alt="pull request"> <img src="https://img.shields.io/badge/%D1%81%D0%BB%D0%B5%D0%B4%D1%83%D1%8E%D1%89%D0%B0%D1%8F_%D1%82%D0%BE%D1%87%D0%BA%D0%B0-9_%D0%BD%D0%BE%D1%8F%D0%B1%D1%80%D1%8F-c96f4a?style=flat-square" alt="следующая точка">
+
+Учебный проект по предмету «проектная деятельность», СПбГУТ им. Бонч-Бруевича
+
+</div>
 
 https://github.com/user-attachments/assets/7cf5ab9f-4028-4ad4-a9d9-33fd33f32502
 
+Пользователь заносит вещи в цифровой гардероб, сервис каждый день предлагает
+комплект по прогнозу погоды, стилевым предпочтениям и истории оценок — и
+объясняет свой выбор словами. Если подходящей вещи нет, предлагает товар
+партнёрского магазина.
+
+<table>
+  <tr>
+    <td align="center" width="25%"><img src="docs/img/screen-today.jpg" alt="Главный экран: погода и комплект"><br><sub><b>Комплект на сегодня</b><br>погода и вещи из гардероба</sub></td>
+    <td align="center" width="25%"><img src="docs/img/screen-wardrobe.jpg" alt="Гардероб"><br><sub><b>Цифровой гардероб</b><br>сетка вещей и поиск</sub></td>
+    <td align="center" width="25%"><img src="docs/img/screen-recognized.jpg" alt="Форма вещи после распознавания"><br><sub><b>Вещь по фото</b><br>категория и цвет сами</sub></td>
+    <td align="center" width="25%"><img src="docs/img/screen-history.jpg" alt="История комплектов"><br><sub><b>История</b><br>комплекты и оценки за 30 дней</sub></td>
+  </tr>
+</table>
 
 ## Стек
 
