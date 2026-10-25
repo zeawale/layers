@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     smtp_password: str = ""
     mail_from: str = ""
 
+    # Пароль демо-пользователя для scripts/demo_wardrobe.py (#56)
+    demo_password: str = ""
+
     @property
     def database_url(self) -> str:
         return (
