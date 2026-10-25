@@ -46,8 +46,11 @@ def pick(catalog: list[PartnerProduct], outfit: Outfit, category: str, user: Use
         and (not product.style or not user.style or product.style == user.style)
         and product.color not in user.disliked_colors
     ]
+    # В дождь и снег непромокаемая обувь полезнее остальной — её первой (API.md, «Порядок»)
+    wet_footwear = needs.wet and category == "footwear"
     fit.sort(
         key=lambda product: (
+            wet_footwear and not product.water_resistance,
             product.color not in user.liked_colors,
             abs(product.warmth - target),
             product.price is None,
