@@ -45,6 +45,9 @@ def general_problems(request: OutfitRequest, result: OutfitResult) -> list[str]:
     if unknown_missing:
         problems.append(f"в missing значения не из attributes.md: {unknown_missing}")
 
+    if "accessory" in result.missing:
+        problems.append("аксессуар в missing: без него комплект полный (engine.md)")
+
     return problems
 
 

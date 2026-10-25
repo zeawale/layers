@@ -85,6 +85,7 @@ TYPICAL_WARDROBE = [
     item(9, "Зимний пуховик", "outerwear", "black", 5, ("winter",), water_resistance=True),
     item(10, "Кроссовки", "footwear", "white", 2),
     item(11, "Зимние ботинки", "footwear", "black", 4, ("winter",), water_resistance=True),
+    item(12, "Шерстяная шапка", "accessory", "gray", 4, ("winter",)),
 ]
 
 SUMMER_DAY = date(2026, 7, 15)
@@ -117,8 +118,8 @@ def expect_only_top_and_bottom(req: OutfitRequest, result: OutfitResult) -> list
 def expect_light_outfit(req: OutfitRequest, result: OutfitResult) -> list[str]:
     problems = []
     items = chosen_items(req, result)
-    if any(i.category == "outerwear" for i in items):
-        problems.append("в жару в комплекте верхняя одежда")
+    if any(i.category in ("outerwear", "accessory") for i in items):
+        problems.append("в жару в комплекте верхняя одежда или аксессуар")
     heavy = [i.name for i in items if i.warmth > 2]
     if heavy:
         problems.append(f"в жару выбраны тёплые вещи: {heavy}")
@@ -144,6 +145,8 @@ def expect_warm_outerwear(req: OutfitRequest, result: OutfitResult) -> list[str]
     problems = []
     if max(i.warmth for i in outerwear) < 4:
         problems.append("в мороз верхняя одежда с теплотой ниже 4")
+    if not any(i.category == "accessory" for i in items):
+        problems.append("в мороз в гардеробе есть шапка, а в комплект она не попала")
     return problems
 
 
