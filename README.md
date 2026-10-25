@@ -1,11 +1,32 @@
+<div align="center">
+
 # Layers
 
-Веб-сервис персональных рекомендаций одежды. Пользователь заносит вещи в
-цифровой гардероб, сервис каждый день предлагает комплект по прогнозу погоды,
-стилевым предпочтениям и истории оценок — и объясняет свой выбор словами.
-Если подходящей вещи нет, предлагает товар партнёрского магазина.
+**Веб-сервис персональных рекомендаций одежды по погоде и цифровому гардеробу**
 
-Учебный проект по предмету «проектная деятельность», СПбГУТ им. Бонч-Бруевича.
+<a href="https://github.com/users/zeawale/projects/2"><img src="https://img.shields.io/badge/%D0%94%D0%BE%D1%81%D0%BA%D0%B0_%D0%B7%D0%B0%D0%B4%D0%B0%D1%87-2e4636?style=for-the-badge&logo=github&logoColor=f4f1ea" alt="Доска задач"></a> <a href="docs/API.md"><img src="https://img.shields.io/badge/API-c96f4a?style=for-the-badge&logo=swagger&logoColor=f4f1ea" alt="API"></a> <a href="docs/HANDBOOK.md"><img src="https://img.shields.io/badge/Handbook-9a6f16?style=for-the-badge&logo=readthedocs&logoColor=f4f1ea" alt="Handbook"></a> <a href="docs/ideas.md"><img src="https://img.shields.io/badge/%D0%98%D0%B4%D0%B5%D0%B8-6f6a60?style=for-the-badge" alt="Идеи"></a>
+
+<img src="https://img.shields.io/badge/Python-2e4636?style=flat-square&logo=python&logoColor=f4f1ea" alt="Python"> <img src="https://img.shields.io/badge/FastAPI-2e4636?style=flat-square&logo=fastapi&logoColor=f4f1ea" alt="FastAPI"> <img src="https://img.shields.io/badge/SQLAlchemy-2e4636?style=flat-square&logo=sqlalchemy&logoColor=f4f1ea" alt="SQLAlchemy"> <img src="https://img.shields.io/badge/PostgreSQL-2e4636?style=flat-square&logo=postgresql&logoColor=f4f1ea" alt="PostgreSQL"> <img src="https://img.shields.io/badge/React-2e4636?style=flat-square&logo=react&logoColor=f4f1ea" alt="React"> <img src="https://img.shields.io/badge/Vite-2e4636?style=flat-square&logo=vite&logoColor=f4f1ea" alt="Vite"> <img src="https://img.shields.io/badge/MUI-2e4636?style=flat-square&logo=mui&logoColor=f4f1ea" alt="MUI"> <img src="https://img.shields.io/badge/CLIP-2e4636?style=flat-square&logo=pytorch&logoColor=f4f1ea" alt="CLIP"> <img src="https://img.shields.io/badge/Open--Meteo-2e4636?style=flat-square" alt="Open-Meteo"> <img src="https://img.shields.io/badge/Docker-2e4636?style=flat-square&logo=docker&logoColor=f4f1ea" alt="Docker"> <img src="https://img.shields.io/badge/Figma-2e4636?style=flat-square&logo=figma&logoColor=f4f1ea" alt="Figma">
+
+Учебный проект по предмету «проектная деятельность», СПбГУТ им. Бонч-Бруевича
+
+</div>
+
+https://github.com/user-attachments/assets/7cf5ab9f-4028-4ad4-a9d9-33fd33f32502
+
+Пользователь заносит вещи в цифровой гардероб, сервис каждый день предлагает
+комплект по прогнозу погоды, стилевым предпочтениям и истории оценок — и
+объясняет свой выбор словами. Если подходящей вещи нет, предлагает товар
+партнёрского магазина.
+
+<table>
+  <tr>
+    <td align="center" width="25%"><img src="docs/img/screen-today.jpg" alt="Главный экран: погода и комплект"><br><sub><b>Комплект на сегодня</b><br>погода и вещи из гардероба</sub></td>
+    <td align="center" width="25%"><img src="docs/img/screen-wardrobe.jpg" alt="Гардероб"><br><sub><b>Цифровой гардероб</b><br>сетка вещей и поиск</sub></td>
+    <td align="center" width="25%"><img src="docs/img/screen-recognized.jpg" alt="Форма вещи после распознавания"><br><sub><b>Вещь по фото</b><br>категория и цвет сами</sub></td>
+    <td align="center" width="25%"><img src="docs/img/screen-history.jpg" alt="История комплектов"><br><sub><b>История</b><br>комплекты и оценки за 30 дней</sub></td>
+  </tr>
+</table>
 
 ## Стек
 
