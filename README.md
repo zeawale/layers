@@ -155,6 +155,10 @@ layers/
 в `.env`): `docker compose exec -T backend python scripts/demo_wardrobe.py`. С фото —
 положить их в `backend/media/demo` и добавить `--photos media/demo`.
 
+Каталог партнёрских товаров — из `backend/scripts/partner_catalog.json`:
+`docker compose exec -T backend python scripts/partner_catalog.py`. Повторный запуск
+обновляет товары по ссылке, а не добавляет второй раз.
+
 Письма сброса пароля без настроенной почты не уходят, а печатаются в лог:
 `docker compose logs backend` (см. `.env.example`, раздел про почту).
 
