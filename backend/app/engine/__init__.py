@@ -9,7 +9,7 @@ from app.engine.models import (
     RatedOutfit,
     WeatherInput,
 )
-from app.engine.stub import build_outfit
+from app.engine.outfit import build_outfit
 
 __all__ = [
     "ItemInput",
