@@ -219,20 +219,20 @@ erDiagram
 
 ### partner_products
 
-Партнёрские товары. Этап 5 (к 7 декабря), формат черновой — согласуем вместе с разделом «Партнёрские товары» в API.md. Каталог заполняется вручную.
+Партнёрские товары. Этап 5 (к 7 декабря), формат согласован 2026-10-25 вместе с разделом «Партнёрские товары» в API.md. Каталог заполняется вручную скриптом `backend/scripts/partner_catalog.py`: повторный запуск ищет товар по `url` и обновляет его, а не добавляет второй раз (#73).
 
 | Поле | Тип | Ограничения | Описание |
 |---|---|---|---|
 | id | serial | PK | |
 | name | text | not null | |
 | shop | text | not null | название магазина |
-| price | numeric | | |
-| url | text | not null | |
-| image_url | text | | |
+| price | integer | | цена в рублях; `null` — магазин не указал |
+| url | text | not null, unique | страница товара в магазине |
+| image_url | text | | картинка из магазина; `null` — нет |
 | category | text | not null | значение из attributes.md: category |
 | color | text | | значение из attributes.md: color; `null` — любой |
 | style | text | | значение из attributes.md: style; `null` — любой |
-| min_warmth | smallint | | |
+| warmth | smallint | not null, check 1–5 | теплота, как `items.warmth`: товар подходит, если отличается от нужной не больше чем на 1 |
 | water_resistance | boolean | not null, default false | главный сценарий партнёрки — «нет дождевика, вот дождевик» |
 
 ## Связи
@@ -243,4 +243,4 @@ erDiagram
 - `items` → `item_seasons`: одна вещь — несколько сезонов (один-ко-многим).
 - `outfits` → `weather_records`: много комплектов — одна погодная запись (все варианты одного дня собраны на одной погоде).
 - `outfits` ↔ `items` через `outfit_items`: многие-ко-многим — в одном комплекте несколько вещей, одна вещь входит в разные комплекты в разные дни.
-- `partner_products` ни к чему не привязана — подбирается на лету по совпадению `category`, `color`, `style`, `min_warmth`, `water_resistance` с тем, чего не хватило в `missing`.
+- `partner_products` ни к чему не привязана — подбирается на лету по совпадению `category`, `color`, `style`, `warmth`, `water_resistance` с тем, чего не хватило в `missing` (API.md, «Как бэк подбирает товары»).
