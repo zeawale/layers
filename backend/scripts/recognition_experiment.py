@@ -1,7 +1,9 @@
 """Эксперимент: насколько точно распознавание угадывает категорию и цвет (#72).
 
 Прогоняет фото через тот же recognize, что и POST /items/recognize, сравнивает
-с разметкой человека и пишет таблицы в docs/recognition-experiment.md.
+с разметкой человека и пишет таблицы в recognition-experiment.md рядом с разметкой.
+В контейнере смонтирована только папка backend, поэтому отчёт ложится туда, а в
+docs/recognition-experiment.md его переносит человек.
 
     docker compose exec -T backend python scripts/recognition_experiment.py \\
         --photos media/demo --labels media/demo/labels.csv
@@ -33,14 +35,13 @@ FIELDS = {"category": "Категория", "color": "Цвет"}
 HEADERS = {"file": ("file", "файл"), "category": ("category", "категория"), "color": ("color", "цвет")}
 LABELS = {field: {o["value"]: o["label"] for o in ATTRIBUTES[field]} for field in FIELDS}
 PHOTO_SUFFIXES = (".HEIC", ".heic", ".jpg", ".jpeg", ".JPG", ".png")
-REPORT = Path(__file__).resolve().parents[2] / "docs" / "recognition-experiment.md"
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Точность распознавания категории и цвета")
     parser.add_argument("--photos", type=Path, required=True)
     parser.add_argument("--labels", type=Path, required=True)
-    parser.add_argument("--out", type=Path, default=REPORT)
+    parser.add_argument("--out", type=Path, help="куда писать отчёт; по умолчанию рядом с разметкой")
     parser.add_argument("--reuse", action="store_true", help="взять ответы модели из прошлого прогона")
     args = parser.parse_args()
     # Русский текст в консоли Windows и в докере
@@ -54,8 +55,9 @@ def main() -> int:
         guesses = run_model(args.photos, labels)
         write_results(results_file, guesses)
     rows = [{**labels[name], **guesses[name], "file": name} for name in labels if name in guesses]
-    args.out.write_text(report(rows), encoding="utf-8")
-    print(f"Фото: {len(rows)}. Ответы модели: {results_file}. Отчёт: {args.out}")
+    out = args.out or args.labels.with_name("recognition-experiment.md")
+    out.write_text(report(rows), encoding="utf-8")
+    print(f"Фото: {len(rows)}. Ответы модели: {results_file}. Отчёт: {out}")
     return 0
 
 
