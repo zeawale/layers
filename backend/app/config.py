@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     outfit_variants_max: int = 3
 
     # Ниже этой уверенности распознавание поле формы не предзаполняет
-    recognition_threshold: float = 0.5
+    recognition_threshold: float = 0.7
 
     # Из него собирается ссылка в письме сброса пароля
     frontend_url: str = "http://localhost:5173"
