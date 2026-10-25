@@ -45,7 +45,12 @@ def explain(
         return EMPTY_WARDROBE
 
     sentences = [weather_sentence(request, needs)]
-    clothes = [item for item in items if item.category not in ("outerwear", "accessory")]
+    # Вещь не по теплоте объясняется своей фразой ниже — в «тёплые вещи на холодный день» её не пишем
+    clothes = [
+        item
+        for item in items
+        if item.category not in ("outerwear", "accessory") and "warmth" not in compromises.get(item.id, [])
+    ]
     if clothes:
         sentences.append(f"{names(clothes)} — {WARMTH_REASONS[needs.warmth]}.")
     for item in items:
