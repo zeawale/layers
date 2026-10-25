@@ -151,6 +151,10 @@ layers/
 Рекомендации пока собирает временная заглушка вместо движка: она пишет об этом
 в объяснении комплекта.
 
+Демо-пользователь `demo@example.com` с гардеробом на 30 вещей (пароль — `DEMO_PASSWORD`
+в `.env`): `docker compose exec -T backend python scripts/demo_wardrobe.py`. С фото —
+положить их в `backend/media/demo` и добавить `--photos media/demo`.
+
 Письма сброса пароля без настроенной почты не уходят, а печатаются в лог:
 `docker compose logs backend` (см. `.env.example`, раздел про почту).
 
