@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
+from app import engine
 from app.models import User, WeatherRecord
 
 OPEN_METEO_FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
@@ -73,6 +74,19 @@ def get_today(db: Session, user: User) -> WeatherRecord:
     record = db.scalars(upsert, execution_options={"populate_existing": True}).one()
     db.commit()
     return record
+
+
+def engine_weather(record: WeatherRecord) -> engine.WeatherInput:
+    """Погода для движка из записи кеша (docs/engine.md, WeatherInput)."""
+    return engine.WeatherInput(
+        temp_min=float(record.temp_min),
+        temp_max=float(record.temp_max),
+        feels_like=float(record.feels_like),
+        wind_speed=float(record.wind_speed),
+        precipitation=float(record.precipitation),
+        precipitation_probability=record.precipitation_probability,
+        condition=record.condition,
+    )
 
 
 def local_today(db: Session, user: User) -> date:

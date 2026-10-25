@@ -3,10 +3,12 @@ import { alpha } from '@mui/material/styles'
 import { Link as RouterLink } from 'react-router-dom'
 
 import CategoryPill from './CategoryPill.jsx'
+import PartnerCard from './PartnerCard.jsx'
 
 // Пустой слот «Нет в гардеробе» на месте категории из missing (макет 2.2): пунктирная терракотовая рамка,
-// подпись категории и ссылка на добавление вещи. Отдельный компонент — сюда же встанет товар партнёра (этап 7)
-export default function MissingSlot({ label, sx }) {
+// подпись категории и ссылка на добавление вещи. Есть товары партнёров — вместо этого карточка товара
+export default function MissingSlot({ label, suggestions = [], sx }) {
+  if (suggestions.length > 0) return <PartnerCard label={label} suggestions={suggestions} sx={sx} />
   return (
     <Box
       sx={(t) => ({

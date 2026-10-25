@@ -28,24 +28,24 @@ function Tile({ item, label, sx }) {
   )
 }
 
-// Плитки комплекта: вещи из items и пустые слоты для missing (макет 2.2). label — подпись категории из справочника.
-// Пустой слот — только для категории, которой нет среди вещей: заглушка движка в дождь кладёт
-// непромокаемую верхнюю одежду в missing, даже если обычное пальто уже в items
+// Плитки комплекта: вещи из items и слоты для missing (макет 2.2, API.md «Партнёрские товары»).
+// label — подпись категории из справочника. absent — пустой слот или товар партнёра на его месте.
+// not_waterproof — куртка есть, но не от дождя: товар рядом отдельным слотом «Под дождь», без товаров — ничего
 export default function OutfitGrid({ items, missing = [], label }) {
-  const present = new Set(items.map((i) => i.category))
   const slots = [
     ...items.map((item) => ({ key: `i${item.id}`, category: item.category, item })),
-    ...missing.filter((c) => !present.has(c)).map((c) => ({ key: `m${c}`, category: c })),
+    ...missing
+      .filter((m) => m.reason === 'absent' || m.suggestions.length > 0)
+      .map((m) => ({ key: `m${m.category}`, category: m.category, missing: m })),
   ].sort((a, b) => rank(a.category) - rank(b.category))
   const layout = LAYOUTS[slots.length] ?? MANY
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: layout.columns, gridAutoRows: layout.rows, gridTemplateRows: layout.rows, gap: 1 }}>
       {slots.map((slot, i) => {
         const sx = layout.tall && i === 0 ? { gridRow: 'span 2' } : undefined
-        const name = label('category', slot.category)
-        return slot.item
-          ? <Tile key={slot.key} item={slot.item} label={name} sx={sx} />
-          : <MissingSlot key={slot.key} label={name} sx={sx} />
+        if (slot.item) return <Tile key={slot.key} item={slot.item} label={label('category', slot.category)} sx={sx} />
+        const name = slot.missing.reason === 'not_waterproof' ? 'Под дождь' : label('category', slot.category)
+        return <MissingSlot key={slot.key} label={name} suggestions={slot.missing.suggestions} sx={sx} />
       })}
     </Box>
   )
