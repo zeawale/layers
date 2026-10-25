@@ -1,17 +1,19 @@
 import { useState } from 'react'
-import { Box, ButtonBase, Link, Typography } from '@mui/material'
+import { Box, Link, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 
 import { formatPrice } from '../format.js'
 import CategoryPill from './CategoryPill.jsx'
+import DotButtons from './DotButtons.jsx'
 import ItemPhoto from './ItemPhoto.jsx'
 
 // Товар партнёра на месте того, чего не хватило (API.md, «Партнёрские товары»): фото товара, название,
 // цена и магазин, «В магазин» и «Реклама». Рамка пунктирная, как у пустого слота: это не вещь из гардероба.
 // Предложений несколько — точки внизу листают их; свайп оставлен вариантам комплекта
 export default function PartnerCard({ label, suggestions, sx }) {
-  const [index, setIndex] = useState(0)
-  const product = suggestions[Math.min(index, suggestions.length - 1)]
+  const [currentId, setCurrentId] = useState(suggestions[0].id)
+  // Пришёл другой набор товаров (новый вариант комплекта) — показываем первый
+  const product = suggestions.find((s) => s.id === currentId) ?? suggestions[0]
   const details = [product.price != null && formatPrice(product.price), product.shop].filter(Boolean).join(' · ')
   return (
     <Box
@@ -34,19 +36,15 @@ export default function PartnerCard({ label, suggestions, sx }) {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="caption" noWrap sx={{ color: 'text.secondary', flexGrow: 1, minWidth: 0 }}>{details}</Typography>
           {suggestions.length > 1 && (
-            <Box role="group" aria-label="Другие товары" sx={{ display: 'flex', flexShrink: 0 }}>
-              {suggestions.map((s, i) => (
-                <ButtonBase
-                  key={s.id}
-                  onClick={() => setIndex(i)}
-                  aria-label={`Товар ${i + 1}`}
-                  aria-current={s.id === product.id ? 'true' : undefined}
-                  sx={{ width: 16, height: 20, borderRadius: '50%' }}
-                >
-                  <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: s.id === product.id ? 'text.primary' : 'outline.main' }} />
-                </ButtonBase>
-              ))}
-            </Box>
+            <DotButtons
+              ids={suggestions.map((s) => s.id)}
+              currentId={product.id}
+              onSelect={setCurrentId}
+              itemLabel={(i) => `Товар ${i + 1}`}
+              groupLabel="Другие товары"
+              size="small"
+              sx={{ flexShrink: 0 }}
+            />
           )}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 1 }}>
