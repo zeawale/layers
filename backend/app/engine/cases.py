@@ -10,11 +10,13 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
 
-from app.engine.checks import chosen_items
+from app.engine.checks import chosen_items, general_problems
 from app.engine.models import ItemInput, OutfitRequest, OutfitResult, Preferences, WeatherInput
 
 # Сколько секунд может занимать подбор на большом гардеробе (docs/engine.md: «доли секунды»)
 TIME_LIMIT_SECONDS = 0.5
+# Сколько раз гонять большой гардероб, чтобы взять самый долгий вызов
+TIMING_RUNS = 20
 
 NO_PREFERENCES = Preferences(style=None, liked_colors=frozenset(), disliked_colors=frozenset())
 
@@ -60,8 +62,14 @@ def weather(
     )
 
 
-def request(day: date, forecast: WeatherInput, wardrobe: list[ItemInput]) -> OutfitRequest:
-    return OutfitRequest(date=day, weather=forecast, wardrobe=wardrobe, preferences=NO_PREFERENCES)
+def request(
+    day: date,
+    forecast: WeatherInput,
+    wardrobe: list[ItemInput],
+    preferences: Preferences = NO_PREFERENCES,
+    **history,
+) -> OutfitRequest:
+    return OutfitRequest(date=day, weather=forecast, wardrobe=wardrobe, preferences=preferences, **history)
 
 
 # Типичный гардероб на все сезоны: из него собираются жара, дождь и мороз.
@@ -123,18 +131,20 @@ def expect_waterproof_outerwear(req: OutfitRequest, result: OutfitResult) -> lis
     if not outerwear and "outerwear" not in result.missing:
         problems.append("в дождь нет верхней одежды и она не отмечена в missing")
     wet = [i.name for i in outerwear if not i.water_resistance]
-    if wet:
-        problems.append(f"в дождь выбрана верхняя одежда без защиты от осадков: {wet}")
+    if wet and "outerwear" not in result.missing:
+        problems.append(f"в дождь верхняя одежда без защиты от осадков, а в missing её нет: {wet}")
     return problems
 
 
 def expect_warm_outerwear(req: OutfitRequest, result: OutfitResult) -> list[str]:
-    outerwear = [i for i in chosen_items(req, result) if i.category == "outerwear"]
+    items = chosen_items(req, result)
+    outerwear = [i for i in items if i.category == "outerwear"]
     if not outerwear:
         return ["в мороз нет верхней одежды"]
+    problems = []
     if max(i.warmth for i in outerwear) < 4:
-        return ["в мороз верхняя одежда с теплотой ниже 4"]
-    return []
+        problems.append("в мороз верхняя одежда с теплотой ниже 4")
+    return problems
 
 
 def expect_dress_instead_of_top_and_bottom(req: OutfitRequest, result: OutfitResult) -> list[str]:
@@ -145,6 +155,16 @@ def expect_dress_instead_of_top_and_bottom(req: OutfitRequest, result: OutfitRes
     for category in ("top", "bottom"):
         if category in result.missing:
             problems.append(f"платье закрывает верх и низ, но {category} указан в missing")
+    return problems
+
+
+def expect_complete_base(req: OutfitRequest, result: OutfitResult) -> list[str]:
+    categories = {i.category for i in chosen_items(req, result)}
+    problems = []
+    if "dress" not in categories and not {"top", "bottom"} <= categories:
+        problems.append(f"нет ни платья, ни верха с низом: {sorted(categories)}")
+    if {"top", "bottom"} & set(result.missing):
+        problems.append("верх и низ есть в гардеробе, а стоят в missing")
     return problems
 
 
@@ -207,10 +227,6 @@ class Case:
     expect: Callable[[OutfitRequest, OutfitResult], list[str]] | None = None
 
 
-def all_season(item_id: int, name: str, category: str, color: str, warmth: int) -> ItemInput:
-    return item(item_id, name, category, color, warmth)
-
-
 CASES = [
     Case(
         "empty",
@@ -225,8 +241,8 @@ CASES = [
             AUTUMN_DAY,
             weather(14, 20, 18),
             [
-                all_season(1, "Серая футболка", "top", "gray", 1),
-                all_season(2, "Чёрные брюки", "bottom", "black", 2),
+                item(1, "Серая футболка", "top", "gray", 1),
+                item(2, "Чёрные брюки", "bottom", "black", 2),
             ],
         ),
         expect_only_top_and_bottom,
@@ -258,9 +274,9 @@ CASES = [
             AUTUMN_DAY,
             weather(13, 19, 16),
             [
-                all_season(1, "Чёрное платье", "dress", "black", 2),
-                all_season(2, "Бежевое платье", "dress", "beige", 3),
-                all_season(3, "Кроссовки", "footwear", "white", 2),
+                item(1, "Чёрное платье", "dress", "black", 2),
+                item(2, "Бежевое платье", "dress", "beige", 3),
+                item(3, "Кроссовки", "footwear", "white", 2),
             ],
         ),
         expect_dress_instead_of_top_and_bottom,
@@ -272,12 +288,13 @@ CASES = [
             AUTUMN_DAY,
             weather(14, 21, 19),
             [
-                all_season(1, "Чёрное платье", "dress", "black", 2),
-                all_season(2, "Белая рубашка", "top", "white", 1),
-                all_season(3, "Джинсы", "bottom", "navy", 3),
-                all_season(4, "Кроссовки", "footwear", "white", 2),
+                item(1, "Чёрное платье", "dress", "black", 2),
+                item(2, "Белая рубашка", "top", "white", 1),
+                item(3, "Джинсы", "bottom", "navy", 3),
+                item(4, "Кроссовки", "footwear", "white", 2),
             ],
         ),
+        expect_complete_base,
     ),
     Case(
         "no_footwear",
@@ -286,9 +303,9 @@ CASES = [
             AUTUMN_DAY,
             weather(9, 14, 12),
             [
-                all_season(1, "Серый свитер", "top", "gray", 3),
-                all_season(2, "Джинсы", "bottom", "navy", 3),
-                all_season(3, "Куртка", "outerwear", "khaki", 3),
+                item(1, "Серый свитер", "top", "gray", 3),
+                item(2, "Джинсы", "bottom", "navy", 3),
+                item(3, "Куртка", "outerwear", "khaki", 3),
             ],
         ),
         expect_footwear_missing,
@@ -297,7 +314,15 @@ CASES = [
         "large",
         "Большой гардероб на 48 вещей, +9 и дождь",
         request(AUTUMN_DAY, weather(6, 11, 9, "rain", precipitation=4.0), large_wardrobe()),
+        expect_waterproof_outerwear,
     ),
 ]
 
 CASES_BY_NAME = {case.name: case for case in CASES}
+
+
+def case_problems(case: Case, result: OutfitResult) -> list[str]:
+    problems = general_problems(case.request, result)
+    if case.expect:
+        problems += case.expect(case.request, result)
+    return problems

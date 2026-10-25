@@ -3,13 +3,16 @@
 Правила взяты из docs/engine.md и docs/attributes.md.
 """
 
-from app.engine.models import OutfitRequest, OutfitResult
+import time
 
-# Значения category из docs/attributes.md
-CATEGORIES = frozenset({"top", "bottom", "dress", "outerwear", "footwear", "accessory"})
+from app.engine import build_outfit
+from app.engine.models import ItemInput, OutfitRequest, OutfitResult
+from app.services.attributes import values
+
+CATEGORIES = values("category")
 
 
-def chosen_items(request: OutfitRequest, result: OutfitResult) -> list:
+def chosen_items(request: OutfitRequest, result: OutfitResult) -> list[ItemInput]:
     """Вещи комплекта в виде ItemInput; id, которых нет в гардеробе, пропускаются."""
     by_id = {item.id: item for item in request.wardrobe}
     return [by_id[item_id] for item_id in result.item_ids if item_id in by_id]
@@ -43,3 +46,13 @@ def general_problems(request: OutfitRequest, result: OutfitResult) -> list[str]:
         problems.append(f"в missing значения не из attributes.md: {unknown_missing}")
 
     return problems
+
+
+def worst_duration(request: OutfitRequest, runs: int) -> float:
+    """Самый долгий из нескольких вызовов build_outfit, в секундах."""
+    worst = 0.0
+    for _ in range(runs):
+        started = time.perf_counter()
+        build_outfit(request)
+        worst = max(worst, time.perf_counter() - started)
+    return worst

@@ -8,16 +8,17 @@
 """
 
 import sys
-import time
+from dataclasses import replace
 
 from app.engine import NoNewVariant, build_outfit
-from app.engine.cases import CASES, CASES_BY_NAME, TIME_LIMIT_SECONDS
-from app.engine.checks import chosen_items, general_problems
+from app.engine.cases import CASES, CASES_BY_NAME, TIME_LIMIT_SECONDS, TIMING_RUNS, Case, case_problems
+from app.engine.checks import chosen_items, general_problems, worst_duration
 
-TIMING_RUNS = 20
+# Столько вариантов в день отдаёт бэк по умолчанию (API.md, variants_max)
+VARIANTS = 3
 
 
-def run_case(case) -> list[str]:
+def run_case(case: Case) -> list[str]:
     req = case.request
     weather = req.weather
     print(f"=== {case.name}: {case.title} ===")
@@ -36,9 +37,30 @@ def run_case(case) -> list[str]:
     print("Не хватает:", ", ".join(result.missing) or "—")
     print("Объяснение:", result.explanation)
 
-    problems = general_problems(req, result)
-    if case.expect:
-        problems += case.expect(req, result)
+    problems = case_problems(case, result)
+    print("Проверки:", "OK" if not problems else "ЕСТЬ ЗАМЕЧАНИЯ")
+    for problem in problems:
+        print("  -", problem)
+    print()
+    return problems
+
+
+def show_variants(case: Case) -> list[str]:
+    """«Другой вариант» дважды: каждый новый комплект не совпадает с прошлыми."""
+    print(f"=== Варианты дня: {case.title} ===")
+    req, shown, problems = case.request, [], []
+    for number in range(1, VARIANTS + 1):
+        try:
+            result = build_outfit(replace(req, shown_today=shown))
+        except NoNewVariant:
+            print(f"Вариант {number}: другого нет (NoNewVariant)")
+            break
+        ids = frozenset(result.item_ids)
+        if ids in shown:
+            problems.append(f"вариант {number} повторяет уже показанный")
+        problems += general_problems(req, result)
+        shown = shown + [ids]
+        print(f"Вариант {number}:", ", ".join(i.name for i in chosen_items(req, result)) or "пусто")
     print("Проверки:", "OK" if not problems else "ЕСТЬ ЗАМЕЧАНИЯ")
     for problem in problems:
         print("  -", problem)
@@ -48,14 +70,9 @@ def run_case(case) -> list[str]:
 
 def measure_large_case() -> list[str]:
     case = CASES_BY_NAME["large"]
-    durations = []
-    for _ in range(TIMING_RUNS):
-        started = time.perf_counter()
-        build_outfit(case.request)
-        durations.append(time.perf_counter() - started)
-    average, worst = sum(durations) / len(durations), max(durations)
+    worst = worst_duration(case.request, TIMING_RUNS)
     print(f"=== Время на гардеробе из {len(case.request.wardrobe)} вещей ({TIMING_RUNS} запусков) ===")
-    print(f"В среднем {average * 1000:.1f} мс, самый долгий {worst * 1000:.1f} мс, лимит {TIME_LIMIT_SECONDS * 1000:.0f} мс")
+    print(f"Самый долгий вызов {worst * 1000:.1f} мс, лимит {TIME_LIMIT_SECONDS * 1000:.0f} мс")
     if worst > TIME_LIMIT_SECONDS:
         return [f"большой гардероб: {worst:.3f} с, лимит {TIME_LIMIT_SECONDS} с"]
     print("Проверки: OK")
@@ -68,6 +85,9 @@ def main() -> int:
     failed = 0
     for case in CASES:
         if run_case(case):
+            failed += 1
+    for name in ("rain", "large"):
+        if show_variants(CASES_BY_NAME[name]):
             failed += 1
     if measure_large_case():
         failed += 1
