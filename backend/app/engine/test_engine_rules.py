@@ -175,6 +175,8 @@ def test_rain_without_waterproof_outerwear():
     assert 6 in result.item_ids
     assert result.missing == ["outerwear"]
     assert "зонт" in result.explanation
+    # Куртка подходит по теплоте: про теплоту в объяснении ни слова
+    assert "по теплоте" not in result.explanation
 
 
 def test_explanation_names_weather_and_items():
