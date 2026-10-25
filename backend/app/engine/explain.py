@@ -57,7 +57,9 @@ def explain(
     if taste >= TASTE_WORTH_MENTION:
         sentences.append(TASTE_LIKED)
     for item in items:
-        sentences += [compromise_sentence(item, reason, needs) for reason in compromises.get(item.id, [])]
+        # Куртка не от дождя — об этом скажет missing («захвати зонт»), здесь не повторяем
+        reasons = [reason for reason in compromises.get(item.id, []) if reason != "waterproof"]
+        sentences += [compromise_sentence(item, reason, needs) for reason in reasons]
     sentences += missing_sentences(items, missing)
     return " ".join(sentences)
 
