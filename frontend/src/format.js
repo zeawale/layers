@@ -9,6 +9,11 @@ export function plural(n, [one, few, many]) {
   return many
 }
 
+// «4 990 ₽»: цена партнёрского товара, рубли целым числом
+export function formatPrice(rubles) {
+  return `${rubles.toLocaleString('ru-RU')} ₽`
+}
+
 // «+12°», «−3°», «0°»: настоящий минус, а не дефис
 export function formatTemp(t) {
   const n = Math.round(t)
