@@ -54,8 +54,9 @@
 ## Что полезно знать
 
 - Где бэк уже готов — отметки «Бэк готов (#N)» в `docs/API.md`.
-- Движок подбора — `backend/app/engine/`. Сейчас там заглушка `stub.py`; Настя
-  заменяет её, не трогая сигнатуру из `docs/engine.md`.
+- Движок подбора — `backend/app/engine/`, вход в `outfit.py`. Сигнатура — из
+  `docs/engine.md`. Проверка без Docker: `python -m app.engine.run_cases` и
+  `python -m pytest app/engine` из папки `backend`.
 - Модели распознавания лежат в образе в `/opt/models`, их качает
   `backend/scripts/download_models.py` при сборке. Первое распознавание после
   старта бэка — около 20 с, процесс с моделями занимает около 2 ГБ памяти.
