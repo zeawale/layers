@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, model_validator
 
-from app.models import Outfit, WeatherRecord
+from app.models import Outfit, PartnerProduct, WeatherRecord
 from app.schemas.item import ItemOut
 from app.schemas.user import UtcDatetime
 from app.services.attributes import ATTRIBUTES
@@ -43,6 +43,33 @@ class FeedbackOut(BaseModel):
     created_at: UtcDatetime
 
 
+class SuggestionOut(BaseModel):
+    id: int
+    name: str
+    shop: str
+    price: int | None
+    url: str
+    image_url: str | None
+
+    @classmethod
+    def from_product(cls, product: PartnerProduct) -> "SuggestionOut":
+        return cls(
+            id=product.id,
+            name=product.name,
+            shop=product.shop,
+            price=product.price,
+            url=product.url,
+            image_url=product.image_url,
+        )
+
+
+class MissingOut(BaseModel):
+    category: str
+    # absent — вещи этой категории нет; not_waterproof — есть, но не от дождя (API.md)
+    reason: Literal["absent", "not_waterproof"]
+    suggestions: list[SuggestionOut]
+
+
 class OutfitOut(BaseModel):
     id: int
     date: dt.date
@@ -51,12 +78,15 @@ class OutfitOut(BaseModel):
     weather: WeatherOut
     items: list[ItemOut]
     explanation: str
-    missing: list[str]
+    missing: list[MissingOut]
     feedback: FeedbackOut | None
     created_at: UtcDatetime
 
     @classmethod
-    def from_outfit(cls, outfit: Outfit) -> "OutfitOut":
+    def from_outfit(
+        cls, outfit: Outfit, suggestions: dict[str, list[PartnerProduct]] | None = None
+    ) -> "OutfitOut":
+        """suggestions — товары по категориям из partners.suggest; у прошлых дней их нет."""
         # Вещи в порядке справочника: верх, низ, платье, верхняя одежда, обувь
         items = sorted(outfit.items, key=lambda item: (CATEGORY_ORDER.index(item.category), item.id))
         feedback = None
@@ -70,7 +100,16 @@ class OutfitOut(BaseModel):
             weather=WeatherOut.from_record(outfit.weather),
             items=[ItemOut.from_item(item) for item in items],
             explanation=outfit.explanation,
-            missing=outfit.missing,
+            missing=[
+                MissingOut(
+                    category=category,
+                    reason="not_waterproof" if any(item.category == category for item in items) else "absent",
+                    suggestions=[
+                        SuggestionOut.from_product(product) for product in (suggestions or {}).get(category, [])
+                    ],
+                )
+                for category in outfit.missing
+            ],
             feedback=feedback,
             created_at=outfit.created_at,
         )

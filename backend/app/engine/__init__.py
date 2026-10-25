@@ -9,10 +9,12 @@ from app.engine.models import (
     RatedOutfit,
     WeatherInput,
 )
-from app.engine.stub import build_outfit
+from app.engine.outfit import build_outfit
+from app.engine.rules import Needs, needs_for
 
 __all__ = [
     "ItemInput",
+    "Needs",
     "NoNewVariant",
     "OutfitRequest",
     "OutfitResult",
@@ -20,4 +22,5 @@ __all__ = [
     "RatedOutfit",
     "WeatherInput",
     "build_outfit",
+    "needs_for",
 ]

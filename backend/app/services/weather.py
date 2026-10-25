@@ -1,5 +1,6 @@
 """Погода на сегодня: прогноз Open-Meteo с кешем на час в weather_records."""
 
+import logging
 from datetime import date, datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -8,11 +9,22 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
+from app import engine
 from app.models import User, WeatherRecord
 
-OPEN_METEO_FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
-TIMEOUT = 5.0
+# Основной адрес и официальное зеркало с тем же прогнозом: основной открывается
+# не из всех сетей (HANDBOOK 8, «Запасной адрес Open-Meteo»)
+OPEN_METEO_FORECAST_URLS = [
+    "https://api.open-meteo.com/v1/forecast",
+    "https://previous-runs-api.open-meteo.com/v1/forecast",
+]
+# На соединение — 3 с: недоступный адрес не должен надолго задерживать главный экран
+TIMEOUT = httpx.Timeout(5.0, connect=3.0)
 CACHE_TTL = timedelta(hours=1)
+
+logger = logging.getLogger(__name__)
+# Адрес, который ответил последним: с него и начинаем, чтобы не ждать недоступный каждый раз
+_working_url = OPEN_METEO_FORECAST_URLS[0]
 
 # Коды погоды WMO из Open-Meteo → четыре состояния из API.md
 CONDITION_CODES = {
@@ -75,6 +87,19 @@ def get_today(db: Session, user: User) -> WeatherRecord:
     return record
 
 
+def engine_weather(record: WeatherRecord) -> engine.WeatherInput:
+    """Погода для движка из записи кеша (docs/engine.md, WeatherInput)."""
+    return engine.WeatherInput(
+        temp_min=float(record.temp_min),
+        temp_max=float(record.temp_max),
+        feels_like=float(record.feels_like),
+        wind_speed=float(record.wind_speed),
+        precipitation=float(record.precipitation),
+        precipitation_probability=record.precipitation_probability,
+        condition=record.condition,
+    )
+
+
 def local_today(db: Session, user: User) -> date:
     """«Сегодня» по часовому поясу последней погоды пользователя. Погоды ещё не было — по UTC."""
     tz = db.scalar(
@@ -98,9 +123,24 @@ def is_fresh(record: WeatherRecord, city: str) -> bool:
 
 
 def fetch_forecast(lat: float, lon: float) -> dict:
+    """Прогноз на сегодня: сначала с адреса, который ответил последним, потом с остальных."""
+    global _working_url
+    urls = [_working_url] + [url for url in OPEN_METEO_FORECAST_URLS if url != _working_url]
+    for url in urls:
+        try:
+            forecast = fetch_from(url, lat, lon)
+        except WeatherServiceError as error:
+            logger.warning("Open-Meteo %s не дал прогноз: %r", url, error.__cause__ or error)
+            continue
+        _working_url = url
+        return forecast
+    raise WeatherServiceError
+
+
+def fetch_from(url: str, lat: float, lon: float) -> dict:
     try:
         response = httpx.get(
-            OPEN_METEO_FORECAST_URL,
+            url,
             params={
                 "latitude": lat,
                 "longitude": lon,
@@ -145,5 +185,5 @@ def fetch_forecast(lat: float, lon: float) -> dict:
 
     # Вероятность осадков Open-Meteo отдаёт не везде, остальное обязательно
     if any(value is None for field, value in forecast.items() if field != "precipitation_probability"):
-        raise WeatherServiceError
+        raise WeatherServiceError("в прогнозе пустые обязательные поля")
     return forecast

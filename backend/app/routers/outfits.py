@@ -11,7 +11,7 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models import Item, Outfit, OutfitItem, User, WeatherRecord
 from app.schemas.outfit import FeedbackIn, HistoryOut, OutfitDayOut, OutfitOut
-from app.services import weather
+from app.services import partners, weather
 
 router = APIRouter(prefix="/outfit", tags=["outfit"])
 
@@ -32,7 +32,7 @@ def get_today(user: User = Depends(get_current_user), db: Session = Depends(get_
             add_variant(db, user, record, *build(db, user, record, shown=[]), number=1)
             db.commit()
             variants = day_variants(db, user, record.date)
-    return day_out(variants)
+    return day_out(db, user, variants)
 
 
 @router.post("/today/regenerate", status_code=status.HTTP_201_CREATED)
@@ -61,7 +61,7 @@ def regenerate(user: User = Depends(get_current_user), db: Session = Depends(get
     number = max((variant.variant for variant in variants), default=0) + 1
     add_variant(db, user, record, result, wardrobe, number)
     db.commit()
-    return day_out(day_variants(db, user, record.date))
+    return day_out(db, user, day_variants(db, user, record.date))
 
 
 @router.post("/{outfit_id}/select")
@@ -88,7 +88,7 @@ def select_variant(
         outfit.selected = True
         db.commit()
         variants = day_variants(db, user, outfit.date)
-    return day_out(variants)
+    return day_out(db, user, variants)
 
 
 @router.post("/{outfit_id}/feedback")
@@ -116,7 +116,7 @@ def give_feedback(
     outfit.feedback_at = func.now() if outfit.rating is not None or outfit.worn else None
     db.commit()
     db.refresh(outfit)
-    return OutfitOut.from_outfit(outfit)
+    return OutfitOut.from_outfit(outfit, partners.suggest(db, user, [outfit]).get(outfit.id))
 
 
 @router.get("/history")
@@ -140,7 +140,11 @@ def history(
         )
         .order_by(Outfit.date.desc())
     ).all()
-    return HistoryOut(outfits=[OutfitOut.from_outfit(outfit) for outfit in outfits], total=len(outfits))
+    suggestions = partners.suggest(db, user, outfits)
+    return HistoryOut(
+        outfits=[OutfitOut.from_outfit(outfit, suggestions.get(outfit.id)) for outfit in outfits],
+        total=len(outfits),
+    )
 
 
 def get_own_outfit(db: Session, user: User, outfit_id: int) -> Outfit:
@@ -209,15 +213,7 @@ def build(
     )
     request = engine.OutfitRequest(
         date=record.date,
-        weather=engine.WeatherInput(
-            temp_min=float(record.temp_min),
-            temp_max=float(record.temp_max),
-            feels_like=float(record.feels_like),
-            wind_speed=float(record.wind_speed),
-            precipitation=float(record.precipitation),
-            precipitation_probability=record.precipitation_probability,
-            condition=record.condition,
-        ),
+        weather=weather.engine_weather(record),
         wardrobe=[
             engine.ItemInput(
                 id=item.id,
@@ -282,10 +278,11 @@ def add_variant(
     )
 
 
-def day_out(variants: list[Outfit]) -> OutfitDayOut:
+def day_out(db: Session, user: User, variants: list[Outfit]) -> OutfitDayOut:
+    suggestions = partners.suggest(db, user, variants)
     return OutfitDayOut(
         date=variants[0].date,
-        variants=[OutfitOut.from_outfit(variant) for variant in variants],
+        variants=[OutfitOut.from_outfit(variant, suggestions.get(variant.id)) for variant in variants],
         selected_id=next(variant.id for variant in variants if variant.selected),
         variants_max=settings.outfit_variants_max,
     )
