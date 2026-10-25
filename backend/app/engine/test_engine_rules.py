@@ -189,6 +189,17 @@ def test_explanation_names_weather_and_items():
     assert all(by_id[item_id].name.lower() in text for item_id in result.item_ids)
 
 
+def test_item_off_warmth_is_not_called_warm():
+    wardrobe = [
+        item(1, "Свитер", "top", "gray", 4),
+        item(2, "Голубые джинсы", "bottom", "light_blue", 2),
+        item(3, "Ботинки", "footwear", "black", 4),
+    ]
+    result = build_outfit(request(AUTUMN_DAY, weather(2, 8, 5), wardrobe))
+    assert "Свитер и ботинки — тёплые вещи на холодный день." in result.explanation
+    assert "Голубые джинсы легче, чем нужно по погоде" in result.explanation
+
+
 def test_missing_parts_are_explained():
     result = build_outfit(request(AUTUMN_DAY, RAIN, [item(1, "Свитер", "top", "gray", 3)]))
     assert result.missing == ["bottom", "outerwear", "footwear"]
